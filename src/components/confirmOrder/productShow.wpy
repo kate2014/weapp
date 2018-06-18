@@ -1,0 +1,134 @@
+<style lang="less">
+    @import "../../common/default";
+    .productImg {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        height: 180rpx;
+        align-items: center;
+        background-color: white;
+        .imgArr {
+            height: 100%;
+            // flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+            .productImage {
+                width: 120rpx;
+                height: 120rpx;
+                margin-left: @commonPadding;
+                position: relative;
+                flex-shrink: 0;
+                image {
+                    width: 100%;
+                    height: 100%;
+                }
+                .soldOut {
+                    width: 100%;
+                    height: 100%;
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    background-color: @modalColor;
+                    font-size: 22rpx;
+                    color: #ffffff;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    opacity: 0.8;
+                }
+                .leftNumber {
+                    width: 100%;
+                    height: 30rpx;
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-size: 22rpx;
+                    background-color: @modalColor;
+                    color: #ffffff;
+                }
+            }
+        }
+        .productCount {
+            padding:0 @commonPadding;
+            font-size: @subContent;
+            color: @minorColor;
+            box-sizing:border-box;
+            flex-shrink: 0;
+            text-align: right;
+            width: 150rpx;
+            text {
+                color: @primaryColor;
+            }
+            .rightIcon {
+                color: @minorColor;
+                font-size: @subContent;
+                margin-left: 5rpx;
+            }
+        }
+    }
+
+</style>
+
+<template>
+    <view class="productImg" @tap="showProductList">
+        <view class="imgArr">
+            <repeat for="{{joinUrl}}" index="index" item="item">
+                <view class="productImage">
+                    <image src="{{item.showPicture}}"></image>
+                    <view wx:if="{{item.amount === 0}}"class="soldOut">已抢完</view>
+                    <view wx:elif="{{item.diffAmount < 0}}" class="leftNumber">仅剩{{item.amount}}件</view>
+                </view>
+            </repeat>
+        </view>
+        <view class="productCount">共<text>{{productList.length}}</text>件<i class="iconfont rightIcon">&#xe617;</i></view>
+    </view>
+
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import Utility from '../../utils/utility'
+
+    export default class productShow extends wepy.component{
+
+        props = {
+            productList: {
+                type: [Object],
+                default: [],
+            },
+        }
+
+        computed = {
+            joinUrl() {
+                const { productList } = this;
+                if(productList) {
+                    productList.forEach(item => {
+                        console.log(item.mainPicture)
+                        item.showPicture = Utility.splicePictureUrl(item.mainPicture, 'todayList');
+                    });
+                    return productList;
+                }
+                return [];
+            }
+        }
+
+        methods = {
+            showProductList() {
+                const { productList } = this;
+                this.$root.$preload('productList', productList)
+                this.$root.$preload('cDetail', true)
+                this.$root.$navigate('./productInfo', { id: '', productList })
+            },
+        }
+
+        onLoad() {
+            // console.log(this);
+        }
+    }
+    
+</script>

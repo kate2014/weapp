@@ -1,0 +1,78 @@
+<style lang="less">
+    #component-SendTag {
+        padding-bottom: 24rpx;
+        view {
+            box-sizing: border-box;
+        }
+        background: #ffffff;
+        .tag-item {
+            display: flex;
+            align-items: center;
+            padding: 24rpx 25rpx 0;
+            background: white;
+            .tag {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 2rpx;
+                font-size: 32rpx;
+                line-height: 32rpx;
+                color: #02cb73;
+                &.gery {
+                    background: white;
+                    color: grey;
+                    border: 1rpx solid white;
+                }
+                &.green {
+                    background: white;
+                    color: #02cb73;
+                    border: 1rpx solid #02cb73;
+                }
+            }
+            .tag-description {
+                font-family: PingFangSC-Regular;
+                font-size: 28rpx;
+                color: #888888;
+                display: flex;
+                align-items: center;
+                margin-left: 10rpx;
+                text-align: left;
+            }
+        }
+    }
+</style>
+
+<template>
+    <view id="component-SendTag">
+        <view class="tag-item">
+            <view class='tag'> <i class='icon-font'>&#xe635;</i></view>
+            <text class="tag-description">该商品超出配送范围可以支持邮寄</text>
+        </view>
+        <view wx:if="{{sendTagData.sendWay===1}}" class='tag-item'>
+            <view class='tag'> <i class='icon-font'>&#xe601;</i> </view>
+            <text class="tag-description"> 当前商品{{sendTagData.boxInfo.workTimeStart}}~{{sendTagData.boxInfo.workTimeEnd}}下单今日送达</text>
+        </view>
+        <view wx:if="{{sendTagData.sendWay===2}}" class='tag-item'>
+            <view class='tag'> <i class='icon-font'>&#xe600;</i></view>
+            <text class="tag-description">当前商品支持次日送达</text>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    export default class SendTag extends wepy.component {
+        props = {
+            sendTagData: {
+                type: Object,
+            },
+        }
+        data = {}
+        components = {}
+        events = {}
+        watch = {}
+        methods = {}
+        onLoad() {
+        }
+    }
+</script>

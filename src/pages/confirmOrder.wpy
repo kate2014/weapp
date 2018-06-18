@@ -1,0 +1,437 @@
+
+<style lang="less">
+  @import '../common/default';
+  .confirmOrder {
+    .blank {
+      width: 100%;
+      height: @listPadding;
+    }
+    .totalPrice {
+      width: 100%;
+      height: @commonHeight;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: flex-end;
+      padding: @commonPadding;
+      font-size: 30rpx;
+      background-color: white;
+      text {
+        color: @subColor;
+      }
+    }
+    .empty {
+      width: 100%;
+      height: 115rpx;
+    }
+    .actualPay {
+      width: 100%;
+      height: 95rpx;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      padding-left: @commonPadding;
+      display: flex;
+      justify-content: space-between;
+      background-color: white;
+      box-shadow: 0 0 8rpx 0 rgba(134, 129, 129, 0.19);
+      .money {
+        font-size: @secondContent;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        text {
+          font-size: @title;
+          color: @subColor;
+          font-weight: bold;
+        }
+      }
+      .submitOrder {
+        width: 250rpx;
+        height: 100%;
+        background-color: @primaryColor;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+</style>
+
+<template>
+  <view class="confirmOrder">   
+    <addAddress wx:if="{{(addressCount === 0 || (addressCount > 0 && address === '')) && sendWay !== 'pick'}}"></addAddress>
+    <sendAddress wx:if="{{addressCount > 0 && sendWay !== 'pick' && address !== ''}}" :address.sync="address"></sendAddress>
+    <pickAddress wx:if="{{ sendWay === 'pick' }}" :picker.sync="picker" ></pickAddress>
+    <view class="blank"></view>
+    <view class="today" wx:if="{{today.length > 0}}">
+      <sendTime sendWay="快速达" sendTime="即刻配送"></sendTime>
+      <todayProductShow :productList.sync="today" @tap="showProductList"></todayProductShow>
+      <view class="blank"></view>
+    </view>
+    <view class="tomorrow" wx:if="{{ tomorrow.length > 0 }}">
+      <tomorrowSendTime sendWay="明日达" sendTime="即刻配送"></tomorrowSendTime>
+      <tomorrowProductShow @tap="showProductList" :productList.sync="tomorrow"></tomorrowProductShow>
+      <view class="blank"></view>
+    </view>
+    <view class="express" wx:if="{{ express.length > 0 }}">
+      <expressSendTime sendWay="邮寄" sendTime="预计2～4日送达"></expressSendTime>
+      <expressProductShow @tap="showProductList" :productList.sync="express"></expressProductShow>
+      <view class="blank"></view>
+    </view>
+    <!-- <xianCardItem text="鲜卡" content="暂无可用" className="grey" showIcon="true" line="false"></xianCardItem>
+    <couponItem text="现金券" content="-￥15" className="red" showIcon="true" line="true"></couponItem>
+    <totalItem text="商品总价" content="￥88.88" className="black" showIcon="false" line="false"></totalItem>
+    <freightItem text="运费" content="￥0.00" className="black" showIcon="false" line="true"></freightItem> -->
+    <xianCardItem text="鲜卡" content="暂无可用" className="grey" showIcon="true" line="false" category="xianCard"></xianCardItem>
+    <couponItem text="现金券" content="暂无可用" className="grey" showIcon="true" line="true" category="coupon"></couponItem>
+    <totalItem text="商品总价" :content.sync="totalFixed" className="black" showIcon="false" line="false" category="none"></totalItem>
+    <freightItem text="运费" :content.sync="changefreight" className="black" showIcon="false" line="true" category="none"></freightItem>
+    <view class="totalPrice">
+        合计<text>{{totalFixed}}</text>
+    </view>
+    <view class="blank"></view>
+    <remarkItem text="备注" content="" className="grey" showIcon="true" line="false" category="remark"></remarkItem>
+    <view class="empty"></view>
+    <view class="actualPay">
+      <view class="money">实付款<text>{{actualPayFixed}}</text></view>
+      <view class="submitOrder" @tap="goPay">提交订单</view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import addAddress from '../components/confirmOrder/addAddress'
+  import sendTime from '../components/confirmOrder/sendTime'
+  import productShow from '../components/confirmOrder/productShow'
+  import listItem from '../components/confirmOrder/listItem'
+  import productDetail from '../components/productDetail'
+  import sendAddress from '../components/confirmOrder/sendAddress'
+  import pickAddress from '../components/confirmOrder/pickAddress'
+
+  import api from '../api/index'
+  import Tip from '../utils/common'
+  import Utility from '../utils/utility'
+
+  const tip = new Tip()
+
+  export default class Home extends wepy.page {
+    config = {
+      navigationBarTitleText: '确认订单',
+      navigationBarBackgroundColor: '#ffffff', // 导航栏背景颜色
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'light', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+      addAddress: addAddress,
+      sendTime: sendTime,
+      tomorrowSendTime: sendTime,
+      expressSendTime: sendTime,
+      todayProductShow: productShow,
+      tomorrowProductShow: productShow,
+      expressProductShow: productShow,
+      xianCardItem: listItem,
+      couponItem: listItem,
+      totalItem: listItem,
+      freightItem: listItem,
+      remarkItem: listItem,
+      sendAddress: sendAddress,
+      pickAddress: pickAddress,
+    }
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      address:{},
+      today: [],
+      addressCount: 0,
+      express: [],
+      overflowTip: false,
+      sendWay: 'send',
+      tomorrow: [],
+      total: 0,
+      freight: 0,
+      actualPay: 0,
+      picker: {},
+    }
+
+    computed = {
+      now() {
+        
+        return +new Date()
+      },
+      totalFixed() {
+        // console.log(this.$root.$parent.globalData)
+        return `￥${this.total.toFixed(2)}`;
+      },
+      changefreight() {
+        return `￥${this.freight.toFixed(2)}`;
+      },
+      actualPayFixed() {
+        return `￥${this.actualPay.toFixed(2)}`;
+      }
+    }
+
+    events = {
+      async wechatPay({ userId, orderId,  openid, success, fail}) {
+        // console.log('**********************************')
+        const payInfo = await api.wechat.wechatPay({
+          query: {
+            userId,
+            _id: orderId,
+            openid,
+          },
+          method: 'POST'
+        });
+        const prepay_id = payInfo.data.prepay_id;
+        const payParams = {
+          'timeStamp': `${+new Date()}`,
+          'nonceStr': Utility.randomString(24),
+          'package': `prepay_id=${prepay_id}`,
+          'signType': 'MD5',
+        }
+        wx.requestPayment({
+          ...payParams,
+          'paySign': Utility.generateSign(payParams),
+          'success':function(res){
+            this.$redirect('./paySuccess', { orderId })
+          },
+          'fail':function(res){
+            this.$redirect('./myOrder')
+          }
+        })
+      }
+    }
+
+    watch = {
+    }
+
+    methods = {
+      showProductList() {
+      },
+      async goPay() {
+        const { sendWay, addressCount, overflowTip, total, picker, address, actualPay, total: totalMoney, picker: currentPicker } = this;
+        let { today, tomorrow, express, freight } = this;
+        const { boxId, shoppingCardIdArr, userInfo } = this.$root.$parent.globalData;
+        const { userId } = userInfo;
+        if(sendWay !== 'pick' && address === '') return  tip.toast('请先选择地址');
+        if (sendWay === 'express' && express.length === 0) return tip.toast('当前无可邮寄商品');
+        today = today.filter(item => item.amount > 0);
+        tomorrow = tomorrow.filter(item => item.amount > 0);
+        express = express.filter(item => (item.amount > 0 && item.isExpress));
+        if (today.length === 0 && tomorrow.length === 0 && express.length === 0) return tip.toast('您选择的商品目前无货~');
+        if (today.length !== 0 && tomorrow.length !== 0 && express.length === 0) {
+          freight = freight / 2;
+        }
+        const data = { channel: '微信小程序', payType: '未支付', status: '待付款', remark: '', username: '18824920361', today: {}, tomorrow: {}, express: {} };
+        if (express.length === 0) data.boxId = boxId;
+        data.sendWay = '鲜盒子配送';
+        if (sendWay === 'pick') {
+            data.sendWay = '上门自提';
+            data.pickerInfo = currentPicker;
+        }
+        if (sendWay === 'send' || express.length > 0) {
+            data.addressId = address._id;
+            data.addressInfo = address;
+        }
+        if (express.length > 0) data.sendWay = '快递';
+        const generateDetail = ({ productArr, arrName }) => {
+          if (productArr.length > 0) {
+              const detail = [];
+              let total = 0;
+              for (let i = 0; i < productArr.length; i++) {
+                  // const obj = {};
+                  const temp = productArr[i];
+                  const obj = Object.assign({}, temp, {
+                      productId: temp._id,
+                      productName: temp.name,
+                      amount: temp.amount,
+                      price: parseFloat(temp.price, 10),
+                      prePrice: parseFloat(temp.priceOut, 10),
+                      weight: parseFloat(temp.weight, 10),
+                  });
+                  delete obj._id;
+                  delete obj.priceOut;
+                  delete obj.name;
+                  detail.push(obj);
+                  total = (((temp.amount * 10000 * temp.price) / 10000) * 1000 + total * 1000) / 1000;
+              }
+              // let sendTimeStr = sendTime[arrName];
+              // if (arrName === 'express') sendTimeStr = 'express';
+              Object.assign(data[arrName], {
+                  detail,
+                  total,
+                  actualPay: totalMoney,
+                  sendDay: arrName,
+                  buyType: 'directBuy',
+                  // sendTime: sendTimeStr,
+                  freight,
+              });
+          }
+        };
+        // 获取今日达的商品信息
+        if (today.length > 0) {
+            generateDetail({ productArr: today, arrName: 'today' });
+        }
+        // 获取次日达的商品信息
+        if (tomorrow.length > 0) {
+            generateDetail({ productArr: tomorrow, arrName: 'tomorrow' });
+        }
+        // 获取次日达的商品信息
+        if (express.length > 0) {
+            generateDetail({ productArr: express, arrName: 'express' });
+        }
+        const all = { data, selectedIdArr: shoppingCardIdArr, totalMoney, userId };
+        const submitOrder = await api.confirmOrder.submitOrder({
+          query: {
+            ...all,
+            global: this.$root.$parent.globalData,
+          },
+          method: 'POST'
+        });
+        if (submitOrder.data.actualPay === 0) {
+          const payResult = await api.wechat.freeCharge({
+            query: {
+              orderId: submitOrder.data._id,
+            },
+            method: 'POST'
+          });
+          if (payResult === 'success') {
+            this.$redirect('./paySuccess', { orderId: submitOrder.data._id });
+          } else {
+            // this.$switch('./myOrder')
+            wx.switchTab({
+              url: './myOrder',
+              success(res) {
+                const page = getCurrentPages().pop(); 
+                if (page == undefined || page == null) return; 
+                page.onLoad(); 
+              }
+            })
+          }
+        } else {
+          const wechatPay = await api.wechat.wechatPay({
+            query: {
+              userId,
+              _id: submitOrder.data._id,
+              openid: userInfo.openid,
+            },
+            method: 'POST'
+          });
+          const prepay_id = wechatPay.data.prepay_id;
+          Utility.wechatPay({ prepay_id }, () => {
+            this.$redirect('./paySuccess', { orderId: submitOrder.data._id });
+          },()=> {
+            this.$switch('./myOrder')
+          });
+          // const payParams = {
+          //   'timeStamp': `${+new Date()}`,
+          //   'nonceStr': Utility.randomString(24),
+          //   'package': `prepay_id=${prepay_id}`,
+          //   'signType': 'MD5',
+          // }
+          // wx.requestPayment({
+          //   ...payParams,
+          //   'paySign': Utility.generateSign(payParams),
+          //   'success':function(res){
+          //     this.$redirect('./paySuccess', { orderId: submitOrder.data._id })
+          //   },
+          //   'fail':function(res){
+          //     this.$redirect('./myOrder')
+          //   }
+          // })
+          // console.log(wechatPay);
+        }
+      }
+    }
+
+    async onLoad(options) {
+      
+      // debugger
+    }
+
+    // 在组件实例进入页面节点树时执行，注意此时不能调用 setData
+    onCreated() {
+    }
+
+    // 在组件实例进入页面节点树时执行
+    onAttached() {
+    }
+
+    // 在组件布局完成后执行，此时可以获取节点信息
+    onReady() {
+    }
+
+    // 在组件实例被移动到节点树另一个位置时执行
+    onMoved() {
+    }
+
+    // 在组件实例被从页面节点树移除时执行
+    onDetached() {
+    }
+
+    async onShow () {
+      const { boxId, addressId, pickerId, sendWay, shoppingCardIdArr, location, couponId, userInfo } = this.$root.$parent.globalData
+      const { userId } = userInfo
+      const { coordinate } = location
+      wx.showLoading({
+        title: '加载中',
+        // mask: true,
+      })
+      const submitInfo = await api.confirmOrder.getSubmitInfo({
+        query: {
+          boxId,
+          addressId,
+          pickerId,
+          sendWay,
+          shoppingCardIdArr,
+          coordinate,
+          couponId,
+          userId
+        },
+        method: 'POST'
+      });
+      wx.hideLoading()
+      this.address = submitInfo.data.address;
+      this.addressCount = submitInfo.data.addressCount;
+      this.express = submitInfo.data.express;
+      this.overflowTip = submitInfo.data.overflowTip;
+      this.sendWay = submitInfo.data.sendWay;
+      this.tomorrow = submitInfo.data.tomorrow;
+      this.today = submitInfo.data.today;
+      this.total = submitInfo.data.total;
+      this.freight = submitInfo.data.freight;
+      this.actualPay = submitInfo.data.actualPay;
+      this.picker = submitInfo.data.picker;
+      this.$apply()
+    }
+
+    // 设置转发参数
+    onShareAppMessage (res) {
+      return {
+        title: this.shareTitle,
+        path: 'pages/confirmOrder',
+        imageUrl: this.shareImage,
+        success: function(res) {
+          // 转发成功
+          console.log('转发成功', res)
+        },
+        fail: function(res) {
+          // 转发失败
+        },
+        complete: function (res) {
+
+        }
+      }
+    }
+  }
+</script>

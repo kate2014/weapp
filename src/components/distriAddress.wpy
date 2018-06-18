@@ -1,0 +1,272 @@
+<style lang="less">
+@import '../common/default.less';
+.address {
+  .xian-cells {
+    margin-top: 20rpx;
+    position:relative;
+    background-color:#FFFFFF;
+    font-size:30rpx;
+    .xian-cell_input{
+      margin:0 25rpx;
+      padding: 23rpx 0;
+      position:relative;
+      display:flex;
+      align-items:center;
+      .xian-cell__hd{
+        .xian-label{
+          width:140rpx;
+          word-wrap:break-word;
+          word-break:break-all;
+        }
+      }
+      .xian-cell__bd{
+        flex: 1;
+        .xian-input{
+        }
+        .xian-input-picker {
+          color: @minorColor;
+          .icon-dingwei{
+            font-size:30rpx;
+            margin-right:10rpx;
+            color:#888;
+          }
+        }
+        .xian-input-picker:after{
+          content: " ";
+          display: inline-block;
+          height: 14rpx;
+          width: 14rpx;
+          border-width: 2rpx 2rpx 0 0;
+          border-color: @minorColor;
+          border-style: solid;
+          -webkit-transform: matrix(0.71, 0.71, -0.71, 0.71, 0, 0);
+          transform: matrix(0.71, 0.71, -0.71, 0.71, 0, 0);
+          position: absolute;
+          top: 50%;
+          right: 14rpx;
+          margin-top: -8rpx;
+        }
+        .xian-cell_select{
+          color:#000;
+        }
+        .xian-cell_tag{
+          background:#ffffff;
+          border:1rpx solid #cacaca;
+          border-radius:2rpx;
+          width: 58rpx;
+          height: 33rpx;
+          font-size: 20rpx;
+          color:@minorColor;
+          letter-spacing:0.19rpx;
+          padding: 6rpx;
+          margin-right: 20rpx;
+        }
+        .xian-cell_tag.active{
+          border-color: @primaryColor;
+          color: @primaryColor;
+        }
+      }
+    }
+    .xian-cell_input:before{
+      content:" ";
+      position:absolute;
+      left:0;
+      top:0;
+      right:0;
+      border-top:1rpx solid @thinColor;
+    }
+    .xian-cell_input:first-child:before{
+      border-top: none;
+    }
+  }
+  .btn-area {
+    .save{
+      background:@primaryColor;
+      border-radius:4rpx;
+      width:670rpx;
+      height:94rpx;
+      font-family:PingFangSC-Regular;
+      font-size:32rpx;
+      color:#ffffff;
+      letter-spacing:2.13rpx;
+      line-height: 94rpx;
+      margin-top: 50rpx;
+    }
+    .delete{
+      background:#ffffff;
+      border-radius:4rpx;
+      width:670rpx;
+      height:94rpx;
+      font-family:PingFangSC-Regular;
+      font-size:32rpx;
+      color:@minorColor;
+      letter-spacing:2.13rpx;
+      margin-top: 30rpx;
+    }
+  }
+}
+</style>
+<template>
+  <form class="address" @submit="saveAddress">
+    <view class="xian-cells">
+      <view class="xian-cell_input">
+        <view class="xian-cell__hd">
+          <view class="xian-label">收货人</view>
+        </view>
+        <view class="xian-cell__bd">
+          <input class="xian-input" placeholder="姓名" focus="true" name="receiver"/>
+        </view>
+      </view>
+      <view class="xian-cell_input">
+        <view class="xian-cell__hd">
+          <view class="xian-label">电话</view>
+        </view>
+        <view class="xian-cell__bd">
+          <input class="xian-input" placeholder="手机号码" type="number" maxlength="11" name="phoneNumber"/>
+        </view>
+      </view>
+      <view class="xian-cell_input">
+        <view class="xian-cell__hd">
+          <view class="xian-label">收货地址</view>
+        </view>
+        <view class="xian-cell__bd">
+          <view class="xian-input-picker" @tap="selectAddress">
+            <i class="iconfont icon-dingwei">&#xe62f;</i>
+            <text class="{{address ? 'xian-cell_select' : ''}}">{{ address === '' ? '选择小区/写字楼/学校' : address  }}
+            </text>
+          </view>
+        </view>
+      </view>
+      <view class="xian-cell_input">
+        <view class="xian-cell__hd">
+          <view class="xian-label">详细地址</view>
+        </view>
+        <view class="xian-cell__bd">
+          <input class="xian-input" placeholder="例：10幢101室" name="unitNumber"/>
+        </view>
+      </view>
+      <view class="xian-cell_input">
+        <view class="xian-cell__hd">
+          <view class="xian-label">标签</view>
+        </view>
+        <view class="xian-cell__bd">
+          <block wx:for="{{tags}}" wx:key="*this">
+            <text class="xian-cell_tag {{item.select ? 'active' : ''}}" @tap="selectTag({{item.id}})">{{item.name}}</text>
+          </block>
+        </view>
+      </view>
+    </view>
+    <view class="btn-area">
+      <button class="save" formType="submit">保存</button>
+      <button wx:if="{{operationType === 'edit'}}" class="delete" @tap="deleteAddress">删除</button>
+    </view>
+  </form>
+</template>
+<script>
+  import wepy from 'wepy'
+  import _ from 'underscore'
+
+  export default class DistriAddress extends wepy.component {
+    data = {
+      tags: [{
+        id: '0',
+        name: '公司',
+        select: true
+      }, {
+        id: '1',
+        name: '住宅',
+        select: false
+      }, {
+        id: '2',
+        name: '学校',
+        select: false
+      }, {
+        id: '3',
+        name: '其他',
+        select: false
+      }],
+      address: '',
+      selectTag: ''
+    }
+    props = {
+      operationType: {
+        type: String,
+        default: 'new'
+      },
+      from: {
+        type: String,
+        default: null
+      },
+      addressId: {
+        type: String,
+        default: null
+      }
+    };
+    methods = {
+      selectTag(id) {
+        _.each(this.tags, tag => {
+          if (tag.id === id) {
+            if (!tag.select) {
+              tag.select = true
+              this.selectTag = tag.name
+              this.$apply()
+            }
+          } else {
+            if (tag.select) {
+              tag.select = false
+              this.$apply()
+            }
+          }
+        })
+      },
+      selectAddress() {
+        wepy.chooseLocation().then((data) => {
+          this.address = data.name
+          this.$apply()
+        })
+      },
+      saveAddress(event) {
+        const { receiver, phoneNumber } = event.detail.value
+        if (!receiver || (receiver.trim() === '')) {
+          wepy.showToast({
+            title: '请输入姓名',
+            icon: 'none'
+          })
+          return false
+        }
+        if (!phoneNumber || (phoneNumber.trim() === '')) {
+          wepy.showToast({
+            title: '请输入手机号码，以便配送员联系您',
+            icon: 'none'
+          })
+          return false
+        }
+        if (!(/^1[0-9]\d{9}$/.test(phoneNumber))) {
+          wepy.showToast({
+            title: '请输入正确的手机号',
+            icon: 'none'
+          })
+          return false
+        }
+        if (!this.address || (this.address.trim() === '')) {
+          wepy.showToast({
+            title: '请选择收货地址',
+            icon: 'none'
+          })
+          return false
+        }
+      },
+      deleteAddress() {
+        wepy.showModal({
+          title: '提示',
+          content: '确定删除当前地址？'
+        }).then((res) => {
+          if (res.confirm) {
+            // 这里做删除地址操作
+            wepy.navigateBack()
+          }
+        })
+      }
+    }
+  }
+</script>

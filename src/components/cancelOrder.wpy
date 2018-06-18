@@ -1,0 +1,223 @@
+<style lang="less">
+    #server-tag-panel {
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        z-index: 1000;
+        background: rgba(156, 156, 156, 0.65);
+        .tag-wraper {
+            position: fixed;
+            height: 460rpx;
+            width: 100%;
+            bottom: -460rpx;
+            left: 0;
+            background: #f4f5f5;
+                .tag-body-item {
+                    height: 86rpx;
+                    width: 100%;
+                    display: flex;
+                    background: #fff;
+                    margin-bottom: 2rpx;
+                    justify-content: center;
+                    .top {
+                        display: flex;
+                        align-items: center;
+                        padding-top: 10rpx;
+                        justify-content: center;
+                        .icon {
+                            width: 96rpx;
+                            height: 42rpx;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                        }
+                        .tag-name {
+                            display: flex;
+                            align-items: center;
+                            height: 42rpx;
+                            font-family: PingFangSC-Regular;
+                            font-size: 30rpx;
+                            color: #353535;
+                        }
+                    }
+                }
+            .content-footer {
+              margin-top: 20rpx;
+                height: 94rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #fff;
+                font-size: 32rpx;
+            }
+        }
+    }
+</style>
+
+<template>
+    <view id="server-tag-panel" animation="{{backgroundAnimationData}}" @tap='hideTagPanel'>
+        <view class="tag-wraper" animation="{{wraperAnimationData}}" @tap.stop="stop">
+                <repeat for="{{TagData}}" key="key" index="index" item="item">
+                    <view class="tag-body-item" @tap.stop="cancelSuccess({{item.name}})">
+                        <view class="top">
+                            <view class="tag-name">
+                                {{item.name}}
+                            </view>
+                        </view>
+                    </view>
+                </repeat>
+            <view class="content-footer" @tap='hideTagPanel'>
+                取消
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../api/index'
+    import moment from 'moment'
+    import _ from 'underscore'
+    import Utility from '../utils/utility.js'
+
+    export default class cancelOrder extends wepy.component {
+        props = {
+            TagData: {
+                type: Array,
+                default: [{
+                        name: '不想要了',
+                    }, {
+                        name: '无法签收',
+                    }, {
+                        name: '重复购买',
+                    }, {
+                        name: '其他',
+                    }]
+            },
+        }
+        data = {
+            wraperAnimationData: {},
+            backgroundAnimationData: {},
+            id: '',
+            status: ''
+        }
+        components = {}
+        events = {
+            openTagPanel(id, status, event) {
+                this.id = id
+                this.status = status
+                this.animationOpen(event);
+                this.$apply()
+            },
+        }
+        watch = {}
+        methods = {
+            hideTagPanel() {
+                this.animationClose();
+                setTimeout(() => {
+                    var that = this;
+                    that.$emit('hideTagPanel')
+                }, 310)
+            },
+            // stop() {
+            //     0
+            // },
+            cancelSuccess(res) {
+                this.animationClose();
+                setTimeout(() => {
+                    var that = this;
+                    that.$emit('hideTagPanel')
+                }, 310)
+                if (this.status === '待付款') {
+                    this.toPayCancelOrder(this.id)
+                } else {
+                    this.payedCancelOrder(this.id)
+                }
+                console.log(this.id)
+            }
+        }
+        async toPayCancelOrder(id) {
+            const results = await api.order.toPayCancelOrder({
+                query: {
+                    id: id
+                },
+                method: 'POST',
+            })
+            if (results.statusCode === 200) {
+                wx.showToast({
+                    title: '取消成功',
+                    icon: 'success',
+                });
+                wx.switchTab({
+                    url: './myOrder',
+                    success(res) {
+                        const page = getCurrentPages().pop(); 
+                        if (page == undefined || page == null) return; 
+                        page.onLoad(); 
+                    }
+                })
+            }
+        }
+        async payedCancelOrder(id) {
+            const userId = wepy.getStorageSync('userId')
+            const results = await api.order.payedCancelOrder({
+                query: {
+                    id: id,
+                    userId: userId
+                },
+                method: 'POST',
+            })
+            if (results.statusCode === 200) {
+                wx.showToast({
+                    title: '取消成功',
+                    icon: 'success',
+                });
+                wx.switchTab({
+                    url: './myOrder',
+                    success(res) {
+                        const page = getCurrentPages().pop(); 
+                        if (page == undefined || page == null) return; 
+                        page.onLoad(); 
+                    }
+                })
+            }
+        }
+        animationOpen(event) {
+            var that = this;
+            setTimeout(() => {
+                that.backgroundAnimation.opacity(1).step();
+                that.backgroundAnimationData = that.backgroundAnimation.export();
+                that.wraperAnimation.bottom(0).step();
+                that.wraperAnimationData = that.wraperAnimation.export();
+                that.$apply();
+            }, 0);
+        }
+        animationClose() {
+            var that = this;
+            that.backgroundAnimation.opacity(0).step();
+            that.backgroundAnimationData = that.backgroundAnimation.export();
+            that.wraperAnimation.bottom('-766rpx').step();
+            that.wraperAnimationData = that.wraperAnimation.export();
+            that.$apply();
+        }
+      onLoad(params) {
+      this.wraperAnimation = wx.createAnimation({
+        transformOrigin: "50% 50%",
+        duration: 300,
+        timingFunction: "ease",
+        delay: 0
+      }),
+      this.backgroundAnimation = wx.createAnimation({
+        transformOrigin: "50% 50%",
+        duration: 300,
+        timingFunction: "ease",
+            delay: 0
+          })
+        }
+}
+</script>

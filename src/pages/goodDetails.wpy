@@ -1,0 +1,570 @@
+<template>
+  <scroll-view id='good-detail' scroll-y="{{!showTagPanel}}">
+    <view class="scroll-wraper" wx:if="{{productInfo._id !== undefined }}">
+      <swiper class='swiper' indicator-dots='indicatorDots' autoplay='autoplay' interval='{{interval}}' duration='{{duration}}'>
+        <block wx:for='{{productInfo.picture}}' wx:key='{{index}}'>
+          <swiper-item>
+            <image src='{{IMAGEHOST+item}}' class='swiper-img' />
+          </swiper-item>
+        </block>
+      </swiper>
+      <view class='description'>
+        <view class='price'>
+          <view class='left'>
+            <text class='realPriceSymbol'>¥</text>
+            <text class='realPrice'>
+                                          {{ productInfo.price}}
+                                    </text>
+            <del class='outPriceSymbol'>¥</del>
+            <del class='outPrice'>{{productInfo.priceOut}}</del>
+          </view>
+          <view class='right'>
+            <view class='saledCount'><text>已售 {{ productInfo.buyCount > 999 ? '999+' : productInfo.buyCount }} </text> </view>
+          </view>
+        </view>
+        <view class='title'>
+          <view class='proName'>{{ (productInfo.promotionInfo && productInfo.promotionInfo.productName) || productInfo.name }}</view>
+          <view class='proSubName'>{{ productInfo && productInfo.subName }}</view>
+          <!-- <view class='share-icon'> <i> &#xe609;</i> </view> -->
+        </view>
+      </view>
+      <sendTag :sendTagData.sync="sendTagData" />
+      <serverTag :serverTagData.sync="sendServerTagData" />
+      <view class='goodAttr-tab'>
+        商品信息
+      </view>
+      <view class="goodAttr-panel">
+        <view class="panel-weight">
+          <text class='attr-name'>重量</text>
+          <text class='attr-value'>{{productInfo.attribute.weight}}</text>
+        </view>
+        <view class="panel-from">
+          <text class='attr-name'>产地</text>
+          <text class='attr-value'>{{productInfo.attribute.placeArea}}</text>
+        </view>
+        <view class="panel-date">
+          <text class='attr-name'>保质期</text>
+          <text class='attr-value'>{{productInfo.attribute.periodDate}}</text>
+        </view>
+        <view class="panel-pak">
+          <text class='attr-name'>包装</text>
+          <text class='attr-value'>{{productInfo.attribute.packing}}</text>
+        </view>
+        <view class="panel-save">
+          <text class='attr-name'>储藏方法</text>
+          <text class='attr-value'>{{productInfo.attribute.storageMethod}}</text>
+        </view>
+      </view>
+      <view class="detail-img-list">
+        <image class='detail-img-item' wx:for="{{productInfo.detailArr[0].imgArr}}" wx:key='{{index}}' src="{{IMAGEHOST+item}}" />
+      </view>
+      <view class="goodDetail-footer">
+        <view class="footer-operte">
+          <view class="operte-item " @tap="call">
+            <i class="operte-icon icon-font grey">
+                       &#xe60b;
+                     </i>
+            <view class="operte-text">
+              客服
+            </view>
+          </view>
+          <view class="operte-item " @tap='goShopCar'>
+            <i class="operte-icon icon-font grey">
+                       &#xe60c;
+                       <view wx:if='{{shopcarNum>0}}' class="cart-num-container">
+                         <text >{{shopcarNum}}</text>
+                       </view>
+                  </i>
+            <view class="operte-text">
+              购物车
+            </view>
+          </view>
+          <view class="operte-item " @tap='like'>
+            <i class="operte-icon icon-font" :class="{ green: productInfo.like}">
+                       
+                       {{productInfo.like>0?'&#xe60e;':'&#xe60d;'}}
+                        
+                     </i>
+            <view class="operte-text">
+              收藏
+            </view>
+          </view>
+        </view>
+        <view class="footer-add-shopping-car" :class='{grey:productInfo.amount===0}' @tap='addShopCar'>
+          加入购物车
+        </view>
+      </view>
+      <serverTagPanel :serverTagData.sync="sendServerTagData" wx:if='{{showTagPanel}}' />
+    </view>
+    <Loading :init.sync="init"/>
+    <!-- <view wx:if="{{productInfo._id === undefined}}" class=" loading">
+      <image class="image-content" src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522663615412.gif"></image>
+      <text class="desc">努力加载中</text>
+    </view> -->
+  </scroll-view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import config from '../common/config'
+  import shopCarMixin from '../mixins/shopcar'
+  import LoginMixin from '../mixins/login'
+  import SendTag from '../components/goodDetail/sendTag'
+  import ServerTag from '../components/goodDetail/serverTag'
+  import ServerTagPanel from '../components/goodDetail/serverTagPanel'
+  import Loading from '../components/common/loading'
+  import api from '../api/index'
+  import _ from 'underscore'
+  export default class GoodDetails extends wepy.page {
+    config = {
+      navigationBarTitleText: '商品详情',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+    components = {
+      sendTag: SendTag,
+      serverTag: ServerTag,
+      serverTagPanel: ServerTagPanel,
+      Loading: Loading
+    }
+    // 引入混合
+    mixins = [shopCarMixin, LoginMixin]
+    data = {
+      showTagPanel: false,
+      IMAGEHOST: config.IMAGEHOST,
+      indicatorDots: true,
+      autoplay: true,
+      interval: 5000,
+      duration: 1000,
+      productInfo: {},
+      sendTime: {
+        begin: '8:00',
+        end: '18:00',
+      },
+      shopcarNum:0,
+      init: false
+    }
+    computed = {
+      sendTagData() {
+        return {
+          sendWay: this.productInfo.sendWay,
+          isExpress: this.$parent.globalData.isExpress,
+          boxInfo: this.productInfo.boxInfo
+        }
+      },
+      sendServerTagData() {
+        return this.productInfo.services
+      },
+    }
+    events = {
+      hideTagPanel() {
+        this.showTagPanel = false;
+      },
+      showTagPanel() {
+        this.showTagPanel = true;
+        this.$broadcast('openTagPanel');
+      }
+    }
+    watch = {}
+    methods = {
+      call() {
+        wx.makePhoneCall({
+          phoneNumber: '4001571162', //此号码并非真实电话号码，仅用于测试  
+          success: function() {
+            console.log("拨打电话成功！")
+          },
+          fail: function() {
+            console.log("拨打电话失败！")
+          }
+        })
+      },
+      async like() {
+        const like = this.productInfo.like;
+        const userId = wx.getStorageSync('userId')
+        if (!like) {
+          const result = await api.myCollection.addCollection({
+            query: {
+              userId,
+              productId: this.productInfo._id
+            },
+            method: 'POST'
+          })
+          if (result.statusCode === 200) {
+            wx.showToast({
+              title: '收藏成功',
+              icon: 'success',
+              duration: 1000
+            });
+            this.productInfo.like = true;
+            this.$apply();
+          }
+        } else {
+          const result = await api.myCollection.cancelCollection({
+            query: {
+              userId,
+              productId: this.productInfo._id
+            },
+            method: 'POST'
+          })
+          if (result.statusCode === 200) {
+            // debugger;
+            wx.showToast({
+              title: '取消成功',
+              icon: 'success',
+              duration: 1000
+            });
+            this.productInfo.like = false;
+            this.$apply();
+          }
+        }
+      },
+      addShopCar(){
+        const {
+          _id,
+          selectNumber,
+          sendWay,
+          xkAmount,
+          zkAmount
+        } = this.productInfo;
+        const {
+          shopingCarData
+        } = this.$parent.globalData;
+        if(this.isOverStoreLimit(shopingCarData,this.productInfo)) return;
+        this.updateOrInsertNumIntoShopCar(shopingCarData,this.productInfo)
+        wx.showToast({
+          title:'加入购物车成功',
+          icon:'success', 
+          duration:600
+        })
+        this.$apply()
+      },
+      goShopCar(){
+         wx.switchTab({
+                    url: './shopCar',
+                })
+      }
+    }
+    getWeightData(productInfo) {
+      const unit = productInfo.weight < 1 ? 'g' : 'kg';
+      let {
+        unitWeightStart,
+        unitWeightEnd,
+        weight
+      } = productInfo;
+      let result = '';
+      if (unit === 'g') {
+        unitWeightStart *= 1000;
+        unitWeightEnd *= 1000;
+        weight *= 1000;
+      }
+      result = productInfo.unitWeightStart && productInfo.unitWeightEnd ? `${unitWeightStart} ～ ${unitWeightEnd}` : `${weight}`;
+      return `${result}${unit}`;
+    }
+     countShopCarNum(){
+         const {
+          shopingCarData
+        } = this.$parent.globalData;
+        const amount = shopingCarData.reduce((total,current)=>{
+             return total+current.amount 
+          },0)
+      this.shopcarNum = amount;
+      this.$apply();
+     }
+    async onLoad(query) {
+      const productId = query.productId;
+       const {
+        boxId,
+        shopingCarData
+      } = this.$parent.globalData
+      const result = await api.product.getProductById({
+        query: {
+          productId,
+          boxId
+        }
+      })
+      if (result.statusCode === 200) {
+        this.mergeShopDataIntoProduct(shopingCarData, [result.data])
+        this.productInfo = result.data;
+        this.init = true;
+        this.productInfo.attribute.weight = this.getWeightData(result.data);
+        this.productInfo.like = false;
+        this.$apply();
+      }
+      this.countShopCarNum()
+      
+    }
+    onShow() {
+      const value = wx.getStorageSync('userId')
+      if (value) {
+        this.unLogin = true
+      } else {
+        this.unLogin = false
+      }
+    }
+    // 转发分享
+    onShareAppMessage(res) {
+      return {
+        title: this.shareTitle,
+        path: 'pages/index',
+        imageUrl: this.shareImage,
+        success: function(res) {
+          // 转发成功
+        },
+        fail: function(res) {
+          // 转发失败
+        },
+        complete: function(res) {}
+      }
+    }
+  }
+</script>
+
+<style lang='less'>
+  view {
+    box-sizing: border-box;
+  }
+  .icon-font {
+    font-family: "iconfont";
+  }
+  #good-detail {
+    height: 100vh;
+    .scroll-wraper {
+      padding-bottom: 98rpx;
+      .swiper-img {
+        width: 100%;
+        height: 100%;
+      }
+      .swiper {
+        height: 750rpx;
+        width: 750rpx;
+      }
+      .description {
+        width: 100%;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .price {
+          width: 100%;
+          text-align: center;
+          display: flex;
+          height: 128rpx;
+          padding: 0rpx 25rpx;
+          .left {
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 35rpx;
+            line-height: 1;
+            .realPriceSymbol {
+              font-family: HelveticaNeue-Medium;
+              font-size: 60rpx;
+              color: #fe4616;
+              letter-spacing: 0;
+              text-align: left;
+            }
+            .outPriceSymbol {
+              font-family: PingFangSC-Regular;
+              font-size: 26rpx;
+              color: #888888;
+              margin-left: 20rpx;
+              margin-bottom: 7rpx;
+              text-decoration: line-through;
+            }
+            .realPrice {
+              font-size: 60rpx;
+              color: #fe4616;
+              font-weight: 700;
+              letter-spacing: 0;
+            }
+            .outPrice {
+              text-decoration: line-through;
+              font-size: 26rpx;
+              color: #888888;
+              margin-bottom: 7rpx;
+            }
+          }
+          .right {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            .saledCount {
+              font-size: 28rpx;
+              color: #888888;
+              padding-bottom: 35rpx;
+            }
+          }
+        }
+        .title {
+          flex: 1;
+          width: 100%;
+          position: relative;
+          padding: 40rpx 25rpx 48rpx 25rpx;
+          border-top: 1rpx #eeeeee solid;
+          border-bottom: 1rpx #eeeeee solid;
+          display: flex;
+          flex-direction: column;
+          .proName {
+            font-family: MicrosoftYaHei;
+            font-size: 36rpx;
+            color: #000000;
+            text-align: left;
+          }
+          .proSubName {
+            font-family: MicrosoftYaHei;
+            margin-top: 20rpx;
+            font-size: 30rpx;
+            color: #353535;
+            text-align: left;
+          }
+          .share-icon {
+            position: absolute;
+            height: 60rpx;
+            width: 60rpx;
+            top: 50%;
+            margin-top: -30rpx;
+            right: 35rpx;
+            i {
+              font-family: iconfont;
+              line-height: 1;
+              font-size: 60rpx;
+              color: #888888;
+            }
+          }
+        }
+      }
+      .goodAttr-tab {
+        height: 88rpx;
+        width: 100%;
+        background: white;
+        font-family: MicrosoftYaHei;
+        font-size: 28rpx;
+        color: #000000;
+        color: #585858;
+        display: flex;
+        align-items: center;
+        padding: 0 25rpx;
+      }
+      .goodAttr-panel {
+        padding-bottom: 20rpx;
+        background: white;
+        view {
+          display: flex;
+          height: 58rpx;
+          padding: 0 25rpx;
+          font-family: PingFangSC-Regular;
+          font-size: 28rpx;
+          line-height: 58rpx;
+          .attr-name {
+            color: #888888;
+            width: 160rpx;
+          }
+          .attr-value {
+            color: #353535;
+          }
+        }
+      }
+      .detail-img-list {
+        font-size: 0;
+        .detail-img-item {
+          width: 750rpx;
+          height: 750rpx;
+        }
+      }
+      .goodDetail-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        height: 98rpx;
+        width: 100%;
+        background: white;
+        box-shadow: 0 0 30rpx 0 rgba(134, 129, 129, 0.18);
+        .footer-operte {
+          width: 350rpx;
+          height: 100%;
+          display: flex;
+          justify-content: space-between;
+          padding: 0 30rpx;
+          .operte-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            .operte-icon {
+              font-size: 40rpx;
+              line-height: 40rpx;
+              display: inline-block;
+              position: relative;
+              color: #888888;
+              &.green {
+                color: #02cb73;
+              }
+              .cart-num-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: absolute;
+                background: #fe4616;
+                width: 28rpx;
+                height: 28rpx;
+                border-radius: 50%;
+                top: -5rpx;
+                right: -5rpx;
+                color: #ffffff;
+                text {
+                  font-family: PingFangSC-Regular;
+                  font-size: 18rpx;
+                  line-height: 18rpx;
+                }
+              }
+            }
+            .operte-text {
+              font-family: PingFangSC-Regular;
+              font-size: 20rpx;
+              margin-top: 5rpx;
+              color: #353535;
+            }
+          }
+        }
+        .footer-add-shopping-car {
+          &.grey{
+            background: #888888;
+          }
+          flex: 1;
+          background: #02cb73; // background: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: PingFangSC-Regular;
+          font-size: 32rpx;
+          color: #ffffff;
+        }
+      }
+    }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      height: 100%;
+      .image-content {
+        width: 615rpx;
+        margin-top: 150rpx;
+      }
+      .desc {
+        font-family: PingFangSC-Regular;
+        font-size: 30rpx;
+        color: #888888;
+        margin-top: 20rpx;
+      }
+    }
+  }
+  
+</style>

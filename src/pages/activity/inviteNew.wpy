@@ -1,0 +1,334 @@
+<style lang="less">
+    @import '../../common/default.less';
+    #page {
+        font-size: 0;
+        view {
+            box-sizing: border-box;
+        }
+        .main {
+            width: 100%;
+            background: #f4f4f4;
+            .header {
+                background: #ffffff;
+                height: 88rpx;
+                margin: 0 25rpx;
+                padding: 25rpx 0;
+                border-bottom: 1rpx #eeeeee solid;
+                display: flex;
+                align-items: center;
+                .red-block {
+                    background: #cc0607;
+                    width: 10rpx;
+                    height: 100%;
+                }
+                .title {
+                    margin-left: 10rpx;
+                    font-size: 30rpx;
+                    color: #202020;
+                }
+            }
+            .main-bg {
+                image {
+                    width: 100%;
+                }
+            }
+            .button-container {
+                background: #fff2e0;
+                padding: 32rpx 0;
+                .common-button {
+                    margin-left: 75rpx;
+                    margin-right: 75rpx;
+                    text-align: center;
+                    line-height: 94rpx;
+                    font-size: 36rpx;
+                    border-radius: 8rpx;
+                    font-weight: 500;
+                }
+                .invited-now {
+                    height: 94rpx;
+                    background: #cc0607;
+                    color: white;
+                }
+            }
+            .my-earn-aera {
+                background: #ffffff;
+                height: 288rpx;
+                .my-earn-body {
+                    height: 200rpx;
+                    display: flex;
+                    &>view {
+                        flex: 1;
+                    }
+                    .my-earn-body-item {
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 36rpx 0;
+                        .money-num {
+                            &.red {
+                                color: #e60405;
+                            }
+                            font-weight: 600;
+                            font-size:60rpx;
+                            color:#202020;
+                            span {
+                                padding-left: 5rpx;
+                                font-size: 30rpx;
+                            }
+                        }
+                        .description {
+                            font-size: 30rpx;
+                            color: #979797;
+                        }
+                    }
+                }
+            }
+            .earn-detail-aera {
+                margin-top: 30rpx;
+                background: #ffffff;
+                .earn-detail-aera-body {
+                    .no-earn-detail {
+                        height: 200rpx;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        &>text:first-child {
+                            font-size: 30rpx;
+                            color: #202020;
+                        }
+                        &>text:last-child {
+                            font-size: 28rpx;
+                            color: #979797;
+                        }
+                    }
+                    .load-more-detail {
+                        margin: 0 25rpx;
+                        height: 88rpx;
+                        border-top: 1rpx #eeeeee solid;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 30rpx;
+                        color: #585858;
+                        .icon {
+                            width: 20rpx;
+                            height: 25rpx;
+                            margin-left: 10rpx;
+                            fill: #979797;
+                        }
+                    }
+                }
+            }
+            .user-instruction-aera {
+                margin-top: 30rpx;
+                background: #ffffff;
+                .header {
+                    height: 88rpx;
+                    color: #202020;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border: none;
+                    padding: 0;
+                    padding-top: 27rpx;
+                    .line {
+                        background: #585858;
+                        width: 48rpx;
+                        height: 2rpx;
+                    }
+                    .title {
+                        margin: 0 30rpx;
+                        font-size: 32rpx;
+                    }
+                }
+                .user-instruction-aera-body {
+                    background: #ffffff;
+                    padding-bottom: 30rpx;
+                    view {
+                        text-align: justify;
+                        padding: 20rpx 25rpx;
+                        font-size: 26rpx;
+                        color: #202020;
+                    }
+                }
+            }
+        }
+        .guide-layer {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            overflow: hidden;
+            z-index: 100;
+            image {
+                position: absolute;
+                top: 0;
+                right: 20rpx;
+                width: 200rpx;
+                height: 460rpx;
+            }
+            .text {
+                position: absolute;
+                top: 460rpx;
+                right: 0;
+                left: 0;
+                text-align: center;
+                font-size: 30rpx;
+            }
+        }
+    }
+</style>
+
+<template>
+    <view id="page" class='main'>
+        <Loading :init.sync="init" />
+        <view class='main'>
+            <view class='main-bg'>
+                <image src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/client/avatar/2018/1/1515051790956.jpg" alt="" />
+            </view>
+            <view class='button-container'>
+                <view class="invited-now common-button"> 立即邀请</view>
+            </view>
+            <view class='my-earn-aera'>
+                <view class='header'>
+                    <view class='red-block'></view>
+                    <view class='title'>我的收益</view>
+                </view>
+                <view class='my-earn-body'>
+                    <view class='my-earn-body-item'>
+                        <view class='money-num red'>
+                            {{oriData.prospectiveEarnings}}
+                            <span>元</span>
+                        </view>
+                        <view class='description'>预计收益</view>
+                    </view>
+                    <view class='my-earn-body-item'>
+                        <view class='money-num'>
+                            {{oriData.actualEarnings}}
+                            <span>元</span>
+                        </view>
+                        <view class='description'>实际收益</view>
+                    </view>
+                    <view class='my-earn-body-item'>
+                        <view class='money-num'>
+                            {{oriData.actualInviteNum}}
+                            <span>人</span>
+                        </view>
+                        <view class='description'>成功邀请</view>
+                    </view>
+                </view>
+            </view>
+            <view class='earn-detail-aera'>
+                <view class='header'>
+                    <view class='red-block'></view>
+                    <view class='title'>收益明细</view>
+                </view>
+                <view class='earn-detail-aera-body'>
+                    <view wx:if="{{userInfos.length === 0}}" class='no-earn-detail'>
+                        <text>暂无奖励</text>
+                        <text>你还没有邀请好友哦</text>
+                    </view>
+                    <UserInfoList wx:if="{{userInfos.length !== 0}}" :userList.sync='userInfos' cutNum='3' />
+                    <view wx:if="{{userInfos.length >= 3}}" class='load-more-detail'> 查看更多
+                        <!-- <SvgFont icon='icon-more1' /> -->
+                    </view>
+                </view>
+            </view>
+            <view class='user-instruction-aera'>
+                <view class='header'>
+                    <view class='line'></view>
+                    <view class='title'>活动规则</view>
+                    <view class='line'></view>
+                </view>
+                <view class='user-instruction-aera-body'>
+                    <view>1.邀请好友成为鲜盒子新用户,好友在接受邀请后下单成功并签收。你可获得鲜盒子8元奖励。下单后取消订单或退款均无法获得奖励</view>
+                    <view>2.奖励会在好友签收后的24小时内发放至您的帐号,您可以在鲜盒子服务号-我的-我的鲜卡中查看。鲜卡可叠加使用</view>
+                    <view>3.你的好友必须是从未使用鲜盒子的新用户。拥有相同手机号、鲜盒子帐号的用户,均视为同一用户</view>
+                    <view>4.鲜盒子保留法律范围内的最终解释权;如有其它疑问请咨询鲜盒子客服</view>
+                </view>
+            </view>
+        </view>
+        <!-- { showMoreDetail &&
+            <MoreDetail userList={userInfos} closeSelf={()=> { this.setState({ showMoreDetail: false }); }}/> 
+            }  -->
+        <!-- <view wx:if='{{showGuide}}'  class="guide-layer">
+                    <image src="/share/arrow.png" />
+                    <view class="text">点击这里邀请好友吧</view>
+                </view> -->
+    </view>
+</template>
+
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../api/index'
+    import moment from 'moment'
+    import _ from 'underscore'
+    import Loading from '../../components/common/loading'
+    import userInfoList from '../../components/activity/userInfoList'
+    export default class InviteNew extends wepy.page {
+        config = {
+            navigationBarTitleText: '邀请新人',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {
+            Loading,
+           UserInfoList: userInfoList
+        }
+        // 引入混合
+        data = {
+            init: false,
+            oriData: null,
+            userInfos:[]
+        }
+        computed = {
+            userInfos(){
+                return this.userInfos
+            }
+        }
+        events = {}
+        watch = {}
+        methods = {}
+        onLoad(params) {
+            this.loadData(params.id)
+        }
+        async loadData(id) {
+            const userId = wx.getStorageSync('userId')
+            const result = await api.activity.getMyInviteData({
+                query: {
+                    userId,
+                    activityId: id
+                }
+            })
+            // 200  ‘获取新人活动’
+            // 201    ‘不是新人专享活动’
+            // 202  ‘活动已经结束啦’
+            // 203  ‘已经领取过’
+            if (result.statusCode === 200) {
+                const {
+                    data
+                } = result;
+                console.log(data);
+                if (data.code !== 200) {
+                    this.$redirect('../default/noActivity')
+                } else {
+                    this.activityId = id;
+                    this.init = true;
+                    this.userInfos = [{username:123},{username:123},{username:123}]
+                    this.oriData = data.data;
+                    this.$apply();
+                }
+            }
+        }
+    }
+</script>

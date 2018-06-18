@@ -1,0 +1,177 @@
+<style lang="less">
+@import './assets/style/weui.less';
+@import './common/default.less';
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+page{
+  background-color: #f4f5f5;
+  height: 100%;
+}
+
+@font-face {
+  font-family: 'iconfont';  /* project id 577997 */
+  src: url('//at.alicdn.com/t/font_577997_ybmmu60s9oirudi.eot');
+  src: url('//at.alicdn.com/t/font_577997_ybmmu60s9oirudi.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_577997_ybmmu60s9oirudi.woff') format('woff'),
+  url('//at.alicdn.com/t/font_577997_ybmmu60s9oirudi.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_577997_ybmmu60s9oirudi.svg#iconfont') format('svg');
+}
+.iconfont{
+  font-family:"iconfont" !important;
+  font-size:16px;font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke-width: 0.2px;
+  -moz-osx-font-smoothing: grayscale;
+}
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+
+export default class extends wepy.app {
+  // 配置信息
+  config = {
+    // 页面列表
+    pages: [
+      'pages/index', // 首页
+      'pages/shopCar', // 服务
+      'pages/home', // 我的
+      'pages/link', // 链接
+      'pages/myOrder',
+      'pages/orderDetail',
+      'pages/productInfo',
+      'pages/afterSale',
+      'pages/paySuccess', // 支付成功
+      'pages/orderRemark', // 订单备注
+      'pages/searchProduct', // 商品查询页
+      'pages/confirmOrder',
+      'pages/channel',
+      'pages/allCategory',
+      'pages/chooseAddress',
+      'pages/goodDetails', // 商品详情页
+      'pages/distriAddress',
+      'pages/selfBoxInfo',
+      'pages/selfAddress',
+      'pages/orderTrace',
+      'pages/Feedback',
+      'pages/bindingPhoneNum',
+      'pages/home/myCoupon', // 我的现金券
+      'pages/home/myCouponInvalid', // 我的无效现金券
+      'pages/home/myCouponQuestion', // 现金券问题
+      'pages/refundDetail',
+      'pages/refundProgress',
+      'pages/home/myXianCard', // 我的鲜卡
+      'pages/home/myXianCardInvalid', // 我的无效鲜卡
+      'pages/home/myXianCardQuestion', // 鲜卡问题
+      'pages/home/xianCardUseRecord', // 鲜卡消费记录
+      'pages/home/myAddress', // 我的地址
+      'pages/home/bindXianCard', // 绑定鲜卡
+      'pages/home/myCollections', // 我的收藏
+      'pages/default/noActivity',
+      'pages/activity/newerCoupn',
+      'pages/activity/inviteNew',
+      
+    ],
+    // window 参数设置
+    window: {
+      backgroundTextStyle: 'light', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      backgroundColor: '#fff', // 窗口的背景颜色
+      navigationBarBackgroundColor: '#fff', // 导航栏背景颜色
+      navigationBarTextStyle: 'blcak', // 导航栏标题颜色
+      enablePullDownRefresh: true, // 是否开启下拉刷新
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    },
+    // 网络超时时间
+    networkTimeout: {
+      request: 10000
+    },
+    tabBar: {
+      color: '#9c9c9c',
+      selectedColor: '#02cb73',
+      borderStyle: 'black',
+      position: 'bottom',
+      backgroundColor: '#fff',
+      list: [{
+        pagePath: 'pages/index',
+        text: '首页',
+        iconPath: './assets/image/index/home.png',
+        selectedIconPath: './assets/image/index/home-active.png'
+      }, {
+        pagePath: 'pages/shopCar',
+        text: '购物车',
+        iconPath: './assets/image/index/chat.png',
+        selectedIconPath: './assets/image/index/chat-active.png'
+      }, {
+        pagePath: 'pages/myOrder',
+        text: '订单',
+        iconPath: './assets/image/index/order.png',
+        selectedIconPath: './assets/image/index/order-active.png'
+      }, {
+        pagePath: 'pages/home',
+        text: '我的',
+        iconPath: './assets/image/index/me.png',
+        selectedIconPath: './assets/image/index/me-active.png'
+      }]
+    }
+  }
+
+  globalData = {
+    userInfo: {
+      username: '',
+      photo: '',
+      phone: '',
+      openid: '',
+    },
+    location: null,
+    shopingCarData:[],
+    isExpress:false,  //用来记录是否展示快递商品
+    boxId: '',
+    addressId: '',
+    shoppingCardIdArr: ['wWWRbqpar8Wv649cD'],
+    pickerId: '',
+    sendWay: 'send',
+    userId: ''
+  }
+  // location 参数
+  // location: {
+  //   coordinate : {
+  //     lat: 30.123,
+  //     lng: 120.123
+  //   }, //坐标
+  //   landmark : '', //地标
+  //   province : '' //省份
+  // }
+  // boxId : '', //鲜库id
+  // addressId : '', //收货地址id
+  // pickerId : '', //自提id
+  // sendWay: '', //配送方式
+  // shoppingCardIdArr: ['',''] //购物车
+  
+
+  constructor () {
+    super()
+    // 引入插件
+    this.use('requestfix')
+    this.use('promisify')
+  }
+
+  async onLaunch() {
+    // 小程序启动之后 触发
+    console.log('start program')
+    // wepy.setStorageSync('userId', 'bupKusJ72idqJLQ7A')
+    // 清理本地缓存
+    // wepy.clearStorageSync()
+    // 重启小程序后，清除附近门店及地理位置信息，重新定位。
+    if (!wepy.getStorageSync('loginCount')) {
+      wepy.setStorageSync('loginCount', 1)
+    }
+  }
+  onShow() {
+  }
+}
+</script>

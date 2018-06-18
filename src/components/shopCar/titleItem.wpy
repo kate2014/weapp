@@ -1,0 +1,66 @@
+<style lang="less">
+  @import '../../common/default';
+.item {
+  height: 88rpx;
+  padding: 0 25rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 30rpx;
+  .item-title {
+    height: 88rpx;
+    display: flex;
+    align-items: center;
+  }
+  .item-content {
+    color: @content;
+    font-size:28rpx;
+  }
+  .item-content-subColor {
+    color:@subColor;
+  }
+  .item-icon-right {
+    font-size: 26rpx;
+    color: @minorColor;
+  }
+  .item-title-content {
+    font-size: 26rpx;
+    color: @minorColor;
+    padding: 5rpx 10rpx 0;
+  }
+}
+</style>
+
+<template>
+  <view class='item'>
+    <view class="item-title">{{title}}</view>
+    <navigator url="/pages/index" open-type="switchTab" hover-class="navigator-hover" class="item-content item-content-subColor" wx:if="{{isFreight*1 > 0 && content}}">实付满25元免运费，还差{{isFreight*1 > 0 ? isFreight : 0}}元 <i wx:if="{{isFreight*1 > 0}}" class="iconfont item-icon-right">&#xe617;</i></navigator>
+    <view class="item-content item-content-subColor" wx:if="{{isFreight*1 <= 0 && content}}">免运费</view>
+  </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+
+    export default class titleItem extends wepy.component{
+        props = {
+            title: String,
+            subTitle: {
+              type: String,
+              default: ''
+            },
+            content: {
+              type: Boolean,
+              default: false
+            },
+            isFreight: {
+              type: String,
+              default: ''
+            },
+            showIcon: {
+              type: String,
+              default: ''
+            }
+        }
+    }
+</script>

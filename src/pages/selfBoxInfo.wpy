@@ -1,0 +1,171 @@
+<style lang="less">
+  @import '../common/default.less';
+  .xianbox-list {
+    padding: 0 25rpx;
+    margin-top:20rpx;
+    background:#fff;
+    .xianbox-list-item {
+      height: 140rpx;
+      border-bottom: 1rpx solid #eeeeee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .xianbox-name {
+        font-size: 28rpx;
+      }
+
+      .xianbox-address {
+        font-size: 26rpx;
+        color: #888888;
+      }
+
+      .xianbox-time {
+        font-size: 24rpx;
+        color: #888888;
+      }
+      .xianbox-location {
+        width: 140rpx;
+        height: 140rpx;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .icon-location {
+          color:@primaryColor;
+        }
+        .xianbox-distance {
+          font-size: 24rpx;
+        }
+      }
+    }
+    .xianbox-list-item:last-child {
+      border-bottom: none;
+    }
+  }
+  .xian-loadmore_end {
+    padding-bottom: 1.5em;
+  }
+</style>
+<template>
+  <view class="xianbox-list">
+    <block wx:for="{{xianboxList}}" >
+      <view class="xianbox-list-item" @tap="goBack({{item._id}})">
+        <view>
+          <view class="xianbox-name">{{item.name}}</view>
+          <view class="xianbox-address">{{item.locationDetail}}</view>
+          <view class="xianbox-time">鲜库营业时间：{{item.workTimeStart}}～{{item.workTimeEnd}}</view>
+        </view>
+        <view class="xianbox-location">
+          <i class="iconfont" style="color:#02CB73;">&#xe612;</i>
+          <view class="xianbox-distance">{{item.distance}}km</view>
+        </view>
+      </view>
+    </block>
+  </view>
+    
+</template>
+<script>
+  import wepy from 'wepy'
+  import _ from 'underscore'
+  import api from '../api/index'
+  import utility from '../utils/utility'
+
+  var QQMapWX = require('../utils/qqmap-wx-jssdk.min.js')
+  var qqmapsdk
+
+  export default class Channel extends wepy.page {
+    config = {
+      navigationBarTitleText: '自提鲜库',
+      navigationBarTextStyle: 'black'
+    }
+
+    components = {}
+
+    // 引入混合
+    mixins = []
+
+    data = {
+      xianboxList: null
+    }
+
+    computed = {
+    }
+
+    watch = {
+    }
+
+    events = {}
+
+    methods = {
+      goBack(boxId) {
+        const boxInfo = _.findWhere(this.xianboxList, { _id: boxId })
+        wepy.setStorageSync('pickerBoxInfo', boxInfo)
+        wepy.navigateBack()
+      }
+    }
+    async init() {
+      const getXianbox = await api.chooseAddress.getXianbox({
+        method: 'GET',
+        query: {
+        }
+      })
+      console.log(getXianbox)
+      var that = this
+      var xianboxList = getXianbox.data
+      var lat = this.$parent.globalData.location.coordinate.lat
+      var lng = this.$parent.globalData.location.coordinate.lng
+      xianboxList.forEach(function (i) {
+        i.distance = utility.caculateDistance({ startLng: lng, startLat: lat, endLng: i.lng, endLat: i.lat })
+      })
+      xianboxList = _.sortBy(xianboxList, 'distance')
+      xianboxList.forEach(function (i) {
+        i.distance = i.distance.toFixed(2)
+      })
+      this.xianboxList = xianboxList
+      console.log(xianboxList)
+      this.$apply()
+      // var distanceList = []
+      // xianboxList.forEach(function (i) {
+      //   var temp = {}
+      //   temp.id = i._id
+      //   temp['latitude'] = i.lat * 1
+      //   temp['longitude'] = i.lng * 1
+      //   distanceList.push(temp)
+      // })
+      // qqmapsdk.calculateDistance({
+      //   mode: 'walking',
+      //   from: {
+      //     latitude: lat,
+      //     longitude: lng
+      //   },
+      //   to: distanceList,
+      //   success: function(res) {
+      //     var result = res.result.elements
+      //     xianboxList.forEach(function (i) {
+      //       result.forEach(function (j) {
+      //         if (Math.abs(i.lat - j.to.lat) < 0.00001 && Math.abs(i.lng - j.to.lng) < 0.00001) {
+      //           i.distance = (j.distance / 1000).toFixed(2) * 1
+      //         }
+      //       })
+      //     })
+      //     xianboxList = _.sortBy(xianboxList, 'distance')
+      //     xianboxList.forEach(function (i) {
+      //       i.distance = i.distance.toFixed(2)
+      //     })
+      //     that.boxInfos = xianboxList
+      //     that.$apply()
+      //   },
+      //   fail: function(res) {
+      //   },
+      //   complete: function(res) {
+      //   }
+      // })
+    }
+    async onLoad(options) {
+      qqmapsdk = new QQMapWX({
+        key: 'SATBZ-RDSWW-YDDR3-RZAAP-ZGCVJ-WRFT3'
+      })
+      this.init()
+    }
+  }
+</script>

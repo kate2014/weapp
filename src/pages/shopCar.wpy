@@ -1,0 +1,1402 @@
+<style lang="less">
+@import "../common/default.less";
+/** 修改默认的navigator点击态 **/
+.navigator-hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  opacity: 0.7;
+}
+icon {
+  display: flex;
+  align-items: center;
+}
+view{
+  box-sizing:border-box;
+}
+.unempty {
+  display: none;
+}
+.empty {
+  z-index: 4;
+  background-color: #ffffff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  .item1 {
+    font-size: 30rpx;
+    color: @content;
+  }
+  .item2 {
+    font-size: 28rpx;
+    color: @minorColor;
+    padding-top: 20rpx;
+    padding-bottom: 49rpx;
+  }
+  .item3 {
+    width: 248rpx;
+    height: 56rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28rpx;
+    color: @minorColor;
+    border: 1rpx solid #cacaca;
+    border-radius: 4rpx;
+  }
+}
+.head {
+  height: 88rpx;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30rpx;
+  line-height: 30rpx;
+  .icon-location {
+    font-size:40rpx;
+    color:@minorColor;
+  }
+  .address {
+    max-width: 70%;
+    padding: 0 20rpx;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  .icon-down {
+    font-size:10rpx;
+    color:@minorColor;
+  }
+}
+.body {
+  width: 750rpx;
+  font-size: 24rpx;
+  line-height: 24rpx;
+  margin-top: 20rpx;
+  background-color: #ffffff;
+}
+
+.item {
+  height: 88rpx;
+  padding: 0 25rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 30rpx;
+  .item-title {
+    height: 88rpx;
+    display: flex;
+    align-items: center;
+  }
+  .item-content {
+    color: @content;
+    font-size:28rpx;
+  }
+  .item-content-subColor {
+    color:@subColor;
+  }
+  .item-icon-right {
+    font-size: 26rpx;
+    color: @minorColor;
+  }
+  .item-title-content {
+    font-size: 26rpx;
+    color: @minorColor;
+    padding: 5rpx 10rpx 0;
+  }
+}
+.sum {
+  border-top: 1rpx solid @thinColor;
+  justify-content: flex-end;
+  .item-content {
+    font-size: 30rpx;
+    font-weight: bold;
+  }
+}
+.product-box {
+  overflow: hidden;
+}
+.product {
+  width: 100%;
+  height: 200rpx;
+  border-top: 1rpx solid @thinColor;
+  display: flex;
+  align-items: center;
+  padding: 0 25rpx;
+  transition: transform 0.5s;
+  position: relative;
+  .product-image {
+    width: 160rpx;
+    height: 160rpx;
+  }
+  .product-content {
+    width: 75%;
+    height: 160rpx;
+    padding-left: 20rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 28rpx;
+    line-height: 28rpx;
+    .product-tags{
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      margin-top: -25rpx;
+      .coupon{
+        width: 148rpx;
+        height: 33rpx;
+        background:#ffffff;
+        border:1rpx solid #d4d4d4;
+        border-radius:2rpx;
+        font-family:PingFangSC-Regular;
+        font-size:22rpx;
+        line-height: 33rpx;
+        text-align: center;
+        color:#b8b8b8;
+        margin-right: 10rpx;
+      }
+      .today{
+        background:#ffffff;
+        border:1rpx solid @primaryColor;
+        border-radius:2rpx;
+        width:78rpx;
+        height:33rpx;
+        font-family:PingFangSC-Regular;
+        font-size:22rpx;
+        line-height: 33rpx;
+        color: @primaryColor;
+        text-align: center;
+        margin-right: 10rpx;
+      }
+      .tommorrow{
+        background:#ffffff;
+        border:1rpx solid @primaryColor;
+        border-radius:2rpx;
+        width:78rpx;
+        height:33rpx;
+        font-family:PingFangSC-Regular;
+        font-size:22rpx;
+        line-height: 33rpx;
+        color: @primaryColor;
+        text-align: center;
+        margin-right: 10rpx;
+      }
+    }
+  }
+}
+.product-num {
+  height: 28rpx;
+  display: flex;
+  justify-content: space-between;
+  font-size: 28rpx;
+  line-height: 28rpx;
+  .product-price {
+    color: @subColor;
+  }
+  .product-amount {
+    width: 160rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 28rpx;
+    line-height: 28rpx;
+    color: @content;
+    .product-chat-add{
+      background:@primaryColor;
+      width:40rpx;
+      height:40rpx;
+      border-radius:100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      .icon-chat{
+        color: #fff;
+        font-size: 18rpx;
+      }
+    }
+    .product-chat-text{
+      font-family:PingFangSC-Regular;
+      font-size:30rpx;
+      color:@content;
+      letter-spacing:0;
+    }
+    .product-chat-sub{
+      background:#ffffff;
+      border:1rpx solid #cacaca;
+      width:39rpx;
+      height:39rpx;
+      border-radius:100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      .icon-chat{
+        color: @minorColor;
+        font-size: 18rpx;
+      }
+    }
+  }
+}
+.product-delete {
+  transform:translateX(-140rpx);
+}
+.delete {
+    background-color: @subColor;
+    height: 200rpx;
+    width: 140rpx;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform:translateX(140rpx);
+}
+.clear {
+  font-size: 28rpx;
+  color: @minorColor;
+  border: 1rpx solid #cacaca;
+  padding: 18rpx 41rpx;
+  border-radius: 4rpx;
+  margin-bottom:1px;
+}
+.soldOut {
+  background-color: #888888;
+  color: #ffffff;
+  padding: 10rpx 30rpx;
+  border-radius: 4rpx;
+}
+.foot {
+  z-index: 3;
+  position: fixed;
+  left: 0rpx;
+  right: 0rpx;
+  bottom: 0rpx;
+  height: 97rpx;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  font-size: 32rpx;
+  line-height: 32rpx;
+  justify-content: space-between;
+  box-shadow: 0 0 8rpx 0 rgba(134, 129, 129, 0.18);
+  .select-all{
+    height: 97rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-left:20rpx;
+    color:#585858;
+    .select-all-content {
+      padding: 0 20rpx;
+    }
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    width:300rpx;
+    height:70rpx;
+    .content-tatual {
+      display: flex;
+      justify-content: flex-end;
+      width: 300rpx;
+      color:#585858;
+      .tatual-price {
+        font-size: 34rpx;
+        color: @subColor;
+        font-weight: bold;
+      }
+    }
+    .content-freight {
+      color:#888888;
+      font-size:24rpx;
+    }
+  }
+  .submit {
+    height: 97rpx;
+    width: 251rpx;
+    color: #ffffff;
+    background-color: @primaryColor;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .unsubmit {
+    height: 97rpx;
+    width: 251rpx;
+    color: #ffffff;
+    background-color: @minorColor;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+.default {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  image{
+   width: 615rpx;
+   height: 479rpx;
+  }
+  text{
+    margin-top:9rpx; 
+    font-size:30rpx;
+    color:#888888;
+  }
+  .btn{
+    margin-top: 40rpx;
+    background:#02cb73;
+    border-radius:4rpx;
+    font-size: 28rpx;
+    width:120rpx;
+    height:58rpx;
+    line-height: 58rpx;
+    color: #fff;
+    text-align: center
+  }
+}
+.hidden {
+  display: none;
+}
+.load{
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+.checkbox_circle{
+  width:46rpx;
+  height:46rpx;
+  border-radius:100%;
+  background: #fff;
+  border:2rpx solid #cacaca;
+}
+
+.checkbox_success{
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  .iconfont{
+    font-size: 46rpx;
+    color: #fff;
+  }
+}
+
+</style>
+
+<template>
+  <!-- {{ unLocation && unLogin ? '' : 'hidden' }} -->
+  <view class="{{loading ? 'hidden' : ''}}">
+    <view>
+      <view class="head" bindtap="toChooseAddress">
+        <i class="iconfont location">&#xe62f;</i>
+        <location wx:if="{{!loading}}" class="address"/>
+        <i class="iconfont icon-down">&#xe611;</i>
+      </view>
+      <view wx:if="{{productList.length === 0 || (quickArrive.length === 0 && tomorrow.length === 0 && express.length === 0 && soldOut.length === 0)}}" class="empty {{loading? 'hidden' : ''}}">
+      <!-- <view class="unempty">  -->
+        <image src='https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662461387.jpg'/>
+        <view class="item1">购物车快饿扁了T.T</view>
+        <view class="item2">快给我挑点宝贝</view>
+        <navigator class="item3" url="/pages/index" open-type="switchTab" hover-class="navigator-hover">随便逛逛</navigator>
+      </view>
+      <!-- <view class="body" wx:if="{{today}}">
+        <todayItem title="快速达" :content.sync="today" :isFreight.sync="isFreight" :showIcon="isFreight"/>
+      </view>
+      <view class="body" wx:if="{{tomorrow}}">
+        <tomorrowItem title="明日达" :content.sync="!  today" :isFreight.sync="isFreight" :showIcon="isFreight"/>
+      </view> -->
+      <view class="body" wx:if="{{quickArrive.length > 0}}">
+        <view class='item'>
+          <view class="item-title" wx:if="{{ isMix === 1 }}">
+            明日达
+          </view>
+          <view class="item-title" wx:if="{{ isMix === 2 }}">
+            快速达
+          </view>
+          <view class="item-title" wx:if="{{ isMix === 3 }}">
+            快速达 | 明日达
+          </view>
+          <navigator url="/pages/index" open-type="switchTab" hover-class="navigator-hover" class="item-content item-content-subColor" wx:if="{{isFreight > 0 && sendWay === 'send'}}">实付满25元免运费，还差{{isFreight > 0 ? isFreight : 0}}元 <i class="iconfont item-icon-right">&#xe617;</i></navigator>
+          <view class="item-content item-content-subColor" wx:if="{{isFreight <= 0 && sendWay === 'send'}}">免运费</view>
+        </view>
+        <repeat for="{{quickArrive}}" key="key" index="index" item="item">
+          <view class="product-box">
+            <view class="product {{item.delete ? 'product-delete' : ''}}" bindtouchstart="start"  bindtouchmove="move" data-list-type="quickArrive" id="{{item._id}}">
+              <view bindtap="select" data-list-type="quickArrive" id="{{item._id}}">
+                <view class="checkbox_circle" wx:if="{{!item.checked}}"></view>
+                <view class="checkbox_success" wx:if="{{item.checked}}">
+                  <i class="iconfont" style="color: #02cb73">&#xe633;</i>
+                </view>
+                <!-- <icon type="circle" size="23" wx:if="{{!item.checked}}"></icon>
+                <icon type="success" size="23" wx:if="{{item.checked}}" color="#02cb73"></icon> -->
+              </view>
+              <image src="{{item.mainPicture}}" class="product-image"/>
+              <view class="product-content">
+                <view class="title">{{item.name}}</view>
+                <view class="product-tags">
+                  <!-- <view class="coupon" wx:if="{{!item.useCoupon}}">现金券不可用</view> -->
+                  <view class="today" wx:if="{{item.sendWay === 1}}">快速达</view>
+                  <view class="today" wx:if="{{item.sendWay === 2}}">明日达</view>
+                </view>
+                <view class="product-num">
+                  <view class="product-price">￥{{item.price}}</view>
+                  <view class="product-amount">
+                    <view class="product-chat-sub" id="{{item._id}}" data-list-type="quickArrive" bindtap="sub"><i class="iconfont icon-chat">&#xe614;</i></view>
+                    <view class="product-chat-text">{{item.amount}}</view>
+                    <view class="product-chat-add" id="{{item._id}}" data-list-type="quickArrive" bindtap="add"><i class="iconfont icon-chat">&#xe615;</i></view>
+                  </view>
+                </view>
+              </view>
+              <view class="delete" data-list-type="quickArrive" id="{{item._id}}" bindtap="delete">
+                删除
+              </view>
+            </view>
+          </view>
+        </repeat>
+      </view>
+
+      <!-- 明日达 -->
+      <view class="body" wx:if="{{tomorrow.length > 0}}">
+        <view class='item'>
+          <view class="item-title">
+            明日达
+          </view>
+          <navigator url="/pages/index" open-type="switchTab" hover-class="navigator-hover" class="item-content item-content-subColor" wx:if="{{isFreight > 0 && tomorrow && !today}}">实付满25元免运费，还差{{isFreight > 0 ? isFreight : 0}}元 <i class="iconfont item-icon-right">&#xe617;</i></navigator>
+          <view class="item-content item-content-subColor" wx:if="{{isFreight <= 0 && tomorrow && !today}}">免运费</view>
+        </view>
+
+        <repeat for="{{tomorrow}}" index="index" key="key" item="item">
+          <view class="product-box">
+            <view class="product {{item.delete ? 'product-delete' : ''}}" wx:if="{{item.sendWay === 2}}" bindtouchstart="start" bindtouchmove="move" data-list-type="tomorrow" id="{{item._id}}">
+              <view bindtap="select" data-list-type="tomorrow" id="{{item._id}}">
+                <view class="checkbox_circle" wx:if="{{!item.checked}}"></view>
+                <view class="checkbox_success" wx:if="{{item.checked}}">
+                  <i class="iconfont" style="color: #02cb73">&#xe633;</i>
+                </view>
+                <!-- <icon type="circle" size="23" wx:if="{{!item.checked}}"></icon>
+                <icon type="success" size="23" wx:if="{{item.checked}}" color="#02cb73"></icon> -->
+              </view>
+              <image src="{{item.mainPicture}}" class="product-image"/>
+              <view class="product-content">
+                <view class="title">{{item.name}}</view>
+                <view class="product-tags">
+                  <!-- <view class="coupon" wx:if="{{!item.useCoupon}}">现金券不可用</view> -->
+                  <view class="today" wx:if="{{item.sendWay === 1}}">快速达</view>
+                  <view class="today" wx:if="{{item.sendWay === 2}}">明日达</view>
+                </view>
+                <view class="product-num">
+                  <view class="product-price">￥{{item.price}}</view>
+                  <view class="product-amount">
+                    <view class="product-chat-sub" data-list-type="tomorrow" id="{{item._id}}" bindtap="sub"><i class="iconfont icon-chat">&#xe614;</i></view>
+                    <view class="product-chat-text">{{item.amount}}</view>
+                    <view class="product-chat-add" data-list-type="tomorrow" id="{{item._id}}" bindtap="add"><i class="iconfont icon-chat">&#xe615;</i></view>
+                  </view>
+                </view>
+              </view>
+              <view class="delete" data-list-type="tomorrow" id="{{item._id}}" bindtap="delete">
+                删除
+              </view>
+            </view>
+          </view>
+        </repeat>
+      </view>
+        <!-- 快递 -->
+      <view class="body" wx:if="{{express.length > 0}}">
+        <view class='item'>
+          <view class="item-title">
+            邮寄
+          </view>
+        </view>
+
+        <repeat for="{{express}}" index="index" key="key" item="item">
+          <view class="product-box">
+            <view class="product {{item.delete ? 'product-delete' : ''}}" bindtouchstart="start" bindtouchmove="move" data-list-type="express" key="quick" id="{{item._id}}">
+              <view bindtap="select" data-list-type="express" id="{{item._id}}">
+                <view class="checkbox_circle" wx:if="{{!item.checked}}"></view>
+                <view class="checkbox_success" wx:if="{{item.checked}}">
+                  <i class="iconfont" style="color: #02cb73">&#xe633;</i>
+                </view>
+                <!-- <icon type="circle" size="23" wx:if="{{!item.checked}}"></icon>
+                <icon type="success" size="23" wx:if="{{item.checked}}" color="#02cb73"></icon> -->
+              </view>
+              <image src="{{item.mainPicture}}" class="product-image"/>
+              <view class="product-content">
+                <view class="title">{{item.name}}</view>
+                <view class="product-tags">
+                  <!-- <view class="coupon" wx:if="{{!item.useCoupon}}">现金券不可用</view> -->
+                  <!-- <view class="today" wx:if="{{item.sendWay === 1}}">快速达</view> -->
+                  <!-- <view class="today" wx:if="{{item.sendWay === 0}}">明日达</view> -->
+                </view>
+                <view class="product-num">
+                  <view class="product-price">￥{{item.price}}</view>
+                  <view class="product-amount">
+                    <view class="product-chat-sub" data-list-type="express" id="{{item._id}}"  bindtap="sub"><i class="iconfont icon-chat">&#xe614;</i></view>
+                    <view class="product-chat-text">{{item.amount}}</view>
+                    <view class="product-chat-add" data-list-type="express" id="{{item._id}}" bindtap="add"><i class="iconfont icon-chat">&#xe615;</i></view>
+                  </view>
+                </view>
+              </view>
+              <view class="delete" data-list-type="express" id="{{item._id}}" bindtap="delete">
+                删除
+              </view>
+            </view>
+          </view>
+        </repeat>
+      </view>
+      <!-- 已抢光 -->
+      <view class="body" wx:if="{{soldOut.length > 0}}">
+        <view class='item'>
+          <view class="item-title">
+            已抢光
+          </view>
+          <view class="clear" bindtap="deleteSoldout">清空已抢光商品</view>
+        </view>
+
+        <repeat for="{{soldOut}}" index="index" item="item" key="key">
+          <view class="product-box">
+            <view class="product {{item.delete ? 'product-delete' : ''}}" bindtouchstart="start" bindtouchmove="move" data-list-type="soldOut" id="{{item._id}}">
+              <view bindtap="select" id="{{item._id}}">
+                <view class="checkbox_circle" wx:if="{{!item.checked}}"></view>
+                <view class="checkbox_success" wx:if="{{item.checked}}">
+                  <i class="iconfont" style="color: #02cb73">&#xe633;</i>
+                </view>
+                <!-- <icon type="circle" size="23" wx:if="{{!item.checked}}"></icon>
+                <icon type="success" size="23" wx:if="{{item.checked}}" color="#02cb73"></icon> -->
+              </view>
+              <image src="{{item.mainPicture}}" class="product-image"/>
+              <view class="product-content" style="height: 110rpx">
+                <view class="title">{{item.name}}</view>
+                <!-- <view class="product-tags">
+                  <view class="coupon" wx:if="{{!item.useCoupon}}">现金券不可用</view>
+                  <view class="today" wx:if="{{item.sendWay === 1}}">快速达</view>
+                  <view class="today" wx:if="{{item.sendWay === 0}}">明日达</view>
+                </view> -->
+                <view class="product-num">
+                  <view class="product-price">￥{{item.price}}</view>
+                  <view class="product-amount">
+                    <view class="soldOut">已抢光</view>
+                  </view>
+                </view>
+              </view>
+              <view style="background-color:#ffffff;opacity:0.5;width:750rpx;height:200rpx;margin-left:-750rpx;z-index:2;"></view>
+              <view class="delete" data-list-type="soldOut" id="{{item._id}}" bindtap="delete">
+                删除
+              </view>
+            </view>
+          </view>
+          
+        </repeat>
+      </view>
+      <view class="body">
+        <view class='item'>
+          <view class='item-title'>现金券</view>
+          <view class='item-content item-content-subColor'>-￥{{coupons}}<i class="iconfont item-icon-right ">&#xe617;</i></view>
+        </view>
+        <view class='item'>
+          <view class='item-title'>商品总价</view>
+          <view class="item-content">￥{{tatual}}</view>
+        </view>
+        <view class='item'>
+          <view class='item-title'>
+            运费 
+            <view wx:if="{{express.length === 0 && sendWay === 'send'}}" class="item-title-content" >{{'实付满25元免运费'}}</view>
+            <!-- <view wx:if="{{express.length !== 0 && sendWay !== 'send'}}" class="item-title-content" >{{'总重量'+ tatualWeight+'kg'}}</view> -->
+          </view>
+          <view class="item-content">￥{{amount ? freight : '0.00'}}</view>
+        </view>
+        <view class='item sum'>
+          <view class='item-title'>合计</view>
+          <view class="item-content item-content-subColor">￥{{actual}}</view>
+        </view>
+      </view>
+      <view style="height:120rpx"></view>
+      <view class="foot">
+      <label class="select-all" bindtap="all">
+        <view class="select-all-icon">
+          <view class="checkbox_circle" wx:if="{{!checked}}"></view>
+          <view class="checkbox_success" wx:if="{{checked}}">
+            <i class="iconfont" style="color: #02cb73">&#xe633;</i>
+          </view>
+          <!-- <icon type="circle" size="23" wx:if="{{!checked}}"></icon>
+          <icon  type="success" size="23" wx:if="{{checked}}" color="#02cb73"></icon> -->
+        </view>
+        <view class="select-all-content">全选</view>
+      </label>
+      
+      <view class="content">
+        <view class="content-tatual">
+          <view>合计：</view>
+          <view class="tatual-price">￥{{actual}}</view>
+        </view>
+        <view class="content-freight">{{freight*1 ? '含运费￥' + freight : '免运费'}}</view>
+      </view>
+      <view class="unsubmit" wx:if="{{!amount}}">去结算({{amount}})</view>
+      <view class="submit" wx:if="{{amount}}" @tap="submit">去结算({{amount}})</view>
+    </view>
+    </view>
+  </view>
+   <view class="weui-loadmore load" wx:if="{{loading}}">
+    <view class="weui-loading"></view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+import baseMixin from '../mixins/base'
+import LoginMixin from '../mixins/login'
+import Location from '../components/location'
+import Loading from '../components/common/loading'
+import Index from './index'
+import titleItem from '../components/shopCar/titleItem'
+import api from '../api/index'
+import Tip from '../utils/common'
+import _ from 'underscore'
+import { splicePictureUrl } from '../utils/utility'
+const tip = new Tip();
+var QQMapWX = require('../utils/qqmap-wx-jssdk.min.js')
+var qqmapsdk
+export default class Service extends wepy.page {
+  config = {
+    navigationBarTitleText: '购物车',
+    navigationBarBackgroundColor: '#ffffff', // 导航栏背景颜色
+    navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+    backgroundColor: '#ffffff', // 窗口的背景色
+    backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+    enablePullDownRefresh: false, // 是否开启下拉刷新
+    disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+    onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+  }
+
+  components = {
+    location: Location,
+    todayItem: titleItem,
+    tomorrowItem: titleItem,
+    Loading: Loading
+  }
+
+  // 引入混合
+  mixins = [baseMixin, LoginMixin]
+
+  data = {
+    productList: [],
+    couponList: [],
+    coupons: '0.00',
+    tatual: '0.00',
+    freight: '0.00',
+    actual: '0.00',
+    amount: 0,
+    quickArrive: [],
+    tomorrow: [],
+    express: [],
+    soldOut: [],
+    checked: false,
+    start: {},
+    end: {},
+    xianboxInfo: [],
+    isFreight: '0.00',
+    sendWay: 'send',
+    loading: true,
+    // unLocation: true,
+    // unLogin: true,
+    showLogin: false,
+    isMix: 1
+  }
+
+  computed = {
+    now() {
+      return +new Date()
+    }
+  }
+
+  watch = {}
+
+  events = {
+    'hiddenLocation'() {
+      this.unLocation = true
+      this.loading = false
+      wx.hideNavigationBarLoading()
+    },
+    'showLocation': () => {
+      this.unLocation = false
+      this.loading = false
+      wx.hideNavigationBarLoading()
+    },
+    'showLogin': () => {
+      this.unLogin = false
+      
+      this.loading = false
+      wx.hideNavigationBarLoading()
+    },
+    'hiddenLogin': () => {
+      this.unLogin = true
+      this.loading = false
+      wx.hideNavigationBarLoading()
+    }
+  }
+
+  methods = {
+    all() {
+      var checked = !this.checked
+      var productList = _.union(this.quickArrive, this.tommorrow, this.express)
+      _.each(productList, item => {
+        if (checked) {
+          item.checked = true
+        } else {
+          item.checked = false
+        }
+      })
+      this.productList = productList
+      this.checked = checked
+      this.calculate()
+    },
+    select(e) {
+      switch (e.currentTarget.dataset.listType) {
+          case "quickArrive":
+            var productList = this.quickArrive
+            var index = productList.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            productList[index].checked = !productList[index].checked
+            var temp = productList.every(function(i) {
+              return i.checked === true
+            })
+            this.quickArrive = productList
+            this.checked = temp
+            this.calculate()
+            break
+          case "tomorrow":
+            var productList = this.tomorrow
+            var index = productList.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            productList[index].checked = !productList[index].checked
+            var temp = productList.every(function(i) {
+              return i.checked === true
+            })
+            this.tomorrow = productList
+            this.checked = temp
+            this.calculate()
+            break
+          case "express":
+            var productList = this.express
+            var index = productList.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            productList[index].checked = !productList[index].checked
+            var temp = productList.every(function(i) {
+              return i.checked === true
+            })
+            // console.log('1')
+            // console.log(productList)
+            let tatualWeight = 0
+            _.each(productList, item => {
+              tatualWeight += item.weight
+            })
+            this.express = productList
+            this.checked = temp
+            this.tatualWeight = tatualWeight
+            this.calculate()
+            break
+          case "soldOut":
+            break
+          default:
+            break
+        }
+    },
+    sub(e) {
+      const { listType } = e.currentTarget.dataset;
+      switch (listType) {
+          case "quickArrive":
+            var index = this.quickArrive.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            if (this.quickArrive[index].amount <= 1) {
+              wx.showModal({
+                title: '提示',
+                content: '请左滑删除！',
+                showCancel: false,
+                confirmText: '马上试试',
+                confirmColor: '#02CB73',
+                success: function(res) {
+                }
+              })
+            } else {
+              this.quickArrive[index].amount -= 1
+              this.calculate()
+            }
+            this.quickArrive[index].delete = false
+            break
+          case "tomorrow":
+            var index = this.tomorrow.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            if (this.tomorrow[index].amount <= 1) {
+              wx.showModal({
+                title: '提示',
+                content: '请左滑删除！',
+                showCancel: false,
+                confirmText: '马上试试',
+                confirmColor: '#02CB73',
+                success: function(res) {
+                }
+              })
+            } else {
+              this.tomorrow[index].amount -= 1
+              this.calculate()
+            }
+            this.tomorrow[index].delete = false
+            break
+          case "express":
+            var index = this.express.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            if (this.express[index].amount <= 1) {
+              wx.showModal({
+                title: '提示',
+                content: '请左滑删除！',
+                showCancel: false,
+                confirmText: '马上试试',
+                confirmColor: '#02CB73',
+                success: function(res) {
+                }
+              })
+            } else {
+              this.express[index].amount -= 1
+              this.calculate()
+            }
+            this.express[index].delete = false
+            break
+          case "soldOut":
+            break
+          default:
+            break
+        }
+    },
+    add(e) {
+      const { shopingCarData } = this.$root.$parent.globalData 
+      const { listType } = e.currentTarget.dataset;
+      switch (listType) {
+          case "quickArrive":
+            var index = this.quickArrive.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            var maxamount = 0
+            if (this.quickArrive[index].sendWay === 2) {
+              maxamount = this.quickArrive[index].zkamount
+            } else {
+              maxamount = this.quickArrive[index].boxamount
+            }
+            if (this.quickArrive[index].amount < maxamount) {
+              if (this.quickArrive[index].amount < 100) {
+                this.quickArrive[index].amount += 1
+                this.calculate()
+                _.findWhere(shopingCarData, { productId: this.quickArrive[index]._id }).amount = this.quickArrive[index].amount
+                _.findWhere(shopingCarData, { productId: this.quickArrive[index]._id }).status = 'modify'
+              }
+            } else {
+              tip.toast(`只剩${maxamount}份了～`)
+            }
+            this.quickArrive[index].delete = false
+            break
+          case "tomorrow":
+            var index = this.tomorrow.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            var maxamount = this.tomorrow[index].boxamount
+            if (this.tomorrow[index].amount < maxamount) {
+              if (this.tomorrow[index].amount < 100) {
+                this.tomorrow[index].amount += 1
+                this.calculate()
+              }
+            } else {
+              tip.toast(`只剩${maxamount}份了～`)
+            }
+            this.tomorrow[index].delete = false
+            break
+          case "express":
+            var index = this.express.findIndex(function(i, index) {
+              if (i._id === e.currentTarget.id) {
+                return index
+              }
+            })
+            if (index === -1) {
+              index = 0
+            }
+            var maxamount = this.express[index].zkamount
+            if (this.express[index].amount < maxamount) {
+              if (this.express[index].amount < 100) {
+                this.express[index].amount += 1
+                this.calculate()
+              }
+            } else {
+              tip.toast(`只剩${maxamount}份了～`)
+            }
+            this.express[index].delete = false
+            break
+          case "soldOut":
+            break
+          default:
+            break
+        }
+    },
+    toChooseAddress() {
+      wx.navigateTo({
+        url: 'chooseAddress?from=shopCar'
+      })
+    },
+    start: function (e) {
+      this.start.id = e.currentTarget.id
+      this.start.x = e.changedTouches[0].pageX
+      this.start.y = e.changedTouches[0].pageY
+    },
+    end: function (e) {
+    },
+    move: function (e) {
+      this.end.id = e.currentTarget.id
+      this.end.x = e.changedTouches[0].pageX
+      this.end.y = e.changedTouches[0].pageY
+      if (this.start.x - this.end.x > 50 && this.start.id === this.end.id) {
+        switch (e.currentTarget.dataset.listType) {
+          case "quickArrive":
+            this.quickArrive.forEach(function (i) {
+              if (i._id === e.currentTarget.id) {
+                i.delete = true
+              }
+            })
+            break
+          case "tomorrow":
+            this.tomorrow.forEach(function (i) {
+              if (i._id === e.currentTarget.id) {
+                i.delete = true
+              }
+            })
+            break
+          case "express":
+            this.express.forEach(function (i) {
+              if (i._id === e.currentTarget.id) {
+                i.delete = true
+              }
+            })
+            break
+          case "soldOut":
+            this.soldOut.forEach(function (i) {
+              if (i._id === e.currentTarget.id) {
+                i.delete = true
+              }
+            })
+            break
+          default:
+            break
+        }
+      } else {
+        switch (e.currentTarget.dataset.listType) {
+          case "quickArrive":
+            this.quickArrive.forEach(function (i) {
+              if (i._id === e.currentTarget.id) {
+                i.delete = false
+              }
+            })
+            break
+          case "tomorrow":
+            this.tomorrow.forEach(function (i) {
+              if (i._id === e.currentTarget.id) {
+                i.delete = false
+              }
+            })
+            break
+          case "express":
+            this.express.forEach(function (i) {
+              if (i._id === e.currentTarget.id) {
+                i.delete = false
+              }
+            })
+            break
+          case "soldOut":
+            this.soldOut.forEach(function (i) {
+              if (i._id === e.currentTarget.id) {
+                i.delete = false
+              }
+            })
+            break
+          default:
+            break
+        }
+      }
+    },
+    delete: function (e) {
+      var that = this
+      const { shopingCarData } = that.$root.$parent.globalData
+      wx.showModal({
+        title: '提示',
+        content: '确认删除该商品？',
+        showCancel: true,
+        cancelText: '取消',
+        cancelColor: '#353535',
+        confirmText: '确认',
+        confirmColor: '#02CB73',
+        success: function(res) {
+          if (res.confirm) {
+            switch (e.currentTarget.dataset.listType) {
+              case "quickArrive":
+                that.quickArrive.forEach(function (i, index) {
+                  if (i._id === e.currentTarget.id) {
+                    api.shopCar.deleteByShoppingCarId({
+                      method: 'GET',
+                      query: {
+                        shoppingCarId: i.shoppingCarId
+                      }
+                    }).then(res => {
+                      if (res.statusCode === 200) {
+                        that.quickArrive.splice(index, 1)
+                        tip.toast('删除成功')
+                        that.calculate()
+                        that.$root.$parent.globalData.shopingCarData = _.without(shopingCarData, { productId: i._id })
+                        if (_.uniq(_.pluck(that.quickArrive, 'sendWay')).length > 1) {
+                          that.isMix = 3
+                        } else if (_.uniq(_.pluck(that.quickArrive, 'sendWay')).length === 1 && _.uniq(_.pluck(that.quickArrive, 'sendWay'))[0] === 1) {
+                          that.isMix = 2
+                        } else {
+                          that.isMix = 1
+                        }
+                        that.$apply()
+                      } else {
+                        tip.toast('删除失败')
+                      }
+                    })
+                  }
+                })
+                break
+              case "tomorrow":
+                that.tomorrow.forEach(function (i, index) {
+                  if (i._id === e.currentTarget.id) {
+                    api.shopCar.deleteByShoppingCarId({
+                      method: 'GET',
+                      query: {
+                        shoppingCarId: i.shoppingCarId
+                      }
+                    }).then(res => {
+                      if (res.statusCode === 200) {
+                        that.tomorrow.splice(index, 1)
+                        tip.toast('删除成功')
+                        that.calculate()
+                        that.$root.$parent.globalData.shopingCarData = _.without(shopingCarData, { productId: i._id })
+                        // that.setSandway()
+                        that.$apply()
+                      } else {
+                        tip.toast('删除失败')
+                      }
+                    })
+                  }
+                })
+                break
+              case "express":
+                that.express.forEach(function (i, index) {
+                  if (i._id === e.currentTarget.id) {
+                    api.shopCar.deleteByShoppingCarId({
+                      method: 'GET',
+                      query: {
+                        shoppingCarId: i.shoppingCarId
+                      }
+                    }).then(res => {
+                      if (res.statusCode === 200) {
+                        that.express.splice(index, 1)
+                        tip.toast('删除成功')
+                        that.calculate()
+                        that.$root.$parent.globalData.shopingCarData = _.without(shopingCarData, { productId: i._id })
+                        // that.setSandway()
+                        that.$apply()
+                      } else {
+                        tip.toast('删除失败')
+                      }
+                    })
+                  }
+                })
+                break
+              case "soldOut":
+                that.soldOut.forEach(function (i, index) {
+                  if (i._id === e.currentTarget.id) {
+                    api.shopCar.deleteByShoppingCarId({
+                      method: 'GET',
+                      query: {
+                        shoppingCarId: i.shoppingCarId
+                      }
+                    }).then(res => {
+                      if (res.statusCode === 200) {
+                        that.soldOut.splice(index, 1)
+                        tip.toast('删除成功')
+                        that.$root.$parent.globalData.shopingCarData = _.without(shopingCarData, { productId: i._id })
+                        // that.setSandway()
+                        that.$apply()
+                      } else {
+                        tip.toast('删除失败')
+                      }
+                    })
+                  }
+                })
+                break
+              default:
+                break
+            }
+          }
+        }
+      })
+    },
+    deleteSoldout: function (e) {
+      var that = this
+      wx.showModal({
+        title: '提示',
+        content: '确认清空失效商品？',
+        showCancel: true,
+        cancelText: '取消',
+        cancelColor: '#353535',
+        confirmText: '确认',
+        confirmColor: '#02CB73',
+        success: function(res) {
+          if (res.confirm) {
+            const { soldOut } = that;
+            const ids = _.pluck(soldOut, "shoppingCarId")
+            api.shopCar.clearSoldOutProducts({
+              method: 'POST',
+              query: {
+                ids
+              }
+            }).then(res => {
+              if (res.statusCode === 200) {
+                tip.toast('操作成功')
+                that.soldOut.length = 0
+                that.$apply()
+              } else {
+                tip.toast('操作失败')
+              }
+            })
+            // that.setSandway()
+          }
+        }
+      })
+    }
+  }
+  // 获取鲜库信息
+  getXianbox() {
+  }
+  async setProduct() {
+  // 获取商品
+    const { userId, boxId, location, shopingCarData } = this.$root.$parent.globalData
+    // const 
+    const addShopCars = _.filter(shopingCarData, (item) => { return item.status })
+    const getInfo = await api.shopCar.getInfo({
+      method: 'POST',
+      query: {
+        userId: wepy.getStorageSync('userId'),
+        boxId,
+        province: location.province ? location.province : '浙江省',
+        addShopCars
+      }
+    })
+    const { productList, quickArrive, tomorrow, express, soldOut } = getInfo.data
+    if (_.uniq(_.pluck(quickArrive, 'sendWay')).length > 1) {
+      this.isMix = 3
+    } else if (_.uniq(_.pluck(quickArrive, 'sendWay')).length === 1 && _.uniq(_.pluck(quickArrive, 'sendWay'))[0] === 1) {
+      this.isMix = 2
+    } else {
+      this.isMix = 1
+    }
+    _.each(quickArrive, (item) => {
+      item.mainPicture = splicePictureUrl(item.mainPicture, 'todayList')
+    })
+    _.each(tomorrow, (item) => {
+      item.mainPicture = splicePictureUrl(item.mainPicture, 'todayList')
+    })
+    _.each(express, (item) => {
+      item.mainPicture = splicePictureUrl(item.mainPicture, 'todayList')
+    })
+    _.each(soldOut, (item) => {
+      item.mainPicture = splicePictureUrl(item.mainPicture, 'todayList')
+    })
+    _.each(productList, item => {
+      item.productId = item._id
+      item.categoryId = item.categoryId[0]
+    })
+    this.productList = productList
+    this.quickArrive = quickArrive
+    this.tomorrow = tomorrow
+    this.express = express
+    this.soldOut = soldOut
+    this.sendWay = this.$root.$parent.globalData.sendWay
+    this.$root.$parent.globalData.shopingCarData = productList
+    this.xianboxInfo = getInfo.data.xianboxInfo
+    this.couponList = getInfo.data.couponList
+    this.loading = false
+    // this.init = true
+    wx.hideNavigationBarLoading()
+    this.$apply()
+  }
+  // 计算金额
+  calculate() {
+    var tatual = 0
+    var amount = 0
+    const nowList = _.union(this.quickArrive, this.tomorrow, this.express);
+    nowList.forEach(function(i) {
+      if (i.checked === true) {
+        tatual += i.price * i.amount
+        amount += i.amount
+      }
+    })
+    var temp = nowList.every(function(i) {
+      return i.checked === false
+    })
+    // console.log(temp)
+    if (tatual - this.coupons * 1 <= 25 && !temp && this.sendWay !== 'pick') {
+      this.freight = '6'
+    } else {
+      this.freight = '0.00'
+    }
+    var actual = tatual + this.freight * 1 - this.coupons * 1
+    if (amount === 0) {
+      this.isFreight = '0.00'
+    } else {
+      this.isFreight = (25 - (tatual - this.coupons * 1)).toFixed(2)
+    }
+    this.tatual = tatual.toFixed(2)
+    this.amount = amount
+    this.actual = actual.toFixed(2)
+  }
+  async onLoad(options) {
+    const self = this
+    qqmapsdk = new QQMapWX({
+      key: 'SATBZ-RDSWW-YDDR3-RZAAP-ZGCVJ-WRFT3'
+    })
+    this.setProduct()
+  }
+  submit() {
+    const self = this
+    const { boxId } = self.$root.$parent.globalData
+    const productList = _.where(_.union(this.quickArrive, this.tommorrow, this.express), { checked: true })
+    self.$root.$parent.globalData.shoppingCardIdArr = _.pluck(productList, 'shoppingCarId')
+    api.shopCar.judgeIsValidate({
+      method: 'POST',
+      query: {
+        submitArr: productList,
+        boxId
+      }
+    }).then(res => {
+      if (res.data) {
+        self.checked = false
+        self.actual = '0.00'
+        self.amount = 0
+        self.tatual = 0
+        self.freight = '0.00'
+        self.$navigate('/pages/confirmOrder')
+        self.$apply()
+      } else {
+        self.setProduct();
+        tip.toast('购物车内商品状态有更新')
+      }
+    })
+  }
+  async onShow() {
+    const self = this
+    const { globalData } = this.$parent
+    const { location } = globalData
+    const userId = wepy.getStorageSync('userId')
+    if (userId && location) {
+      // this.unLogin = true
+    } else {
+      this.$switch({ url: './index'})
+      
+      // this.unLogin = false
+    }
+    wx.showNavigationBarLoading()
+    self.checked = false
+    self.actual = '0.00'
+    self.amount = 0
+    self.tatual = 0
+    self.freight = '0.00'
+    this.setProduct()
+    this.$invoke('location', 'initLocation')
+  }
+  async onReady() {
+  }
+  onLoad() {
+  }
+
+  // 设置转发参数
+  onShareAppMessage(res) {
+    return {
+      title: '购物车',
+      path: 'pages/shopCar',
+      imageUrl: '',
+      success: function(res) {
+        // 转发成功
+        console.log('转发成功', res)
+      },
+      fail: function(res) {
+        // 转发失败
+      },
+      complete: function(res) {}
+    }
+  }
+}
+</script>
+

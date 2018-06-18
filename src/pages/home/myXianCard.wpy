@@ -1,0 +1,230 @@
+<!--suppress ALL -->
+<template>
+    <view id="my-xiancard" :class="{'white-bg':xianCardArr.length===0}">
+        <navigator url='./myXianCardQuestion'>
+            <view class="xiancard-question-header">
+                鲜卡问题
+                <i class='wenhao icon-font'>&#xe616;</i>
+            </view>
+        </navigator>
+        <view class="xiancard-container">
+            <repeat for="{{xianCardArr}}" key="index" index="index" item="item">
+                <xiancard :xiancardData="item"></xiancard>
+            </repeat>
+            
+        </view>
+         <view class="default-bg" wx:if="{{xianCardArr.length===0&&loading===false}}">
+            <image src='https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662475213.jpg'/>
+        </view>
+        <Loading :init.sync="init"/>
+        <view class="bottom-operate" wx:if="{{!loading}}">
+            没有更多了
+            <view class="line"></view>
+            <navigator url="./myXianCardInvalid"> 查看无效卡</navigator>
+            <i class="jiantou icon-font">
+                        &#xe617;
+                    </i>
+        </view>
+        <navigator url='./bindXianCard' class="bind-xian-card">
+            绑定鲜卡
+        </navigator>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import XianCard from '../../components/xianCard/xianCard'
+    import api from '../../api/index'
+    import moment from 'moment'
+    import Loading from '../../components/common/loading'
+    export default class MyXianCard extends wepy.page {
+        config = {
+            navigationBarTitleText: '鲜卡',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {
+            xiancard: XianCard,
+            Loading: Loading
+        }
+        data = {
+            xianCardArr: [],
+            loading:true,
+            loadingMore:false,
+            current:0,
+            init: false,
+            pageSize:30,
+        }
+        // 引入混合
+        computed = {
+        }
+        watch = {}
+        events = {}
+        methods = {
+            getMsg(e) {
+                console.log(e, e.detail)
+            }
+        }
+        // 设置转发参数
+        onShareAppMessage(options) {
+            let url = options.webViewUrl
+            return {
+                title: this.shareTitle,
+                path: 'pages/link?url=' + encodeURIComponent(url),
+                imageUrl: this.shareImage,
+                success: function(res) {
+                    // 转发成功
+                    console.log('转发成功', res)
+                },
+                fail: function(res) {
+                    // 转发失败
+                },
+                complete: function(res) {}
+            }
+        }
+         onLoad() {
+            this.loadXianCardList(false);
+        }
+        async loadXianCardList(loadMore) {
+            const userId = wx.getStorageSync('userId')
+            console.log(userId)
+            const Result = await api.xiancard.getMyXianCard({
+                query: {
+                    userId,
+                    type: 1,
+                    current:this.current,
+                    pageSize:this.pageSize
+                }
+            })
+            if (Result.statusCode === 200) {
+                this.loading = false
+                this.xianCardArr =  Result.data.map(el=>{
+                    return {
+                        ...el,
+                        activeTime : moment(el.activeTime).format('YYYY-MM-DD') ,
+                        terminalTime :moment(el.terminalTime).format('YYYY-MM-DD'),
+                    }
+                })
+
+                // this.xianCardArr.forEach(element => {
+                //     element.activeTime = moment(element.activeTime).format('YYYY-MM-DD') 
+                //     element.terminalTime =moment(element.terminalTime).format('YYYY-MM-DD') 
+                // });
+                if(loadMore){
+                    this.current = this.current+1;
+                    this.loadingMore = false;
+                }
+                this.init = true
+                this.$apply();
+                
+            }
+        }
+    }
+</script>
+
+<style lang="less">
+    view {
+        box-sizing: border-box;
+    }
+    .icon-font {
+        font-family: "iconfont";
+    }
+    #my-xiancard {
+        width: 100%;
+        height: 100vh;
+        &.white-bg{
+            background: white;
+            view{
+                background: white!important;
+            }
+        }
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            flex: 1;
+            .image-content {
+                width: 615rpx;
+                margin-top: 150rpx;
+            }
+            .desc {
+                font-family: PingFangSC-Regular;
+                font-size: 30rpx;
+                color: #888888;
+                margin-top: 20rpx;
+            }
+        }
+        .xiancard-question-header {
+            background: #f4f5f5;
+            width: 100%;
+            height: 58rpx;
+            line-height: 58rpx;
+            padding-right: 25rpx;
+            text-align: right;
+            font-family: PingFangSC-Regular;
+            font-size: 26rpx;
+            color: #888888;
+            .wenhao {
+                display: inline-block;
+                margin-left: 10rpx;
+                font-size: 25rpx;
+            }
+        }
+        .xiancard-container {
+            width: 100%;
+            background: #f4f5f5;
+            padding: 0 25rpx;
+        }
+        .default-bg{
+            width: 100%;
+            height: 480rpx;
+            margin-top:100rpx;
+            padding:0 68rpx;
+            image{
+                width:100%;
+                height: 100%;
+            }
+        }
+        .bottom-operate {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+             margin: 28rpx 0;
+            font-family: PingFangSC-Regular;
+            font-size: 22rpx;
+            color: #353535;
+            .line {
+                margin: 0 20rpx;
+                background: #353535;
+                width: 2rpx;
+                height: 21rpx;
+            }
+            .jiantou {
+                display: inline-block;
+                margin-left: 10rpx;
+                color: #000000;
+                font-size: 12rpx;
+            }
+        }
+        .bind-xian-card{
+            background:#ffffff;
+box-shadow:0 6rpx 10rpx 0 rgba(72,72,72,0.50);
+width:750rpx;
+height:94rpx;
+position:fixed;
+bottom: 0;
+left: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family:PingFangSC-Regular;
+font-size:30rpx;
+color:#02cb73;
+        }
+    }
+</style>

@@ -1,0 +1,159 @@
+<!--suppress ALL -->
+<template>
+    <scroll-view scroll-y='{{true}}' lower-threshold='100' bindscrolltolower='loadMore' id="xian-card-record">
+        <block wx:for="{{recordList}}" wx:key='index'>
+            <view class="record-item">
+                <view class="left">
+                    <view class="order-num">
+                        订单编号 {{item.orderNumber}}
+                    </view>
+                    <view class="order-time">
+                        {{item.createdAt}}
+                    </view>
+                </view>
+                <view class="right">
+                    {{item.consumeMoney}}
+                </view>
+            </view>
+        </block>
+        <view wx:if="{{loading}}" class=" loading">
+            <image class="image-content" src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522663615412.gif"></image>
+            <text class="desc">努力加载中</text>
+        </view>
+        <view wx:if="{{loadMore}}" class="weui-loadmore">
+            <view class="weui-loading"></view>
+            <view class="weui-loadmore__tips">正在加载</view>
+        </view>
+        <view class="weui-loadmore weui-loadmore_line" wx:if="{{!loading&&!loadMore}}">
+            <text class='no-more weui-loadmore__tips weui-loadmore__tips_in-line' >没有更多了</text>
+        </view>
+    </scroll-view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../api/index'
+    import moment from 'moment'
+    export default class XianCardRecord extends wepy.page {
+        config = {
+            navigationBarTitleText: '消费记录',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {}
+        data = {
+            recordList: [],
+            id: '',
+            current: 0,
+            pageSize: 10,
+            loading: true,
+            loadMore: false
+        }
+        computed = {}
+        watch = {}
+        events = {}
+        methods = {
+            loadMore() {
+                if (this.loadMore) return;
+                this.loadMore = true;
+                this.$apply();
+                this.loadRecord(this.id)
+            }
+        }
+        onLoad(options) {
+            this.loadRecord(options.id)
+        }
+        async loadRecord(id) {
+            const userId = wx.getStorageSync('userId')
+            const result = await api.xiancard.getXianCardUseRecord({
+                query: {
+                    userId,
+                    cardId: id,
+                    current: this.current,
+                    pageSize: this.pageSize
+                }
+            })
+            if (result.statusCode === 200) {
+                this.loading = false;
+                const data = result.data.map(el => {
+                    return {
+                        ...el,
+                        orderNumber: el.orderNumberArr[0],
+                        createdAt: moment(el.createdAt).format('YYYY-MM-DD') + ' ' + moment(el.createdAt).format('HH:mm')
+                    }
+                });
+                this.recordList = this.recordList.concat(data);
+                this.id = id;
+                this.current = this.current + 1;
+                this.loadMore = false
+                this.$apply();
+            }
+        }
+    }
+</script>
+
+<style lang="less">
+    view {
+        box-sizing: border-box;
+    }
+    #xian-card-record {
+        height: 100%;
+        width: 100%;
+        padding-top: 20rpx;
+        background: #f4f5f5;
+        box-sizing: border-box;
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            height: 100%;
+            .image-content {
+                width: 615rpx;
+                margin-top: 150rpx;
+            }
+            .desc {
+                font-family: PingFangSC-Regular;
+                font-size: 30rpx;
+                color: #888888;
+                margin-top: 20rpx;
+            }
+        }
+        .record-item {
+            background: #ffffff;
+            height: 120rpx;
+            padding: 15rpx 25rpx;
+            border-bottom: 1rpx #eeeeee solid;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .left {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                .order-num {
+                    font-family: PingFangSC-Regular;
+                    font-size: 28rpx;
+                    color: #000000;
+                }
+                .order-time {
+                    font-family: PingFangSC-Regular;
+                    font-size: 26rpx;
+                    color: #888888;
+                }
+            }
+            .right {
+                font-family: PingFangSC-Regular;
+                font-size: 30rpx;
+                color: #fe4616;
+            }
+        }
+        .no-more {
+            background: #f4f5f5;
+        }
+    }
+</style>

@@ -1,0 +1,170 @@
+<style lang="less">
+.Feedback{
+  .phoneInfo{
+    height: 88rpx;
+    display: flex;
+    align-items: center;
+    .phone{
+      font-size:30rpx;
+      color:#000000;
+      margin-right: 50rpx;
+    }
+    .phoneNum{
+      font-size:30rpx;
+      color:#888888;
+    }
+  }
+  ProblemDescription{
+    margin-top: 20rpx;
+  }
+  .outside{
+    background: #fff;
+    padding: 0 25rpx;
+  }
+  .footBtn{
+    display: flex;
+    justify-content: center;
+    .btn{
+      margin: 50rpx 0;
+      width: 670rpx;
+      height: 94rpx;
+      line-height: 94rpx;
+      color: #fff;
+      background-color: #02cb73;
+      text-align: center;
+      border-radius: 4rpx;
+    }
+  }
+}
+.outTop{
+  margin-top: 20rpx;
+}
+</style>
+<template>
+  <form class="Feedback" bindsubmit="formSubmit">
+    <view class="phoneInfo outside">
+      <view class="phone">手机号</view>
+      <view class="phoneNum">{{phone}}</view>
+    </view>
+    <ProblemDescription class="outTop" :pleasHold.sync="pleasHold"></ProblemDescription>
+    <view class="footBtn">
+      <button class="btn" form-type="submit" hover-class="none">提交</button>
+    </view>
+  </form>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import ProblemDescription from '../components/problemDescription'
+  import Utility from '../utils/utility.js'
+  import _ from 'underscore'
+  import api from '../api/index'
+
+  export default class Feedback extends wepy.page {
+    config = {
+      navigationBarTitleText: '意见反馈',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+      ProblemDescription
+    }
+    
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      pleasHold: '请输入反馈，我们将为您不断改进',
+      phone: '',
+      userId: ''
+    }
+
+    computed = {
+    }
+
+    events = {
+      upLoadPictrue(files) {
+        this.picture = files
+      }
+    }
+
+    watch = {
+    }
+
+    methods = {
+    }
+    async formSubmit(e) {
+      // console.log(this.userId, this.phone)
+      // console.log(e.detail.value.content)
+      let device = {}
+      let operateSystem = {}
+      let navigatorEngine = {}
+      wx.getSystemInfo({
+        success(res) {
+          device.type = 'mobile'
+          device.identified = true
+          device.manufacturer = res.brand
+          device.model = res.model
+          operateSystem.name = res.platform
+          operateSystem.version = { original: res.system, alias: 'null' }
+          navigatorEngine.name = res.Webkit
+          navigatorEngine.version = { original: res.version, alias: 'null' }
+        }
+      })
+      const arr = []
+      _.each(this.picture, item => {
+        arr.push(Utility.uploadToOss(item))
+      })
+      Promise.all(arr).then(
+        api.order.feedback({
+          query: {
+            userId: this.userId,
+            contact: this.phone,
+            content: e.detail.value.content,
+            device: device,
+            operateSystem: operateSystem,
+            navigatorEngine: navigatorEngine,
+            imageList: this.picture,
+          },
+          method: 'POST',
+        }).then(res => {
+          if (res.statusCode === 200) {
+               wepy.showToast({
+                 title: '提交成功',
+               })
+               wx.switchTab({
+                url: './home',
+                success(res) {
+                  const page = getCurrentPages().pop(); 
+                  if (page == undefined || page == null) return; 
+                  page.onLoad(); 
+                }
+              })
+            }
+        }).catch(err => {
+          console.log(err)
+        })
+      )
+    }
+    async onLoad() {
+      const userInfo = wepy.getStorageSync('userInfo')
+      if (userInfo) {
+        const { phone, userId } = userInfo
+        if (phone) {
+          this.phone = phone
+        }
+        if (userId) {
+          this.userId = userId
+        }
+      } 
+    }
+
+  }
+</script>
+

@@ -1,0 +1,347 @@
+<style lang="less">
+  @import '../assets/style/weui.less';
+  @import '../common/default';
+  // 头部
+  .header {
+    display: flex;
+    align-items: center;
+    width: 750rpx;
+    height: 159rpx;
+    background: linear-gradient(to top, #08b067 1%, @primaryColor 88%);
+    .portrait {
+      width: 110rpx;
+      height: 110rpx;
+      background-color: #EEE;
+      border-radius: 50%;
+      margin: 0 30rpx 0 25rpx;
+
+      .userAvatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+      }
+    }
+    .goLogin {
+      float: left;
+      color: #FFFFFF;
+      font-size: @title;
+      .text {
+        white-space: nowrap;
+        margin-right: 10rpx;
+      }
+    }
+    .userinfo {
+      // display: flex;
+      // flex-direction: column;
+      // font-family: PingFangSC-Regular;
+      // justify-content: space-between;
+      color: #FFFFFF;
+      .nickname {
+        font-size: @title;
+      }
+      .phone {
+        font-size: @secondContent;
+      }
+    }
+  } // 现金券 鲜卡
+  .ticket {
+    display: flex;
+    width: 750rpx;
+    height: 160rpx;
+    .content {
+      background-color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 50%;
+      height: 100%;
+      .text {
+        font-size: 28rpx;
+      }
+      .num {
+        margin-right: 5rpx;
+        font-size: 40rpx;
+      }
+      .unit {
+        font-size: 24rpx;
+      }
+      .green {
+        color: @primaryColor;
+      }
+      .red {
+        color: @subColor;
+      }
+    }
+  }
+  .panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 750rpx;
+    height: 88rpx;
+    background-color: #FFFFFF;
+    color: #888888;
+    .icon {
+      margin-left: 30rpx;
+    }
+    .title {
+      color: #000000;
+      margin-left: 26rpx;
+    }
+    .link {
+      margin-right: 25rpx;
+    }
+  }
+.waitLogin{
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  image{
+   width: 615rpx;
+   height: 479rpx;
+  }
+  text{
+    margin-top:9rpx; 
+    font-size:30rpx;
+    color:#888888;
+  }
+  .btn{
+    margin-top: 40rpx;
+    background:#02cb73;
+    border-radius:4rpx;
+    font-size: 28rpx;
+    width:120rpx;
+    height:58rpx;
+    line-height: 58rpx;
+    color: #fff;
+    text-align: center
+  }
+}
+  .hidden{
+    display: none;
+  }
+  .load{
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+</style>
+
+<template>
+  <!-- class="{{ unLogin? '' : 'hidden' }}"-->
+  <view class="{{ loading? 'hidden' : '' }}">
+    <!-- 头部 -->
+    <view class="header">
+      <view class="portrait">
+        <image wx:if="{{ !hasUserInfo && canIUse }}" class="userAvatar" src="" background-size="cover"></image>
+        <image wx:else class="userAvatar" src="{{photo}}" background-size="cover"/>
+      </view>
+      <view wx:if="{{ !hasUserInfo && canIUse }}" @tap="goLogin" class="goLogin">
+        <text class="text">立即登录</text>
+        <i class="iconfont">&#xe617;</i>
+      </view>
+      <view wx:else class="userinfo">
+        <text class="nickname">{{ userInfo.username }}</text>
+        <view wx:if="{{ userInfo.phone }}" class="phone">
+          <i style="font-size: 28rpx;" class="iconfont">&#xe627;</i> {{ userInfo.phone }}
+        </view>
+        <view wx:else class="phone" @tap="binding">
+          未绑定手机号
+          <i style="font-size: 28rpx;" class="iconfont">&#xe617;</i>
+        </view>
+      </view>
+    </view>
+    <!-- 现金券 鲜卡 -->
+    <view class="ticket">
+      <navigator url="/pages/home/myCoupon" class="content" style="border-right: 1rpx solid #EEEEEE">
+        <text class="unit green"> <text class="num">{{ myWealth.couponNumber }}</text>张</text>
+        <text class="text">现金券</text>
+      </navigator>
+      <navigator url="/pages/home/myXianCard" class="content" style="border-right: 1rpx solid #EEEEEE">
+        <text class="unit red"> <text class="num">{{ myWealth.cardMoney }}</text>元</text>
+        <text class="text">鲜卡</text>
+      </navigator>
+    </view>
+    <!-- 面板 -->
+    <panelAddress style="margin: 20rpx 0;" title="我的地址" icon="&#xe62a;" url="/pages/home/myAddress"/>
+    <panelCollection title="我的收藏" icon="&#xe62b;" url="/pages/home/myCollections" />
+    <panelFeedback topBorder="true" title="意见反馈" icon="&#xe62c;" url="/pages/Feedback"/>
+    <panelService topBorder="true" title="联系客服" icon="&#xe629;" noJump='no' />
+  </view>
+  <!-- <view class="waitLogin {{ unLogin? 'hidden' : '' }} {{loading? 'hidden' : ''}}">
+    <image src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662496336.jpg"/>
+    <text>您还没有登录，请登录后查看</text>
+    <view class="btn" @tap="goLogin">登录</view>
+  </view> -->
+  <view class="weui-loadmore load" wx:if="{{loading}}">
+    <view class="weui-loading"></view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import LoginMixin from '../mixins/login'
+  import PanelNav from '../components/panelNav'
+  import api from '../api/index'
+  export default class Home extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的',
+      navigationBarBackgroundColor: '#02cb73',
+      navigationBarTextStyle: 'white', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'light', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+    components = {
+      panelAddress: PanelNav,
+      panelCollection: PanelNav,
+      panelFeedback: PanelNav,
+      panelService: PanelNav
+    }
+    // 引入混合
+    mixins = [baseMixin, LoginMixin]
+    data = {
+      myWealth:{},
+      canIUse: false,
+      userInfo: {},
+      coupon: 0,
+      xianCardPrice: 862343.56,
+      // unLogin: true,
+      photo: '',
+      loading: true
+    }
+    computed = {
+      now() {
+        return +new Date()
+      }
+    }
+    events = {
+      hideTagPanel() {
+        this.call();
+      },
+    }
+    watch = {}
+    methods = {
+      binding() {
+        this.$navigate({
+          url: `bindingPhoneNum`
+        })
+      }
+    }
+    call() {
+      wx.showModal({
+        title: '联系客服',
+        content: '服务时间：9:00~18:00(节假日除外);\n服务电话 400-157-1162',
+        showCancel: true,
+        cancelText: '取消',
+        cancelColor: '#353535',
+        confirmText: '拨打客服',
+        confirmColor: '#02CB73',
+        success: function(res) {
+          console.log(res);
+          if (res.confirm) {
+            wx.makePhoneCall({
+              phoneNumber: '400-157-1162', //此号码并非真实电话号码，仅用于测试  
+              success: function() {
+                console.log("拨打电话成功！")
+              },
+              fail: function() {
+                console.log("拨打电话失败！")
+              }
+            })
+          }
+        }
+      })
+    }
+    async getData() {
+      // console.log('2');
+      let that = this
+     
+      // const result = await getTestData();
+      // console.log(result);
+    }
+    async onLoad() {
+      const userId = wx.getStorageSync('userId')
+      this.getData()
+      this.loadMyWealth(userId);
+      this.$apply()
+      
+    }
+    async loadMyWealth(userId){
+      const result = await api.xiancard.getMyWealth({
+        query:{
+          userId
+        }
+      })
+      if(result.statusCode===200){
+          this.myWealth = result.data
+          this.loading = false
+          this.$apply();
+      }
+    }
+    goLogin() {
+      this.getLogin()
+      this.$apply()
+    }
+    // 设置转发参数
+    onShareAppMessage(res) {
+      return {
+        title: this.shareTitle,
+        path: 'pages/home',
+        imageUrl: this.shareImage,
+        success: function(res) {
+          // 转发成功
+          console.log('转发成功 curry', res)
+        },
+        fail: function(res) {
+          // 转发失败
+        },
+        complete: function(res) {}
+      }
+    }
+    onShow() {
+      wx.showNavigationBarLoading()
+      const { globalData } = this.$parent
+      const { location } = globalData
+      try{
+        const userId = wx.getStorageSync('userId')
+        this.userInfo = wx.getStorageSync('userInfo')
+        if (userId && location) {
+          // this.unLogin = true
+          wx.hideNavigationBarLoading()
+          
+        } else {
+          // this.unLogin = false
+          this.$switch({ url: './index' })
+          wx.hideNavigationBarLoading()
+        }
+        if (this.userInfo && this.userInfo.photo) {
+          if(this.userInfo.photo.substring(0, 7) === '/client') {
+            this.photo = 'https://xian62-1.oss-cn-hangzhou.aliyuncs.com' + this.userInfo.photo
+          } else if (this.userInfo.photo.substring(0, 14) === 'https://xian62' || this.userInfo.photo.substring(0, 5) === 'https') {
+            this.photo = this.userInfo.photo
+          } else {
+            this.photo = this.userInfo.phone.replace('http', 'https')
+          }
+        }
+      } catch (e) {
+        console.log(e)
+      }
+      this.loadMyWealth()
+    }
+  }
+
+</script>

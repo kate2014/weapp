@@ -1,0 +1,201 @@
+<style lang="less">
+.refundDetail{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .refundMoney{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 88rpx;
+    .num{
+      font-size:30rpx;
+      color:#fe4616;
+    }
+  }
+  .refundPath{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    .title{
+      border-bottom: 2rpx solid #eee;
+      height: 86rpx;
+      line-height: 86rpx;
+    }
+    .contact{
+      display: flex;
+      flex: 1;
+      justify-content:center;
+      align-items:center;
+      .btn{
+        width: 246rpx;
+        height: 56rpx;
+        line-height: 56rpx;
+        text-align: center;
+        font-size:28rpx;
+        color:#888888;
+        border-radius: 4rpx;
+        border:2rpx solid #cacaca;
+        i{
+          margin-right: 10rpx;
+        }
+      }
+    }
+  }
+  .title{
+    font-size:30rpx;
+    color:#202020;
+  }
+}
+.outer{
+  padding: 0 25rpx;
+  background-color: #fff; 
+  margin-top: 20rpx;
+}
+</style>
+<template>
+  <view class="refundDetail">
+    <view class="outer">
+      <ProductDetail :pDetail.sync="pDetail" :cDetail.sync="cDetail"></ProductDetail>
+    </view>
+    <view class="refundMoney outer">
+      <view class="title">退款金额</view>
+      <view class="num">¥{{refund.price}}</view>
+    </view>
+    <view class="refundPath outer">
+      <view class="title">退款流程</view>
+      <Steps :detail.sync="detail"></Steps>
+      <view class="contact">
+        <view class="btn" @tap="phoneCall">
+          <i class="iconfont" style="color: #02cb73">&#xe61b;</i>联系鲜盒子
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import Steps from '../components/steps'
+  import ProductDetail from '../components/productDetail'
+  import api from '../api/index'
+  import moment from 'moment'
+  import _ from 'underscore'
+  import Utility from '../utils/utility.js'
+
+  export default class refundDetail extends wepy.page {
+    config = {
+      navigationBarTitleText: '退款进度',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+      Steps,
+      ProductDetail
+    }
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      pDetail: [],
+      refund: {},
+      detail: [],
+      cDetail: false
+    }
+
+    computed = {
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+      phoneCall() {
+        wepy.makePhoneCall({
+          phoneNumber: '18888888888'
+        })
+      }
+    }
+
+    async getRefundByOrderId(productId, orderId) {
+      const res = await api.order.getRefundByOrderId({
+        query: {
+          id: orderId
+        }
+      })
+      if (res.statusCode === 200) {
+        const { data } = res
+        const { detail } = data
+        const pDetail = this.pDetail
+        const refund = this.refund
+        let productDetail = {}
+        _.each(detail, item => {
+          if (productId === item.productId){
+            productDetail = item
+          }
+        })
+        const { mainPicture, productName, amount, price, weight, refundDetail, refundAmount } = productDetail
+        const image = Utility.splicePictureUrl(mainPicture, 'productDetail')
+        pDetail.push({name: productName, num: amount, price: price,  weight: weight, image: image})
+        refund.price = price
+        let expressInfo =''
+         console.log(refundDetail)
+        _.each(refundDetail, item => {
+          const { createdAt } = item
+          item.time = moment(createdAt).format('YYYY-MM-DD HH:mm:ss')
+          if (!item.refundStatus) {
+            item.expressInfo = '您发起了退款申请'
+          }
+          let describe = ''
+          if (item.refundStatus === '鲜库已同意')  {
+            if (amount === refundAmount) {
+              describe = '鲜盒子已同意当前商品（数量' + amount + '）的退款申请，等待财务审核';
+            } else {
+              describe = '鲜盒子已同意了您的退款申请';
+            }
+          }
+          switch (item.refundStatus) {
+            case '鲜库已同意':
+              item.expressInfo = describe
+              break;
+            case '拒绝退款':
+              item.expressInfo = '鲜盒子拒绝了您的退款,若有问题请联系客服'
+              break;
+            case '财务同意':
+              item.expressInfo = '财务审核通过'
+              break;
+            case '退款成功':
+              item.expressInfo = '退款成功'
+              break;
+            default:
+              break;
+          }
+          
+        })
+        this.detail = refundDetail.reverse()
+        const first = _.first(this.detail)
+        first.current = true
+        first.done = true
+        this.$apply()
+      }
+    }
+
+    async onLoad(params) {
+      const { productId, orderId, cDetail } = params
+      this.cDetail = cDetail
+      this.$apply()
+      this.getRefundByOrderId(productId, orderId)
+    }
+  }
+</script>
+

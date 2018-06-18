@@ -1,0 +1,822 @@
+<template>
+  <view>
+    <view class="search-bar">
+      <view class="search-bar_form">
+        <picker mode="region" bindchange="bindRegionChange" value="{{region}}" custom-item="{{customItem}}">
+          <view class="city">
+            <view>{{region[1]}}</view>
+            <i class="iconfont icon-down">&#xe611;</i>
+          </view>
+        </picker>
+        <view class="search-content">
+          <icon type="search" size="16"></icon>
+          <input type="text" confirm-type="search" class="search-bar_input" placeholder="搜索地点" value="{{inputVal}}" bindinput="inputTyping"/>
+          <view class="icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
+            <icon type="clear" size="14"></icon>
+          </view>
+        </view>
+        
+      </view>
+    </view>
+    <view style="height:20rpx;background-color:#f2f2f2" wx:if="{{searching}}"></view>
+    <scroll-view scroll-y="true" class="search-list" wx:if="{{searching}}">
+      
+      <block wx:for="{{searchList}}" wx:key="key">
+        <view class="search-list-item" id="{{item.id}}" bindtap="selectSearchLit">
+          <view class="search-list-item-title">{{item.title}}</view> 
+          <view class="search-list-item-content">{{item.address}}</view>
+        </view>
+      </block>
+      <view class="no-search" wx:if="{{searching && searchList.length === 0}}">
+        <image src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662487133.jpg"/>
+        <view class="no-search-list">暂无匹配到收货地址，请重新输入！</view>
+      </view>
+    </scroll-view>
+    <view wx:if="{{!searching}}">
+      <view class="note">因各地区商品和配送服务不同，请您选择准确的收货地址</view>
+      <view class="address">
+        <i class="iconfont icon-location">&#xe60f;</i>
+        <view class="address-content" bindtap="currentAddress">{{address.address_reference.landmark_l2.title}}</view> 
+        <view class="getAddress" bindtap="getAddress">
+          <view style="font-size:26rpx;">当前定位</view>
+          <i wx:if="{{!refresh}}" class="iconfont icon-refresh">&#xe610;</i>
+          <image wx:if="{{refresh}}" src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/default/2018/4/1522748017865.gif" class="image-refresh"/>
+        </view>
+      </view>
+      <view class="address-info">
+        <view class="select-title">
+          <view class="distribution {{distribution ? 'selected' : ''}}" id="distribution" bindtap="change">配送地址</view>
+          <view class="take {{distribution ? '' : 'selected'}}" id="take" bindtap="change">自提地址</view>
+        </view>
+        <view class="select-list" wx:if="{{distribution}}">
+          <block wx:for="{{addressList}}" wx:key="key">
+            <view class="select-list-item" id="{{item._id}}" bindtap="selectAddress">
+              <view class="user">
+                <view>{{item.receiver}}</view>
+                <view>{{item.phoneNumber}}</view>
+              </view>
+              <view class="select-list-item-address">{{item.detail}}{{item.unitNumber}}</view>
+            </view>
+          </block>
+          
+        </view>
+
+        <view class="select-list" wx:if="{{!distribution}}">
+          <block wx:for="{{pickerList}}" wx:key="key">
+            <view class="select-list-item" id="{{item._id}}" bindtap="selectPicker">
+              <view class="user">
+                <view>{{item.name}}</view>
+                <view>{{item.phone}}</view>
+              </view>
+              <view class="select-list-item-address">鲜库·{{item.boxInfo.name}}</view>
+            </view>
+          </block>
+        </view>
+        <view class="choose-title">附近地址</view>
+
+        <view class="address-list" wx:if="{{distribution}}">
+          <block wx:for="{{pois}}" wx:key="key">
+            <view class="address-list-item" id="{{item.id}}" bindtap="selectPois">
+              {{item.title}}
+            </view>
+          </block>
+        </view>
+        <view class="xianbox-list" wx:if="{{!distribution}}">
+          <block wx:for="{{xianboxList}}" wx:key="key">
+            <view class="xianbox-list-item">
+              <view id="{{item._id}}" bindtap="selectXianbox">
+                <view class="xianbox-name">{{item.name}}</view>
+                <view class="xianbox-address">{{item.locationDetail}}</view>
+                <view class="xianbox-time">鲜库营业时间：{{item.workTimeStart}}～{{item.workTimeEnd}}</view>
+              </view>
+              <view class="xianbox-location" id="{{item._id}}" bindtap="showXianbox">
+                <i class="iconfont" style="color:#02CB73;">&#xe612;</i>
+                <view class="xianbox-distance">{{item.distance}}km</view>
+              </view>
+            </view>
+          </block>
+        </view>
+
+      </view>
+    </view>
+    <view style="height:1rpx"></view>
+    <view wx:if="{{distribution}}" class="add-address" @tap="targetAddress">新增配送地址</view>
+    <view wx:else class="add-address" @tap="targetAddress">新增自提地址</view>
+  </view>
+</template>
+
+
+<style lang="less">
+@import "../common/default.less";
+/** 修改默认的navigator点击态 **/
+.navigator-hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  opacity: 0.7;
+}
+.unempty {
+  display: none;
+}
+
+.search-bar {
+  width: 750rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  .search-bar_form {
+    width: 710rpx;
+    height: 58rpx;
+    border-radius: 4rpx;
+    background: #f2f2f2;
+    display: flex;
+    align-items: center;
+    .city {
+      height: 58rpx;
+      font-size: 28rpx;
+      padding: 0 20rpx;
+      border-right: 1rpx solid #cecece;
+      display: flex;
+      align-items: center;
+      min-width: 130rpx;
+
+      flex-shrink: 0;
+      .icon-down {
+        padding-left: 20rpx;
+        font-size:10rpx;
+      }
+    }
+    .search-content {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 20rpx;
+      flex-shrink: 1;
+      .search-bar_input {
+        font-size: 26rpx;
+        display: flex;
+        align-items: center;
+        padding: 0 10rpx;
+        color: @content;
+      }
+      .icon-clear {
+        position: absolute;
+        right: 40rpx;
+      }
+    }
+  }
+}
+.search-list {
+  background-color: #ffffff;
+  padding: 0 25rpx;
+  position: fixed;
+  top: 108rpx;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  .search-list-item {
+    height: 128rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 1rpx solid #eeeeee;
+    font-size: 28rpx;
+    .search-list-item-title {
+      font-size: 28rpx;
+    }
+    .search-list-item-content {
+      width: 100%;
+      font-size: 26rpx;
+      color: @minorColor;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+  .no-search{
+    height: 70%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .no-search-list {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30rpx;
+      color: @minorColor;
+    }
+  }
+  
+}
+
+.note {
+  height: 58rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 20rpx;
+  color: @subColor;
+  font-size: @subContent;
+}
+
+.address {
+  height: 88rpx;
+  display: flex;
+  padding: 0 20rpx;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  .icon-location {
+    font-size: 40rpx;
+    color: @primaryColor;
+  }
+  .address-content {
+    font-size: 28rpx;
+    width: 470rpx;
+  }
+  .getAddress {
+    display: flex;
+    align-items: center;
+    color: @minorColor;
+    .icon-refresh {
+      font-size: 40rpx;
+      padding-left:25rpx;
+    }
+    .image-refresh {
+      width:52rpx;
+      height:52rpx;
+      padding-left:20rpx;
+    }
+  }
+}
+
+
+.address-info {
+  margin-top: 25rpx;
+  background-color: #ffffff;
+  margin-bottom: 150rpx;
+  .select-title {
+    height: 88rpx;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-bottom: 1rpx solid #eeeeee;
+    .selected {
+      height: 88rpx;
+      border-bottom: 4rpx solid @primaryColor;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      color: @primaryColor;
+    }
+  }
+  .select-list {
+    padding: 0 25rpx;
+    .select-list-item {
+      height: 140rpx;
+      border-bottom: 1rpx solid #eeeeee;
+      display: flex;
+      flex-direction: column;
+      .user {
+        width: 360rpx;
+        display: flex;
+        justify-content: space-between;
+        color:#888888;
+        font-size: 26rpx;
+        padding-top: 27rpx;
+      }
+      .select-list-item-address {
+        width: 100%;
+        font-size: 28rpx;
+        padding-top: 10rpx;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+  }
+  .choose-title {
+    height: 58rpx;
+    background-color: #f4f4f4;
+    font-size: 26rpx;
+    color: #888888;
+    display: flex;
+    align-items: center;
+    padding: 0 20rpx;
+  }
+
+  .address-list {
+    padding: 0 25rpx;
+    .address-list-item {
+      height: 88rpx;
+      display: flex;
+      align-items: center;
+      border-bottom: 1rpx solid #eeeeee;
+      font-size: 28rpx;
+    }
+  }
+
+  .xianbox-list {
+    padding: 0 25rpx;
+    .xianbox-list-item {
+      height: 140rpx;
+      border-bottom: 1rpx solid #eeeeee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .xianbox-name {
+        font-size: 28rpx;
+      }
+
+      .xianbox-address {
+        font-size: 26rpx;
+        color: #888888;
+      }
+
+      .xianbox-time {
+        font-size: 24rpx;
+        color: #888888;
+      }
+      .xianbox-location {
+        width: 140rpx;
+        height: 140rpx;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        .icon-location {
+          color:@primaryColor;
+        }
+        .xianbox-distance {
+          font-size: 24rpx;
+        }
+      }
+    }
+  }
+}
+.add-address {
+  height: 94rpx;
+  background-color: #ffffff;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  color: @primaryColor;
+  box-shadow: 0 0 8rpx 0 rgba(134, 129, 129, 0.18);
+}
+
+
+
+</style>
+
+<script>
+import wepy from 'wepy'
+import baseMixin from '../mixins/base'
+import api from '../api/index'
+import utility from '../utils/utility'
+import _ from 'underscore'
+
+var QQMapWX = require('../utils/qqmap-wx-jssdk.min.js')
+var qqmapsdk
+
+export default class ChooseAddress extends wepy.page {
+  config = {
+    navigationBarTitleText: '选择收货地址',
+    navigationBarBackgroundColor: '#ffffff', // 导航栏背景颜色
+    navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+    backgroundColor: '#ffffff', // 窗口的背景色
+    backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+    enablePullDownRefresh: false, // 是否开启下拉刷新
+    disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+    onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+  }
+
+  components = {}
+
+  // 引入混合
+  mixins = [baseMixin]
+
+  data = {
+    searching: false,
+    inputVal: '',
+    address: '定位中...',
+    region: ['浙江省', '杭州市', '滨江区'],
+    customItem: '',
+    distribution: true,
+    pois: null,
+    searchList: null,
+    refresh: false,
+    from: null,
+    xianboxList: [],
+    addressList: [],
+    pickerList: []
+  }
+
+  computed = {
+    now() {
+      return +new Date()
+    }
+  }
+
+  watch = {}
+
+  events = {}
+
+  methods = {
+    clearInput: function () {
+      this.inputVal = ''
+      this.searchList = null
+      this.searching = false
+    },
+    inputTyping: function (e) {
+      var that = this
+      this.searching = true
+      this.inputVal = e.detail.value
+      if (e.detail.value === '') {
+        this.searching = false
+      } else {
+        qqmapsdk.getSuggestion({
+          keyword: e.detail.value,
+          region: that.region[1],
+          region_fix: 1,
+          policy: 1,
+          success: function(res) {
+            that.searchList = res.data
+            that.$apply()
+          },
+          fail: function(res) {
+            that.searchList = []
+            that.$apply()
+          },
+          complete: function(res) {
+          }
+        })
+      }
+    },
+    getAddress() {
+      var that = this
+      this.refresh = true
+      wx.getLocation({
+        type: 'gcj02',
+        altitude: false,
+        success: function(res) {
+          var latitude = res.latitude
+          var longitude = res.longitude
+          qqmapsdk.reverseGeocoder({
+            location: {
+              latitude: latitude,
+              longitude: longitude
+            },
+            get_poi: 1,
+            success: function(addRes) {
+              that.address = addRes.result
+              that.pois = addRes.result.pois
+              that.$apply()
+            },
+            fail: function(res) {
+            },
+            complete: function(res) {
+              that.refresh = false
+              that.$apply()
+            }
+          })
+        }
+      })
+    },
+    bindRegionChange: function (e) {
+      this.region = e.detail.value
+    },
+    showXianbox: function(e) {
+      this.xianboxList.forEach(function (i) {
+        if (i._id === e.currentTarget.id) {
+          wx.openLocation({
+            latitude: i.lat * 1,
+            longitude: i.lng * 1,
+            scale: 18,
+            name: i.name,
+            address: i.locationDetail
+          })
+        }
+      })
+    },
+    change: function (e) {
+      if ((e.currentTarget.id === 'distribution' && !this.distribution) || (e.currentTarget.id === 'take' && this.distribution)) {
+        this.distribution = !this.distribution
+      }
+      this.initDistance()
+    },
+    targetAddress() {
+      if (this.distribution) {
+        wepy.navigateTo({
+          url: 'distriAddress?type=new&from=' + this.from
+        })
+      } else {
+        wepy.navigateTo({
+          url: 'selfAddress?type=new&from=' + this.from
+        })
+      }
+    },
+    selectPois: function (e) {
+      var that = this
+      const { globalData } = this.$parent
+      this.pois.forEach(function (i) {
+        if (i.id === e.currentTarget.id) {
+          globalData.location.landmark = i.title
+          globalData.location.coordinate = i.location
+          globalData.location.province = i.ad_info.province
+          globalData.addressId = ''
+          globalData.pickerId = ''
+          // globalData.boxId
+          that.calculateDistance(i.location.lat, i.location.lng)
+          that.getNearAddress()
+        }
+      })
+    },
+    selectSearchLit: function (e) {
+      var that = this
+      const { globalData } = this.$parent
+      this.searchList.forEach(function (i) {
+        if (i.id === e.currentTarget.id) {
+          globalData.location.landmark = i.title
+          globalData.location.coordinate = i.location
+          globalData.location.province = i.province
+          globalData.addressId = ''
+          globalData.pickerId = ''
+          // globalData.boxId
+          that.calculateDistance(i.location.lat, i.location.lng)
+          that.getNearAddress()
+        }
+      })
+      
+    },
+    selectAddress: function (e) {
+      var that = this
+      const { globalData } = this.$parent
+      this.addressList.forEach(function (i) {
+        if (i._id === e.currentTarget.id) {
+          globalData.location.landmark = i.detail // + i.unitNumber
+          globalData.location.coordinate.lat = i.coordinate.lat
+          globalData.location.coordinate.lng = i.coordinate.lng
+          globalData.location.province = i.province
+          globalData.addressId = i._id
+          globalData.pickerId = ''
+          // globalData.boxId
+          that.calculateDistance(i.coordinate.lat, i.coordinate.lng)
+          
+        }
+      })
+    },
+    selectPicker: function (e) {
+      var that = this
+      const { globalData } = this.$parent
+      this.pickerList.forEach(function (i) {
+        if (i._id === e.currentTarget.id) {
+          globalData.location.landmark = '自提：鲜库·' + i.boxInfo.name
+          globalData.location.coordinate.lat = i.boxInfo.lat
+          globalData.location.coordinate.lng = i.boxInfo.lng
+          globalData.location.province = i.boxInfo.location[0]
+          globalData.boxId = i.boxId
+          globalData.addressId = ''
+          globalData.pickerId = i._id
+          globalData.sendWay = 'pick'
+          globalData.isExpress = false
+        }
+      })
+      wx.reLaunch({
+        url: that.from
+      })
+    },
+    selectXianbox: function (e) {
+      var that = this
+      const { globalData } = this.$parent
+      this.xianboxList.forEach(function (i) {
+        if (i._id === e.currentTarget.id) {
+          globalData.location.landmark = '自提：鲜库·' + i.name
+          globalData.location.coordinate.lat = i.lat
+          globalData.location.coordinate.lng = i.lng
+          globalData.location.province = i.location[0]
+          globalData.boxId = i._id
+          globalData.addressId = ''
+          globalData.pickerId = ''
+          globalData.sendWay = 'pick'
+          globalData.isExpress = false
+        }
+      })
+      wx.reLaunch({
+        url: that.from
+      })
+    },
+    currentAddress: function (e) {
+      const { globalData } = this.$parent
+      globalData.location.coordinate = this.address.location
+      globalData.location.landmark = this.address.address_reference.landmark_l2.title
+      globalData.location.province = this.address.ad_info.province
+      globalData.addressId = ''
+      globalData.pickerId = ''
+      // globalData.boxId
+      this.calculateDistance(this.address.location.lat, this.address.location.lng)
+      this.getNearAddress()
+    }
+  }
+  calculateDistance(lat, lng) {
+    var that = this
+    const { globalData } = this.$parent
+    var distanceList = []
+    this.xianboxList.forEach(function (i) {
+      var temp = {}
+      temp.id = i._id
+      temp['latitude'] = i.lat * 1
+      temp['longitude'] = i.lng * 1
+      temp.deliveryRange = i.deliveryRange * 1
+      distanceList.push(temp)
+    })
+    distanceList = distanceList.filter(function (i) {
+      return utility.caculateDistance({ startLng: lng, startLat: lat, endLng: i.longitude, endLat: i.latitude }) <= i.deliveryRange
+    })
+    if (distanceList.length === 0) {
+      globalData.boxId = 'BJ0001'
+      globalData.sendWay = 'express'
+      globalData.isExpress = true
+      wx.reLaunch({
+        url: that.from
+      })
+    } else {
+      qqmapsdk.calculateDistance({
+        mode: 'walking',
+        from: {
+          latitude: lat,
+          longitude: lng
+        },
+        to: distanceList,
+        success: function(res) {
+          // console.log(res)
+          var result = res.result.elements
+          distanceList.forEach(function (i) {
+            result.forEach(function (j) {
+              if (Math.abs(i.latitude - j.to.lat) < 0.00001 && Math.abs(i.longitude - j.to.lng) < 0.00001) {
+                i.distance = j.distance
+              }
+            })
+          })
+          var success = distanceList.filter(function (i) {
+            return i.deliveryRange * 1000 - i.distance >= 0
+          })
+          // console.log(success)
+          if (success.length === 0) {
+            globalData.boxId = 'BJ0001'
+            globalData.sendWay = 'express'
+            globalData.isExpress = true
+          } else {
+            // 排序取distance最小的
+            globalData.boxId = success[0].id
+            globalData.sendWay = 'send'
+            globalData.isExpress = false
+          }
+          wx.reLaunch({
+            url: that.from
+          })
+        },
+        fail: function(res) {
+        },
+        complete: function(res) {
+          // console.log(res)
+        }
+      })
+    }
+  }
+  initDistance() {
+    // var that = this
+    var xianboxList = this.xianboxList
+    var lat = this.address.location.lat
+    var lng = this.address.location.lng
+    xianboxList.forEach(function (i) {
+      i.distance = utility.caculateDistance({ startLng: lng, startLat: lat, endLng: i.lng, endLat: i.lat })
+    })
+    xianboxList = _.sortBy(xianboxList, 'distance')
+    xianboxList.forEach(function (i) {
+      i.distance = i.distance.toFixed(2)
+    })
+    this.xianboxList = xianboxList
+    this.$apply()
+    
+  }
+
+  getNearAddress() {
+    const addressList = this.addressList
+    const nearAddressList = [];
+    const coordinate = this.$parent.globalData.location.coordinate
+    if (addressList) {
+      addressList.forEach((item) => {
+          const params = { startLng: parseFloat(coordinate.lng, 10), startLat: parseFloat(coordinate.lat, 10), endLng: parseFloat(item.coordinate.lng), endLat: parseFloat(item.coordinate.lat) };
+          const distance = utility.caculateDistance(params);
+          if (distance <= 0.1) {
+              Object.assign(item, { distance });
+              nearAddressList.push(item);
+          }
+      });
+      if (nearAddressList.length) {
+        const sortList = _.sortBy(nearAddressList, 'distance').reverse();
+        this.$parent.globalData.addressId = sortList[0]._id
+      }
+    }
+  }
+  setLocation() {
+    var that = this
+    wx.getLocation({
+      type: 'gcj02',
+      altitude: false,
+      success: function(res) {
+        var latitude = res.latitude
+        var longitude = res.longitude
+        qqmapsdk.reverseGeocoder({
+          location: {
+            latitude: latitude,
+            longitude: longitude
+          },
+          get_poi: 1,
+          success: function(addRes) {
+            that.address = addRes.result
+            that.pois = addRes.result.pois
+            that.$apply()
+          },
+          fail: function(res) {
+          },
+          complete: function(res) {
+          }
+        })
+      }
+    })
+  }
+  async init() {
+    var userId = this.$parent.globalData.userId || this.$parent.globalData.userInfo.userId || wx.getStorageSync('userId')
+    const getXianbox = await api.chooseAddress.getXianbox({
+      method: 'GET',
+      query: {
+        current: 0,
+        pageSize: 20
+      }
+    })
+    const getUserAddress = await api.chooseAddress.getUserAddress({
+      method: 'GET',
+      query: {
+        userId: userId,
+        current: 0,
+        pageSize: 20
+      }
+    })
+    const getUserPicker = await api.chooseAddress.getUserPicker({
+      method: 'GET',
+      query: {
+        userId: userId,
+        current: 0,
+        pageSize: 20
+      }
+    })
+    this.xianboxList = getXianbox.data
+    this.addressList = getUserAddress.data
+    this.pickerList = getUserPicker.data
+    wx.hideNavigationBarLoading()    
+    this.$apply()
+  }
+  
+  async onLoad(options) {
+    wx.showNavigationBarLoading()        
+    // console.log(this.$parent)
+    this.from = options.from
+    qqmapsdk = new QQMapWX({
+      key: 'SATBZ-RDSWW-YDDR3-RZAAP-ZGCVJ-WRFT3'
+    })
+    this.setLocation()
+    this.init()
+  }
+  async onShow() {
+  }
+  async onHide() {
+  }
+  async onUnload() {
+  }
+  // 设置转发参数
+  onShareAppMessage(res) {
+    return {
+      title: '鲜盒子',
+      path: 'pages/index',
+      imageUrl: '',
+      success: function(res) {
+        // 转发成功
+        console.log('转发成功', res)
+      },
+      fail: function(res) {
+        // 转发失败
+      },
+      complete: function(res) {}
+    }
+  }
+}
+</script>
+

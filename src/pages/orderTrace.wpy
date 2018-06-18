@@ -1,0 +1,143 @@
+<style lang="less">
+
+.orderTrace{
+  height:100%;
+  .container{
+    padding: 0 25rpx;
+    background-color: #fff; 
+    height:100%;
+    padding-top: 20rpx;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    .content{
+      margin-top: 0;
+      font-size:28rpx;
+      color:#000000;
+    }
+    .time{
+      font-size:26rpx;
+      color:#888888;
+      text-align: left;
+    }
+  }
+}
+.outer{
+  margin-top: 20rpx;
+  background-color: #fff; 
+  padding: 0 25rpx;
+}
+.load{
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+</style>
+<template>
+  <view class="orderTrace">
+    <block wx:if="{{ status === '支付后取消'}}">
+      <view class="container">
+        <view class="content">您的订单已取消，退款金额：23.34元，预计在1-7个工作日原路退回您的账户中</view>
+        <view class="time">2016-12-04  08:36:13</view>
+      </view>
+    </block>
+    <view wx:else class="outer">
+      <Steps :detail.sync="detail"></Steps>
+    </view>
+  </view>
+  <view class="weui-loadmore load" wx:if="{{loading}}">
+    <view class="weui-loading"></view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import Steps from '../components/steps'
+  import api from '../api/index'
+  import moment from 'moment'
+  import _ from 'underscore'
+  import Utility from '../utils/utility.js'
+
+
+  export default class orderTrace extends wepy.page {
+    config = {
+      navigationBarTitleText: '订单跟踪',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+      Steps
+    }
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      detail: [],
+      loading: false,
+      status: ''
+    }
+
+    computed = {
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+    }
+    async getOrderTrace(id) {
+      const res = await api.order.getOrderTraceById({
+        query: {
+          id: id
+        }
+      })
+      this.load = true
+      this.$apply()
+      if (res.statusCode === 200) {
+        const { data } = res
+        const { expressInfo } = data
+        _.each(expressInfo, item => {
+          item.time = moment(item.time).format('YYYY-MM-DD HH:mm:ss')
+          if (item.expressInfo === '备货完成，等待配送') {
+            const { deliveryStaff } = item
+            item.phone = deliveryStaff.phone
+          }
+        })
+        const last = _.last(expressInfo)
+        last.current = true
+        last.done = true
+        this.detail = expressInfo.reverse()
+        this.load = false
+        this.$apply()
+        // this.load = false
+      }
+    }
+    onLoad(params) {
+      const { id, status } = params
+      console.log(params)
+      if(status === '支付后取消') {
+        this.status = status
+      } else {
+        this.getOrderTrace(id)
+      }
+    }
+  }
+</script>
+

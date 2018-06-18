@@ -1,0 +1,451 @@
+<style lang="less">
+@import '../common/default.less';
+.afterSale{
+  height: 100%;
+  .selectAll{
+    display:flex;
+    height:87rpx;
+    align-items:center;
+    border-bottom:1rpx solid #eee;
+    .title{
+      font-size:30rpx;
+      color:#353535;
+      letter-spacing:0.29rpx;
+    }
+    
+  }
+  .commodity{
+    .container{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      height:144rpx;
+      border-bottom:1rpx solid #eee;
+      .weui-check__hd_in-checkbox{
+        padding-right: 20rpx;
+      }
+      .left{
+        display:flex;
+        align-items:center;
+      }
+    }
+    .image{
+      width: 120rpx;
+      height: 120rpx;
+      margin-right: 20rpx;
+      image{
+        width: 120rpx;
+        height: 120rpx;
+      }
+    }
+    .info{
+      .name{
+        font-size: 28rpx;
+      }
+      .num{
+        margin-top: 12rpx;
+        font-size: 26rpx;
+        color: #888;
+      }
+    }
+    .product-chat{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      width: 160rpx;
+      .tap-area{
+        padding: 12rpx;
+      }
+      .product-chat-add{
+        background:@primaryColor;
+        width:40rpx;
+        height:40rpx;
+        border-radius:100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        .icon-chat{
+          color: #fff;
+          font-size: 18rpx;
+        }
+      }
+      .product-chat-text{
+        font-family:PingFangSC-Regular;
+        font-size:30rpx;
+        color:@content;
+        letter-spacing:0;
+      }
+      .product-chat-sub{
+        background:FFF;
+        border:1rpx solid #cacaca;
+        width:39rpx;
+        height:39rpx;
+        border-radius:100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        .icon-chat{
+          color: @minorColor;
+          font-size: 18rpx;
+        }
+      }
+    }
+  }
+  .refundMoney{
+    display: flex;
+    justify-content: space-between;
+    height: 88rpx;
+    align-items: center;
+    .title{
+      font-size: 30rpx;
+      color: #202020;
+    }
+    .money{
+      font-size: 30rpx;
+      color: #fe4616;
+    }
+  }
+  .refundCause{
+    display: flex;
+    justify-content: space-between;
+    height: 88rpx;
+    align-items: center;
+    .refundContainer{
+      align-items: center;
+      display: flex;
+    }
+    .title{
+      font-size: 30rpx;
+      color: #202020;
+      margin-right: 20rpx;
+    }
+    .weui-input{
+      font-size:28rpx;
+      color:#888888;
+    }
+  }
+  
+  .footBtn{
+    display: flex;
+    justify-content: center;
+    .btn{
+      margin: 50rpx 0;
+      width: 670rpx;
+      height: 94rpx;
+      line-height: 94rpx;
+      color: #fff;
+      background-color: #02cb73;
+      text-align: center;
+      border-radius: 4rpx;
+    }
+  }
+}
+.outer{
+  padding: 0 25rpx;
+  background-color: #fff; 
+  margin-top: 20rpx;
+}
+.weui-check__hd_in-checkbox{
+  padding-right: 20rpx;
+}
+.checkbox_circle{
+  margin: 0;
+  width:36rpx;
+  height:36rpx;
+  border-radius:100%;
+  background: #fff;
+  border:2rpx solid #cacaca;
+}
+.checkbox_success{
+  .iconfont{
+    font-size: 40rpx;
+    color: #fff;
+  }
+}
+</style>
+<template>
+  <form class="afterSale" bindsubmit="formSubmit">
+    <view class="select-commodity outer">
+      <view class="selectAll">
+          <view class="weui-cell__hd weui-check__hd_in-checkbox"  @tap.stop="selectAll">
+            <view class="checkbox_circle" wx:if="{{!checked}}"></view>
+            <view class="checkbox_success" wx:if="{{checked}}"><i class="iconfont" style="color: #02cb73">&#xe633;</i></view>
+          </view>
+          <view class="title">全选</view>
+      </view>
+      <view class="commodity">
+        <repeat for="{{checkboxItems}}" item="item" key="key" index="index">
+          <view class="container">
+            <view class="left">
+              <view class="weui-cell__hd weui-check__hd_in-checkbox" @tap.stop="select" id="{{item.productId}}">
+                <view class="checkbox_circle" wx:if="{{!item.checked}}"></view>
+                <view class="checkbox_success" wx:if="{{item.checked}}"><i class="iconfont" style="color: #02cb73">&#xe633;</i></view>
+              </view>
+              <view class="image">
+                <image src="{{item.image}}"/>
+              </view>
+              <view class="info">
+                <view class="name">{{item.name}}</view>
+                <view class="num">x{{item.amount}}</view>
+              </view>
+            </view>
+            <view class="right">
+              <view wx:if="{{item.checked}}" class="product-chat">
+                <view class="tap-area" @tap.stop="subtract({{ item.productId }})">
+                  <view class="product-chat-sub">
+                    <i class="iconfont icon-chat">&#xe614;</i>
+                  </view>
+                </view>
+                <text class="product-chat-text">{{item.num}}</text>
+                <view class="tap-area" @tap.stop="plus({{ item.productId }})">
+                  <view class="product-chat-add">
+                    <i class="iconfont icon-chat">&#xe615;</i>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </repeat>
+      </view>
+      <view class="refundMoney">
+          <view class="title">退款金额</view>
+          <view class="money">¥{{money}}</view>
+      </view>
+    </view>
+        <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+          <view class="refundCause outer">
+              <view class="refundContainer">
+                <view class="title">退款原因</view>
+                <view class="weui-input">{{array[index]}}</view>
+              </view>
+              <view class="icon"><i class="iconfont" style="color: #888">&#xe617;</i></view>
+          </view>
+        </picker>
+      <ProblemDescription :pleasHold.sync="pleasHold"></ProblemDescription>
+      <view class="footBtn" @tap="comfirmRefund">
+        <button class="btn" form-type="submit" hover-class="none">提交</button>
+      </view>
+  </form>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import ProblemDescription from '../components/problemDescription'
+  import api from '../api/index'
+  import moment from 'moment'
+  import _ from 'underscore'
+  import Utility from '../utils/utility.js'
+
+  export default class afterSale extends wepy.page {
+    config = {
+      navigationBarTitleText: '商品信息',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+      ProblemDescription
+    }
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      checked: false,
+      count: false,
+      money: 0.00,
+      showModal: false,
+      array: ['商品质量有问题', '商品错发', '商品漏发', '商品破损', '保质期过短', '其他'],
+      index: 0,
+      checkboxItems: [],
+      pleasHold: '请描述退款原因',
+      refundReson: '',
+      order: {},
+      currenTime: new Date()
+    }
+
+    computed = {
+    }
+
+    events = {
+      upLoadPictrue(files) {
+        this.picture = files
+      },
+      addContent(value) {
+        this.refundReson = value
+      }
+    }
+
+    watch = {
+    }
+
+    methods = {
+      selectAll (e) {
+        const that = this
+        that.checked = !that.checked
+        this.checkboxItems.forEach(elm => {
+          elm.checked = that.checked
+        })
+        this.calculate()
+        this.$apply()
+      },
+      select (e) {
+        const that = this
+        const checkboxItems = that.checkboxItems
+        const { id } = e.currentTarget
+        const value = []
+        _.each(checkboxItems, item => {
+          if (item.productId === id) {
+            item.checked = !item.checked
+          }
+          value.push(item.checked)
+        })
+        let judge = _.indexOf(value, false)
+        if (judge === -1) {
+          that.checked = true
+        } else {
+          that.checked = false
+        }
+        this.calculate()
+        that.$apply()
+      },
+      subtract(productId, e) {
+        const checkboxItems = this.checkboxItems
+        const checkboxItem = _.find(checkboxItems, { productId: productId })
+        const stepper = _.result(checkboxItem, 'num')
+        if (stepper === 1) {
+          _.each(checkboxItems, item => {
+            if (item.productId === productId) {
+              item.checked = false
+            }
+          })
+        } else {
+          _.each(checkboxItems, item => {
+            if (item.productId === productId) {
+              item.num--
+            }
+          })
+        }
+        const judge = _.indexOf(_.pluck(checkboxItems, 'checked'), false)
+        if (judge === -1) {
+          this.checked = true
+        } else {
+          this.checked = false
+        }
+        this.calculate()
+        this.$apply()
+      },
+      plus(productId, e) {
+        const checkboxItems = this.checkboxItems
+        const checkboxItem = _.find(checkboxItems, { productId: productId })
+        const stepper = _.result(checkboxItem, 'num')
+        const amount = _.result(checkboxItem, 'amount')
+        if (stepper < amount) {
+          _.each(checkboxItems, item => {
+            if (item.productId === productId) {
+              item.num++
+            }
+          })
+        } else {
+          wepy.showToast({
+            title: '退货数量应小于购买数量',
+            icon: 'none'
+          })
+        }
+        this.calculate()
+        this.$apply()
+      },
+      bindPickerChange(e) {
+        this.index = e.detail.value
+        this.$apply()
+      },
+      async formSubmit(e) {
+        const arr = []
+        _.each(this.picture, item => {
+          arr.push(Utility.uploadToOss(item))
+        })
+        Promise.all(arr).then(
+          api.order.applySale({
+            query: {
+              detail: this.checkboxItems,
+              orderActualPay: this.money,
+              orderId: this.order._id,
+              orderNumber: this.order.orderNumber,
+              picture: this.picture,
+              reason: this.array[this.index] + '&' + this.refundReson,
+              refundDes: ['发起退款申请'],
+              refundTimes: { '发起退款申请' : this.currenTime },
+            },
+            method: 'POST',
+          }).then(res => {
+            if (res.statusCode === 200) {
+               wepy.showToast({
+                 title: '提交成功',
+               })
+               wx.switchTab({
+                url: './myOrder',
+                success(res) {
+                  const page = getCurrentPages().pop(); 
+                  if (page == undefined || page == null) return; 
+                  page.onLoad(); 
+                }
+              })
+            } else { 
+
+            }
+          })
+        ).catch( err => {
+          console.log(err)
+        })
+      }
+    }
+    calculate() {
+      const checkboxItems = this.checkboxItems
+      let actual = 0
+      _.each(checkboxItems, item => {
+        if (item.checked === true) {
+          actual += (item.price * item.num - item.couponDiscountMoney)
+        }
+      })
+      this.money = parseFloat(actual.toFixed(2));
+      this.$apply()
+    }
+    
+    async comfirmRefund() {
+    }
+    async getOrderDetail(id) {
+      const res = await api.order.getOrderDetailById({
+        query: {
+          id: id
+        }
+      })
+      if (res.statusCode === 200) {
+        const { data } = res
+        this.order = data
+        this.$apply()
+        const { detail } = data
+        _.each(detail, item => {
+          const { productName, amount, mainPicture } = item
+          item.name = productName
+          item.num = amount
+          item.checked = false
+          item.image = Utility.splicePictureUrl(mainPicture, 'todayList')
+        })
+        this.checkboxItems = detail
+        this.$apply()
+      }
+    }
+    onLoad(params) {
+      const {orderId } = params
+      this.getOrderDetail(orderId)
+    }
+  }
+</script>

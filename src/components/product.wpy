@@ -1,0 +1,279 @@
+<style lang="less">
+    @import '../common/default.less';
+    view {
+        box-sizing: border-box;
+    }
+    #product-wraper {
+        padding: 0 25rpx 0 25rpx;
+        width: 750rpx;
+        height: 300rpx;
+        display: flex;
+        flex-direction: column;
+        .top-line {
+            height: 1rpx;
+            width: 100%;
+            background: #eee;
+            margin-bottom: 30rpx; // border-top: 1rpx solid #eee;
+        }
+        .product {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            .product-image {
+                position: relative;
+                width: 250rpx;
+                height: 250rpx;
+                margin-right: 20rpx;
+                image {
+                    width: 250rpx;
+                    height: 250rpx;
+                }
+                .sold-out {
+                    position: absolute;
+                    top:0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 250rpx;
+                    height: 250rpx;
+                    background: rgba(153, 153, 153, 0.40);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .text {
+                        opacity: 0.8;
+                        font-family: PingFangSC-Regular;
+                        font-size: 32rpx;
+                        color:#ffffff;
+                    }
+                }
+            }
+            .product-info {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                height: 100%;
+                flex: 1;
+                overflow: hidden;
+                padding-bottom: 20rpx;
+                .product-name {
+                    font-family: PingFangSC-Regular;
+                    font-size: 32rpx;
+                    color: @mianColor;
+                    text-align: left;
+                    line-height: 34rpx;
+                    width: 100%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+                .product-subName {
+                    font-family: PingFangSC-Regular;
+                    font-size: 30rpx;
+                    color: @minorColor;
+                    text-align: left;
+                    width: 90%;
+                    line-height: 30rpx;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+                .product-tags {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-start;
+                    font-size: 35rpx;
+                    font-family: 'iconfont';
+                    .today {
+                        color: #d4d4d4;
+                    }
+                    .tommorrow {
+                        color: #02cb73;
+                    }
+                }
+                .price-info {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    .product-price {
+                        font-family: PingFangSC-Medium;
+                        font-size: 22rpx;
+                        color: #fe4616;
+                        letter-spacing: 0;
+                        text-align: left;
+                        margin-right: 20rpx;
+                        .price-int {
+                            font-size: 40rpx;
+                        }
+                    }
+                    .product-price-out {
+                        font-family: PingFangSC-Regular;
+                        font-size: 22rpx;
+                        color: @minorColor;
+                        text-align: left;
+                        text-decoration: line-through;
+                    }
+                    .chat {
+                        background: @primaryColor;
+                        width: 65rpx;
+                        height: 65rpx;
+                        border-radius: 100%;
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: center;
+                        align-items: center;
+                        .icon-chat {
+                            color: #f4fffd;
+                            font-size: 30rpx;
+                        }
+                    }
+                    .product-chat {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-between;
+                        align-items: center;
+                        width: 160rpx;
+                        height: 65rpx;
+                        .tap-area {
+                            padding: 12rpx;
+                        }
+                        .product-chat-add {
+                            background: @primaryColor;
+                            width: 40rpx;
+                            height: 40rpx;
+                            border-radius: 100%;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: center;
+                            align-items: center;
+                            .icon-chat {
+                                color: #fff;
+                                font-size: 18rpx;
+                            }
+                        }
+                        .product-chat-text {
+                            font-family: PingFangSC-Regular;
+                            font-size: 30rpx;
+                            color: @content;
+                            letter-spacing: 0;
+                        }
+                        .product-chat-sub {
+                            background: FFF;
+                            border: 1rpx solid #cacaca;
+                            width: 39rpx;
+                            height: 39rpx;
+                            border-radius: 100%;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: center;
+                            align-items: center;
+                            .icon-chat {
+                                color: @minorColor;
+                                font-size: 18rpx;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+</style>
+
+<template>
+    <view id='product-wraper'>
+        <view class="top-line">
+        </view>
+        <view class="product" @tap='goDetail({{item._id}})'>
+            <view class="product-image">
+                <image src="{{ IMAGEHOST+item.mainPicture}}" />
+                <view wx:if="{{item.amount===0}}" class="sold-out">
+                    <text class='text'>已抢光</text>
+                </view>
+            </view>
+            <view class="product-info">
+                <text class="product-name">{{item.name}}</text>
+                <text class="product-subName">{{item.subName}}</text>
+                <view class="product-tags">
+                    <block wx:if="{{isExpress}}">
+                        <view class="today">&#xe635;</view>
+                    </block>
+                    <block wx:else>
+                        <view class="today" wx:if="{{item.useCoupon}}">现金券不可用</view>
+                        <view class="today" wx:if="{{item.sendWay === 1}}">&#xe601;</view>
+                        <view class="tommorrow" wx:else>&#xe600;</view>
+                    </block>
+                </view>
+                <view class="price-info">
+                    <view>
+                        <text class="product-price">
+                        <text>¥</text>
+                        <text class="price-int">{{item.price}}</text>
+                        </text>
+                        <text class="product-price-out">¥{{item.priceOut}}</text>
+                    </view>
+                    <view wx:if="{{item.selectNumber > 0}}" class="product-chat">
+                        <view class="tap-area" @tap.stop="subProduct({{item._id}})">
+                            <view class="product-chat-sub">
+                                <i class="iconfont icon-chat">&#xe614;</i>
+                            </view>
+                        </view>
+                        <text class="product-chat-text">{{item.selectNumber}}</text>
+                        <view class="tap-area" @tap.stop="addProduct({{item._id}})">
+                            <view class="product-chat-add"><i class="iconfont icon-chat">&#xe615;</i></view>
+                        </view>
+                    </view>
+                    <view wx:else class="chat" @tap.stop="addProduct({{item._id}})"><i class="iconfont icon-chat">&#xe607;</i></view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import config from '../common/config'
+    import LoginMixin from '../mixins/login'
+    
+    export default class Product extends wepy.component {
+        props = {
+            item: {
+                type: Object,
+                default: {}
+            },
+            unLogin: {
+                type: Boolean,
+            },
+            isExpress: {
+                type: Boolean,
+                default: false
+            }
+        }
+        mixins = [LoginMixin]
+        
+        data = {
+            IMAGEHOST: config.IMAGEHOST
+        }
+        methods = {
+            goDetail(id) {
+                if (this.unLogin) {
+                    this.getLogin()
+                } else {
+                    this.$emit('goDetail', id)
+                }
+            },
+            addProduct(id) {
+                if (this.unLogin) {
+                   this.getLogin()
+                } else {
+                    this.$emit('addProduct', id)
+                }
+            },
+            subProduct(id) {
+                this.$emit('subProduct', id)
+            },
+        }
+    }
+</script>

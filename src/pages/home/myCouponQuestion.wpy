@@ -1,0 +1,130 @@
+<!--suppress ALL -->
+<template>
+    <view id="coupon-question">
+        <view class="question-head">
+            Q1：现金券是什么？
+        </view>
+        <view class="question-body">
+            现金券是仅限在鲜盒子平台使用，在下单时抵扣相应的金额。
+        </view>
+        <view class="question-head">
+            Q2：现金券怎么获得？
+        </view>
+        <view class="question-body">
+            <view class="">
+                1. 平时您会不定期的收到现金券等优惠，同时也会收到短信告知；
+            </view>
+            <view class="">
+                2. 参与邀请有礼、专题活动、领券中心等特定形式活动获取。
+            </view>
+        </view>
+        <view class="question-head">
+            Q3：现金券有哪些？
+        </view>
+        <view class="question-body">
+            目前“鲜盒子”平台发放的现金券包括通用类现金券（全平台商品通用），类目现金券（指定类目商品使用），鲜库现金券（指定鲜库使用）等。
+        </view>
+        <view class="question-head">
+            Q4：现金券如何使用及使用限制？
+        </view>
+        <view class="question-body">
+            <view class="">
+                1. 您可以进入鲜盒子平台中，点击[我的]--[现金券]中进行查看，并在订单中满足现金券使用限制的情况下使用;
+            </view>
+            <view class="">
+                2. 同一个订单仅可以使用1张现金券，不可叠加使用；
+            </view>
+            <view class="">
+                3. 现金券与新人鲜卡、促销特价商品不能同时使用（订单中含有特价、促销商品不可使用现金券);
+            </view>
+            <view class="">
+                4. 现金券不能兑换现金，优惠金额不能开具发票；
+            </view>
+            <view class="">
+                5. 现金券应在券面载明的有效期内使用，过期作废；
+            </view>
+            <view class="">
+                6. 如使用现金券的订单发生售后退货退款，现金券不予退还，此外，如有其它明确不予退还现金券的情形时则不予退还。
+            </view>
+        </view>
+        <view class="question-body">
+            最终解释权归杭州快又鲜电子商务有限公司所有
+        </view>
+    </view>
+</template>
+
+
+<style lang="less">
+    view {
+        box-sizing: border-box;
+    }
+    .icon-font {
+        font-family: "iconfont";
+    }
+    #coupon-question {
+        width: 100%;
+        height: 100vh;
+        .question-head {
+            background: #ffffff;
+            width: 750rpx;
+            height: 88rpx;
+            font-family: PingFangSC-Medium;
+            font-size: 32rpx;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            padding: 0 25rpx;
+        }
+        .question-body {
+            background: #ffffff;
+            width: 750rpx;
+            padding: 10rpx 25rpx;
+            font-family: PingFangSC-Regular;
+            font-size: 28rpx;
+            color: #888888;
+            view{
+                padding:10rpx 0;
+            }
+        }
+    }
+</style>
+
+<script>
+    import wepy from 'wepy'
+    export default class myCouponQuestion extends wepy.page {
+        config = {
+            navigationBarTitleText: '鲜卡问题',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {}
+        data = {}
+        // 引入混合
+        computed = {}
+        watch = {}
+        events = {}
+        methods = {}
+        // 设置转发参数
+        onShareAppMessage(options) {
+            let url = options.webViewUrl
+            return {
+                title: this.shareTitle,
+                path: 'pages/link?url=' + encodeURIComponent(url),
+                imageUrl: this.shareImage,
+                success: function(res) {
+                    // 转发成功
+                    console.log('转发成功', res)
+                },
+                fail: function(res) {
+                    // 转发失败
+                },
+                complete: function(res) {}
+            }
+        }
+        onLoad() {}
+    }
+</script>

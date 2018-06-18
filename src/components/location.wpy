@@ -1,0 +1,212 @@
+<template>
+  <View>
+    {{location.landmark}}
+  </View>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  var QQMapWX = require('../utils/qqmap-wx-jssdk.min.js')
+  import api from '../api/index'
+  import LoginMixin from '../mixins/login'
+  import utility from '../utils/utility'
+  import _ from 'underscore'
+  
+  var qqmapsdk
+  export default class Location extends wepy.component {
+    props = {}
+    data = {
+      location: {
+        landmark: '定位中...'
+      }
+    }
+    // 引入混合
+    mixins = [LoginMixin]
+    events = {
+      
+    }
+    async onLoad() {
+      qqmapsdk = new QQMapWX({
+        key: 'SATBZ-RDSWW-YDDR3-RZAAP-ZGCVJ-WRFT3'
+      })
+      this.initAddress()
+      this.initLocation()
+      
+    }
+    async onShow() {
+    }
+    async initAddress() {
+      var userId = this.$parent.$parent.globalData.userId || this.$parent.$parent.globalData.userInfo.userId || wx.getStorageSync('userId')
+      const getUserAddress = await api.chooseAddress.getUserAddress({
+        method: 'GET',
+        query: {
+          userId: userId,
+          current: 0,
+          pageSize: 20
+        }
+      })
+      this.addressList = getUserAddress.data 
+      this.$apply()
+    }
+    getNearAddress() {
+      const addressList = this.addressList
+      const nearAddressList = [];
+      const coordinate = this.$parent.$parent.globalData.location.coordinate
+      if (addressList) {
+        addressList.forEach((item) => {
+            const params = { startLng: parseFloat(coordinate.lng, 10), startLat: parseFloat(coordinate.lat, 10), endLng: parseFloat(item.coordinate.lng), endLat: parseFloat(item.coordinate.lat) };
+            const distance = utility.caculateDistance(params);
+            if (distance <= 0.1) {
+                Object.assign(item, { distance });
+                nearAddressList.push(item);
+            }
+        });
+        if (nearAddressList.length) {
+          const sortList = _.sortBy(nearAddressList, 'distance').reverse();
+          this.$parent.$parent.globalData.addressId = sortList[0]._id
+        }
+      }
+    }
+    async getBoxId(latitude, longitude) {
+      const result = await api.location.getClosestBoxID({
+        query: {
+          lat: latitude,
+          lng: longitude
+        }
+      })
+      if (result.statusCode === 200) {
+        if (result.data.status !== 200) {
+          this.$parent.$parent.globalData.boxId = 'BJ0001'
+          this.$parent.$parent.globalData.isExpress = true;
+        } else {
+          this.$parent.$parent.globalData.boxId = result.data.boxId;
+          this.$parent.$parent.globalData.isExpress = false;
+        }
+      }
+    }
+    async initLocation() {
+      const {
+        globalData
+      } = this.$parent.$parent
+      if (globalData.location) {
+        this.location = globalData.location
+        this.getNearAddress()
+        this.$apply()
+      } else {
+        this.getLocation()
+      }
+    }
+    // 获取定位
+    async getLocation() {
+      this.$emit('showLocation')
+      const that = this;
+      const {
+        globalData
+      } = this.$parent.$parent
+      wx.getLocation({
+        type: 'gcj02',
+        altitude: false,
+        success: async function(res) {
+          const latitude = res.latitude
+          const longitude = res.longitude
+          qqmapsdk.reverseGeocoder({
+            location: {
+              latitude: latitude,
+              longitude: longitude
+            },
+            success: function(addRes) {
+              var temp = {}
+              temp.coordinate = addRes.result.location
+              temp.landmark = addRes.result.address_reference.landmark_l2.title
+              temp.province = addRes.result.ad_info.province
+              that.location = temp
+              globalData.location = temp
+              that.getBoxId(latitude, longitude)
+              globalData.addressId = ''
+              globalData.pickerId = ''
+              that.$emit('hiddenLocation')
+              that.$emit('showPage')
+              that.$apply()
+
+            },
+            complete: function(res) {
+              that.getNearAddress()
+            }
+          })
+        },
+        fail: function(res) {
+          that.$emit('hiddenPage')
+          wx.showModal({
+            title: '授权提示',
+            content: '检测到您没打开鲜盒子的定位权限，是否去设置打开？',
+            success(res) {
+              if (res.confirm) {
+                wx.openSetting({
+                  success(res) {
+                    const { authSetting } = res
+                    if (authSetting['scope.userLocation']) {
+                      wx.getLocation({
+                        type: 'gcj02',
+                        altitude: false,
+                        success(res) {
+                          const latitude = res.latitude
+                          const longitude = res.longitude
+                          qqmapsdk.reverseGeocoder({
+                            location: {
+                              latitude: latitude,
+                              longitude: longitude
+                            },
+                            success: function(addRes) {
+                              var temp = {}
+                              temp.coordinate = addRes.result.location
+                              temp.landmark = addRes.result.address_reference.landmark_l2.title
+                              temp.province = addRes.result.ad_info.province
+                              that.location = temp
+                              globalData.location = temp
+                              that.getBoxId(latitude, longitude)
+                              globalData.addressId = ''
+                              globalData.pickerId = ''
+                              that.$emit('showPage')
+                              const pRoute = that.$parent.$parent.__route__.substring(6)
+                              if(pRoute === 'shopCar') {
+                                wx.switchTab({
+                                  url: './shopCar',
+                                  success(res) {
+                                    that.$emit('hiddenLocation')
+                                    that.$emit('showLogin')
+                                    const page = getCurrentPages().pop()
+                                    if (page === undefined || page === null) return
+                                    page.onShow()
+                                  }
+                                })
+                              }
+                              that.$apply()
+                            },
+                            complete: function(res) {
+                            }
+                          })
+                        }
+                      })
+                    }
+                    const userId = wx.getStorageSync('userId')
+                    if (authSetting['scope.userInfo']) {
+                      that.login()
+                    }
+                      // that.$emit('hiddenLogin')
+                      // that.$emit('showLogin')
+                    that.$emit('showPage')
+                  }
+                })
+              } else if (res.cancel) {
+                that.$emit('hiddenPage')
+              }
+            },
+            fail(res) {
+              that.$emit('hiddenPage')
+            }
+          })
+        }
+      })
+    }
+  }
+</script>

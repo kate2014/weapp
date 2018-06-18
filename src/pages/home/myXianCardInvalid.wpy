@@ -1,0 +1,189 @@
+<!--suppress ALL -->
+<template>
+    <view id="my-xiancard" :class="{'white-bg':xianCardArr.length===0}">
+        <navigator url='./myXianCardQuestion'>
+            <view class="xiancard-question-header">
+                鲜卡问题
+                <i class='wenhao icon-font'>&#xe616;</i>
+            </view>
+        </navigator>
+        <view class="xiancard-container">
+          <repeat for="{{xianCardArr}}" key="index" index="index" item="item">
+                <xiancard :xiancardData="item"></xiancard>
+            </repeat>
+        </view>
+         <view class="default-bg" wx:if="{{xianCardArr.length===0&&loading===false}}">
+            <image src='https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662475213.jpg'/>
+            <text>暂无相关鲜卡</text>
+        </view>
+        <Loading :init.sync="init"/>
+        <view class="weui-loadmore weui-loadmore_line" wx:if="{{!loading&&xianCardArr.length!==0}}">
+            <text class='bottom-operate weui-loadmore__tips weui-loadmore__tips_in-line' >没有更多了</text>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import XianCard from '../../components/xianCard/xianCard'
+    import api from '../../api/index'
+    import moment from 'moment'
+    import Loading from '../../components/common/loading'
+
+    export default class MyXianCardInvalid extends wepy.page {
+        config = {
+            navigationBarTitleText: '无效卡',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {
+            xiancard: XianCard,
+            Loading: Loading
+        }
+        data = {
+            xianCardArr: [],
+            loading:true,
+            loadingMore:false,
+            current:0,
+            init: false,
+            pageSize:30,
+        }
+        // 引入混合
+        computed = {
+        }
+        watch = {}
+        events = {}
+        methods = {
+            getMsg(e) {
+                console.log(e, e.detail)
+            }
+        }
+        // 设置转发参数
+        onShareAppMessage(options) {
+            let url = options.webViewUrl
+            return {
+                title: this.shareTitle,
+                path: 'pages/link?url=' + encodeURIComponent(url),
+                imageUrl: this.shareImage,
+                success: function(res) {
+                    // 转发成功
+                    console.log('转发成功', res)
+                },
+                fail: function(res) {
+                    // 转发失败
+                },
+                complete: function(res) {}
+            }
+        }
+        onLoad() {
+            this.loadXianCardList(false);
+        }
+        async loadXianCardList(loadMore) {
+            const userId = wx.getStorageSync('userId')
+            const Result = await api.xiancard.getMyXianCard({
+                query: {
+                    userId,
+                    type: 0,
+                    current:this.current,
+                    pageSize:this.pageSize
+                }
+            })
+            if (Result.statusCode === 200) {
+                this.loading = false
+                 this.xianCardArr =  Result.data.map(el=>{
+                    return {
+                        ...el,
+                        activeTime : moment(el.activeTime).format('YYYY-MM-DD') ,
+                        terminalTime :moment(el.terminalTime).format('YYYY-MM-DD'),
+                    }
+                })
+                if(loadMore){
+                    this.current = this.current+1;
+                    this.loadingMore = false;
+                }
+                this.init = true
+                this.$apply();
+            }
+        }
+    }
+</script>
+
+<style lang="less">
+    view {
+        box-sizing: border-box;
+    }
+    .icon-font {
+        font-family: "iconfont";
+    }
+    #my-xiancard {
+        &.white-bg {
+            background: white;
+            view {
+                background: white!important;
+            }
+        }
+        width: 100%;
+        height: 100vh;
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            flex: 1;
+            .image-content {
+                width: 615rpx;
+                margin-top: 150rpx;
+            }
+            .desc {
+                font-family: PingFangSC-Regular;
+                font-size: 30rpx;
+                color: #888888;
+                margin-top: 20rpx;
+            }
+        }
+        .xiancard-question-header {
+            background: #f4f5f5;
+            width: 100%;
+            height: 58rpx;
+            line-height: 58rpx;
+            padding-right: 25rpx;
+            text-align: right;
+            font-family: PingFangSC-Regular;
+            font-size: 26rpx;
+            color: #888888;
+            .wenhao {
+                display: inline-block;
+                margin-left: 10rpx;
+                font-size: 25rpx;
+            }
+        }
+        .xiancard-container {
+            width: 100%;
+            background: #f4f5f5;
+            padding: 0 25rpx;
+        }
+         .default-bg {
+            width: 100%;
+            height: 480rpx;
+            margin-top: 100rpx;
+            padding: 0 68rpx;
+                text-align: center;
+            image {
+                width: 100%;
+                height: 100%;
+            }
+            text {
+                font-family: PingFangSC-Regular;
+                font-size: 30rpx;
+                color: #888888;
+            }
+        }
+        .bottom-operate {
+           background-color: #f4f5f5;
+        }
+    }
+</style>

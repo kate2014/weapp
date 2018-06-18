@@ -1,0 +1,180 @@
+<style lang="less">
+    @import '../../common/default.less';
+    #receiveCoupon {
+        font-size: 0;
+        width: 100%;
+        .container {
+            width: 100%;
+            .img-wrapper {
+                position: relative;
+                width: 100%;
+                .main-img {
+                    // margin-top: .88rem;
+                    width: 100%;
+                    height: auto;
+                }
+                .button-container {
+                    position: absolute;
+                    top: 63%;
+                    width: 100%;
+                    .common-button {
+                        border-radius: 8rpx;
+                        margin: 0 50rpx;
+                        height: 94rpx;
+                        text-align: center;
+                        line-height: 94rpx;
+                        font-size: 36rpx;
+                        color: #ffffff;
+                        font-weight: 500;
+                    }
+                    .not-receive {
+                        .common-button();
+                        background: #da3624;
+                    }
+                    .received {
+                        .common-button();
+                        background: #ffbb1c;
+                    }
+                }
+            }
+        }
+    }
+</style>
+
+<template>
+    <view id="receiveCoupon">
+        <Loading :init.sync="init" />
+        <view class="container" wx:if='{{activity!==null}}'>
+            <view class="img-wrapper">
+                <image class="main-img" mode='widthFix' @load='imageLoaded' src='{{IMAGEHOST+activity.newConfig.image}}' />
+                <view class='button-container'>
+                    <!-- {{getButton}} -->
+                    <view wx:if="{{!received&&imageLoaded}}" @tap='receiveNewCoupon' class="not-receive">
+                        立即领取
+                    </view>
+                    <view wx:if="{{received&&imageLoaded}}" @tap='goHome' class="received">
+                        领取成功，去逛逛
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../api/index'
+    import moment from 'moment'
+    import Loading from '../../components/common/loading'
+    import _ from 'underscore'
+    import config from '../../common/config'
+    export default class NewerCoupon extends wepy.page {
+        config = {
+            navigationBarTitleText: '邀请新人',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {
+            Loading
+        }
+        // 引入混合
+        data = {
+            IMAGEHOST: config.IMAGEHOST,
+            init: false,
+            activityId:'',
+            received: false,
+            imageLoaded:false,
+            activity: null
+        }
+        computed = {
+            // getButton(){
+            //     return '<view class='not-receive'>123</view>'
+            // }
+        }
+        events = {}
+        watch = {}
+        methods = {
+            imageLoaded(){
+                this.imageLoaded = true;
+            },
+            goHome(){
+                this.$switch('../index')
+            },
+            receiveNewCoupon(){
+            //   console.log(this.$parent.globalData);
+               
+                this.receiveNewCoupon();
+            }
+        }
+        async loadActivity(id) {
+            const userId = wx.getStorageSync('userId')
+            const result = await api.activity.getNewById({
+                query: {
+                    userId,
+                    activityId: id
+                }
+            })
+            // 200  ‘获取新人活动’
+            // 201    ‘不是新人专享活动’
+            // 202  ‘活动已经结束啦’
+            // 203  ‘已经领取过’
+            if (result.statusCode === 200) {
+                const {
+                    data
+                } = result;
+                if (data.code !== 200 && data.code !== 203) {
+                    this.$redirect('../default/noActivity')
+                } else {
+                    if (data.code === 203) {
+                        this.received = true;
+                    }
+                    this.activityId = id;
+                    this.init = true;
+                    this.activity = data.data;
+                    this.$apply();
+                }
+            }
+        }
+        async receiveNewCoupon(){
+            // this.received = true;
+            // this.$apply();
+            const userId = wx.getStorageSync('userId')
+            const result = await api.activity.receiveNew({
+                query: {
+                    userId,
+                    activityId: this.activityId
+                },
+                method:"POST"
+            })
+            if(result.statusCode===200){
+                console.log(result.data);
+                const {data} = result;
+                if(data.code===209){
+                    this.$redirect('../bindingPhoneNum');return;
+                }
+                if(data.code!==200){
+                    wx.showToast({
+                        title: data.msg,
+                        icon:'none'
+                    })
+                }else{
+                    wx.showToast({
+                        title: '领取现金券成功',
+                        icon:'none'
+                    })
+                    this.received = true;
+                }
+                this.$apply();
+            }
+
+        }
+        onLoad(params) {
+            // console.log(params);
+            this.loadActivity(params.id)
+        }
+    }
+</script>

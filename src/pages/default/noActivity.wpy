@@ -1,0 +1,93 @@
+<style lang="less">
+    .container {
+        width: 100%;
+        height: 100%;
+        background: white;
+    }
+    .default-bg {
+        box-sizing: border-box;
+        width: 100%;
+        height: 480rpx;
+        margin-top: 100rpx;
+        padding: 0 68rpx;
+        image {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    text{
+        width: 100%;
+        text-align: center;
+        font-family:PingFangSC-Regular;
+        font-size:30rpx;
+        color:#888888;
+    }
+</style>
+
+<template>
+    <view class="container">
+        <view class="default-bg">
+            <image src='https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662456850.jpg' />
+        </view>
+        <text>暂无活动</text>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../api/index'
+    import LoginMixin from '../../mixins/login'
+    
+    export default class NoActivity extends wepy.page {
+        config = {
+            navigationBarTitleText: '鲜盒子',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 海鲜水产.png页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {}
+        // 引入混合
+        mixins = [LoginMixin]
+        data = {
+        }
+        computed = {
+            now() {
+                return +new Date()
+            }
+        }
+        events = {}
+        watch = {}
+        methods = {
+        }
+        async onLoad(options) {}
+        onShow() {
+            console.log(this.unLogin)
+            const value = wx.getStorageSync('userId')
+            if (value) {
+                this.unLogin = true
+            } else {
+                this.unLogin = false
+            }
+        }
+        // 设置转发参数
+        onShareAppMessage(res) {
+            return {
+                title: this.shareTitle,
+                path: 'pages/home',
+                imageUrl: this.shareImage,
+                success: function(res) {
+                    // 转发成功
+                    console.log('转发成功', res)
+                },
+                fail: function(res) {
+                    // 转发失败
+                },
+                complete: function(res) {
+                }
+            }
+        }
+    }
+</script>
+

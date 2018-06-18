@@ -1,0 +1,192 @@
+<!--suppress ALL -->
+<template>
+    <view id="bind-xiancard">
+        <view class="bind-title ">
+            请输入鲜卡密码
+        </view>
+        <view class="password-wraper">
+            <view class="password-label">
+                密码
+            </view>
+            <view class="password-input">
+                <input class='password-input' @input='input' placeholder='卡密码不区分大小写，不包含“-”' type="text" placeholder-class='place-holder' />
+            </view>
+        </view>
+        <view class="tip">
+            {{tip}}
+        </view>
+        <view class="confirm-button" @tap='confirm'>
+            {{loading?'绑定中...':'确定'}}
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../api/index'
+    export default class BindXianCard extends wepy.page {
+        config = {
+            navigationBarTitleText: '绑定鲜卡',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {}
+        data = {
+            password: '',
+            tip: '',
+            loading: false
+        }
+        // 引入混合
+        computed = {}
+        watch = {}
+        events = {}
+        methods = {
+            getMsg(e) {
+                console.log(e, e.detail)
+            },
+            input(e) {
+                const str = (e.detail.value).replace(/[^a-zA-Z0-9]/g, '')
+                const value = str.replace(/(\w{4})(?=\w)/g, "$1 - ");
+                if (value.length > 25) return value.substr(0, 25);
+                this.password = value;
+                this.$apply();
+                return value;
+            },
+            async confirm() {
+                if (this.loading) return;
+                this.loading = true;
+                const userId = wx.getStorageSync('userId')
+                this.$apply();
+                console.log(this.password);
+                const result = await api.xiancard.bindXianCard({
+                    query: {
+                        userId,
+                        password: this.password.replace(/\s-\s/g, "")
+                    },
+                    method: 'POST'
+                })
+                if (result.statusCode === 200) {
+                    this.loading = false;
+                    this.tip = this.mapResult(result.data);
+                    this.$apply();
+                }
+            }
+        }
+        mapResult(code) {
+            switch (code) {
+                case 'noCard':
+                    return '不存在该鲜卡';
+                case 'noCard':
+                    return '不存在该鲜卡'
+                case 'alreadyReceived':
+                    return '已经绑过'
+                case 'notNewUser':
+                    return '不是新用户'
+                case 'receiveCouponYet':
+                    return '已经领过新人优惠券'
+                case 'alreadyActive':
+                    return '已经激活'
+                case 'success':
+                    return '激活成功'
+                case 'block':
+                    return '黑卡'
+                default:
+                    return ''
+            }
+            //             'noCard'   
+            // 'alreadyReceived'  已经绑过
+            // 'notNewUser'  不是新用户
+            // 'receiveCouponYet'  已经领过新人优惠券
+            // 'alreadyActive'  已经激活
+            // 'success'  激活成功
+            // 'block'  黑卡
+        }
+        // 设置转发参数
+        onShareAppMessage(options) {
+            let url = options.webViewUrl
+            return {
+                title: this.shareTitle,
+                path: 'pages/link?url=' + encodeURIComponent(url),
+                imageUrl: this.shareImage,
+                success: function(res) {
+                    // 转发成功
+                    console.log('转发成功', res)
+                },
+                fail: function(res) {
+                    // 转发失败
+                },
+                complete: function(res) {}
+            }
+        }
+        onLoad() {
+            //'replace(/(\w{4})(?=\w)/g, "$1-"));'
+        }
+    }
+</script>
+
+<style lang="less">
+    view {
+        box-sizing: border-box;
+    }
+    .icon-font {
+        font-family: "iconfont";
+    }
+    #bind-xiancard {
+        width: 100%;
+        height: 100vh;
+        .bind-title {
+            height: 94rpx;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 25rpx;
+            font-family: PingFangSC-Regular;
+            font-size: 30rpx;
+            color: #000000;
+        }
+        .password-wraper {
+            background: #ffffff;
+            width: 100%;
+            height: 88rpx;
+            padding: 0 25rpx;
+            display: flex;
+            align-items: center;
+            font-family: PingFangSC-Regular;
+            font-size: 30rpx;
+            color: #000000;
+            .password-label {}
+            .password-input {
+                flex: 1;
+                margin-left: 50rpx;
+            }
+            .place-holder {
+                color: #888888;
+            }
+        }
+        .tip {
+            padding: 0 25rpx;
+            height: 26rpx;
+
+            margin-top: 24rpx;
+            text-align: left;
+            color: #ff516f;
+            font-size: 26rpx;
+        }
+        .confirm-button {
+            margin: 50rpx 50rpx 0;
+            background: #02cb73;
+            border-radius: 4rpx;
+            width: 670rpx;
+            height: 94rpx;
+            text-align: center;
+            line-height: 94rpx;
+            font-family: PingFangSC-Regular;
+            font-size: 32rpx;
+            color: #ffffff;
+        }
+    }
+</style>

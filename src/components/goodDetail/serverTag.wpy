@@ -1,0 +1,81 @@
+<style lang="less">
+    #component-serverTag {
+        width: 100%;
+        height: 88rpx;
+        background: white;
+        border-top: 1rpx solid #eeeeee;
+        border-bottom: 1rpx solid #eeeeee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 25rpx;
+        .tag-name-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            .tag-name {
+                font-family: MicrosoftYaHei;
+                font-size: 26rpx;
+                display: flex;
+                align-items: center;
+                color: #888888;
+                margin-right: 25rpx;
+            }
+        }
+        .show-tag-detail-button-container {
+            width: 40rpx;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            .show-tag-detail-button {
+                color: #888888;
+                display: flex;
+                align-items: center;
+                font-size: 26rpx;
+            }
+        }
+    }
+</style>
+
+<template>
+    <view id="component-serverTag" @tap="showTagPanel">
+        <view class='tag-name-container'>
+            <block wx:for="{{serverTagData}}"  wx:key='{{index}}'>
+                <view class="tag-name">
+                    ·{{item.title}}
+                </view>
+            </block>
+        </view>
+        <view class="show-tag-detail-button-container">
+            <i class='icon-font show-tag-detail-button'>&#xe60a;</i>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    export default class ServerTag extends wepy.component {
+        props = {
+            serverTagData: {
+                type: Array,
+            },
+        }
+        data = {}
+        components = {}
+        events = {}
+        watch = {}
+        methods = {
+            showTagPanel(){
+                this.$emit('showTagPanel')
+            }
+        }
+        onLoad() {
+            console.log(this);
+            
+            // if (this.serverTagData.length > 4) {
+            //     this.serverTagData = this.serverTagData.slice(0, 4)
+            // }
+        }
+    }
+</script>

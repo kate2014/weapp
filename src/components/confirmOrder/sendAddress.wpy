@@ -1,0 +1,105 @@
+<style lang="less">
+    @import '../../common/default';
+    .sendAddress {
+        width: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        padding: 30rpx @commonPadding;
+        .locationIcon {
+            width: 70rpx;
+            color: @primaryColor;
+            i {
+                font-size: 40rpx;
+            }
+        }
+        .addressInfo {
+            display: flex;
+            flex-direction: column;
+            color: @mianColor;
+            flex: 1;
+            .userInfo {
+                display: flex;
+                font-size: 28rpx;
+                .name {
+                    max-width: 150rpx;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    margin-right: 30rpx;
+                }
+
+            }
+            .address {
+                font-size: 30rpx;
+                font-weight: bold;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+            }
+
+        }
+        .rightIcon {
+            color: @minorColor;
+            margin-left: 5rpx;
+            i {
+                font-size: @subContent;
+            }
+        }
+    }
+
+</style>
+
+<template>
+    <view class="sendAddress" @tap="goSelectAddress">
+        <view class="locationIcon">
+            <i class="iconfont">&#xe62a;</i>
+        </view>
+        <view class="addressInfo">
+            <view class="userInfo">
+                <view class="name">{{address.receiver}}</view>
+                <view class="phoneNumber">{{address.phoneNumber}}</view>
+            </view>
+            <view class="address">{{joinAddress}}</view>
+        </view>
+        <view class="rightIcon">
+            <i class="iconfont">&#xe63e;</i>
+        </view>
+    </view>
+
+</template>
+
+<script>
+
+    import wepy from 'wepy'
+
+    export default class sendAddress extends wepy.component {
+        props = {
+            address: {
+                type: Object,
+            }
+        }
+
+        computed = {
+            joinAddress() {
+                const { unitNumber, detail } = this.address;
+                return `${detail}${unitNumber ? unitNumber : ''}`;
+            }
+        }
+
+        methods = {
+            goSelectAddress() {
+                // this.$root.$redirect('./home/myAddress', { from: 'confirmOrder' });
+                this.$root.$navigate('./home/myAddress', { from: 'confirmOrder' });
+            }
+        }
+
+        onLoad() {
+            console.log(this)
+        }
+
+    }
+
+</script>

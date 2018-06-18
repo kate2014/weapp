@@ -1,0 +1,185 @@
+<style lang="less">
+    #server-tag-panel {
+        position: fixed;
+        height: 100%;
+        width: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0;
+        z-index: 1000;
+        background: rgba(156, 156, 156, 0.65);
+        .tag-wraper {
+            position: fixed;
+            height: 766rpx;
+            width: 100%;
+            bottom: -766rpx;
+            left: 0;
+            background: white;
+            .content-header {
+                background: #ffffff;
+                width: 100%;
+                height: 88rpx;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 34rpx;
+            }
+            .content-body {
+                overflow: scroll;
+                height: 584rpx;
+                width: 100%;
+                .tag-body-item {
+                    height: 146rpx;
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    .top {
+                        display: flex;
+                        align-items: center;
+                        padding-top: 10rpx;
+                        .icon {
+                            width: 65rpx;
+                            height: 42rpx;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            .circle {
+                                background: #02cb73;
+                                width: 15rpx;
+                                height: 15rpx;
+                                border-radius: 100%;
+                            }
+                        }
+                        .tag-name {
+                            display: flex;
+                            align-items: center;
+                            height: 42rpx;
+                            font-family: PingFangSC-Regular;
+                            font-size: 30rpx;
+                            color: #353535;
+                        }
+                    }
+                    .bottom {
+                        flex: 1;
+                        padding: 0 25rpx 0 65rpx;
+                        display: flex;
+                        font-family: PingFangSC-Regular;
+                        font-size: 26rpx;
+                        color: #888888;
+                    }
+                }
+            }
+            .content-footer {
+                height: 94rpx;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #02cb73;
+                font-family: PingFangSC-Regular;
+                font-size: 32rpx;
+                color: #ffffff;
+            }
+        }
+    }
+</style>
+
+<template>
+    <view id="server-tag-panel" animation="{{backgroundAnimationData}}" @touchmove.stop="stop" @tap='hideTagPanel'>
+        <view class="tag-wraper" animation="{{wraperAnimationData}}" @tap.stop="stop">
+            <view class="content-header">
+                服务支持
+            </view>
+            <scroll-view scroll-y='true' class="content-body">
+                <block wx:for="{{serverTagData}}" wx:key='{{index}}'>
+                    <view class="tag-body-item">
+                        <view class="top">
+                            <view class="icon">
+                                <view class="circle">
+                                </view>
+                            </view>
+                            <view class="tag-name">
+                                {{item.title}}
+                            </view>
+                        </view>
+                        <view class="bottom">
+                            {{item.content}}
+                        </view>
+                    </view>
+                </block>
+            </scroll-view>
+            <view class="content-footer" @tap='hideTagPanel'>
+                完成
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    export default class ServerTagPanel extends wepy.component {
+        props = {
+            serverTagData: {
+                type: Array,
+                default: []
+            },
+        }
+        data = {
+            wraperAnimationData: {},
+            backgroundAnimationData: {}
+        }
+        components = {}
+        events = {
+            openTagPanel(event) {
+                this.animationOpen(event);
+            },
+        }
+        watch = {}
+        methods = {
+            hideTagPanel() {
+                this.animationClose();
+                setTimeout(() => {
+                    var that = this;
+                    that.$emit('hideTagPanel')
+                }, 310)
+            },
+            stop() {
+                0
+            },
+        }
+        animationOpen(event) {
+            var that = this;
+            setTimeout(() => {
+                console.log('event', event);
+                that.backgroundAnimation.opacity(1).step();
+                that.backgroundAnimationData = that.backgroundAnimation.export();
+                that.wraperAnimation.bottom(0).step();
+                that.wraperAnimationData = that.wraperAnimation.export();
+                that.$apply();
+            }, 0);
+        }
+        animationClose() {
+            var that = this;
+            that.backgroundAnimation.opacity(0).step();
+            that.backgroundAnimationData = that.backgroundAnimation.export();
+            that.wraperAnimation.bottom('-766rpx').step();
+            that.wraperAnimationData = that.wraperAnimation.export();
+            that.$apply();
+        }
+        onLoad() {
+            this.wraperAnimation = wx.createAnimation({
+                    transformOrigin: "50% 50%",
+                    duration: 300,
+                    timingFunction: "ease",
+                    delay: 0
+                }),
+                this.backgroundAnimation = wx.createAnimation({
+                    transformOrigin: "50% 50%",
+                    duration: 300,
+                    timingFunction: "ease",
+                    delay: 0
+                })
+        }
+    }
+</script>

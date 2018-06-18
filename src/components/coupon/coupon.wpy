@@ -1,0 +1,167 @@
+<template>
+    <view class="coupon" :class="{invalid:couponData.status!=='valid'}">
+        <view class="coupon-info">
+            <view class="coupon-info-container">
+                <view class="name-and-value">
+                    <view class="name">
+                        {{couponData.name}}
+                    </view>
+                    <view class="value">
+                        <i class='symbol'>¥</i> <i>{{couponData.faceValue}}</i>
+                        <view wx:if="{{couponData.status !=='valid'}}" class="status-tag icon-font">
+                            {{couponData.status ==='used'?'&#xe62d;':'&#xe62e;'}}
+                        </view>
+                    </view>
+                </view>
+                <view class="date-and-use-value">
+                    <view wx:if="{{couponData.expiredType !== 'fixPoint'}}" class="date">有效期{{couponData.startTime}} ～ {{couponData.endTime}}</view>
+                    <view wx:else class="date">有效期至{{ couponData.createdAt}}</view>
+                    <view class="use-value">
+                        满{{couponData.minOrderValue}}可用
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="space-line">
+            <view class="inline-line">
+            </view>
+            <view class="left-ball">
+            </view>
+            <view class="right-ball">
+            </view>
+        </view>
+        <view class="coupin-condition">
+            {{couponData.detail}}
+        </view>
+    </view>
+</template>
+
+<style lang="less">
+    .coupon {
+        &.invalid {
+            view {
+                color: #888888!important;
+            }
+        }
+        width: 100%;
+        background: white;
+        box-shadow: 0 2rpx 6rpx 0 rgba(215, 215, 215, 0.50);
+        margin-bottom: 20rpx;
+        .coupon-info {
+            display: flex;
+            flex-direction: column;
+            height: 120rpx;
+            padding: 0 25rpx;
+            .coupon-info-container {
+                display: flex;
+                flex-direction: column;
+                &>view {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .name-and-value {
+                    align-items: flex-end;
+                    height: 72rpx;
+                    .name {
+                        font-family: PingFangSC-Medium;
+                        font-size: 30rpx;
+                        color: #000000;
+                        font-weight: 700;
+                        line-height: 1;
+                    }
+                    .value {
+                        position: relative;
+                        font-family: HelveticaNeue;
+                        line-height: 1;
+                        font-size: 60rpx;
+                        color: #fe4616;
+                        .symbol {
+                            font-family: HelveticaNeue-Medium;
+                            font-size: 35rpx;
+                        }
+                        .status-tag {
+                            position: absolute;
+                            color: #888888;
+                            width: 120rpx;
+                            height: 90rpx;
+                            font-size: 90rpx;
+                            top: 5rpx;
+                            left:-150rpx;
+                        }
+                    }
+                }
+                .date-and-use-value {
+                    height: 48rpx;
+                    font-family: PingFangSC-Regular;
+                    font-size: 24rpx;
+                    color: #353535;
+                    .date {}
+                    .use-value {}
+                }
+            }
+        }
+        .space-line {
+            position: relative;
+            width: 100%;
+            padding: 0 24rpx;
+            .inline-line {
+                width: 100%;
+                border-bottom: 1rpx dotted #eeeeee;
+            }
+            .left-ball {
+                width: 34rpx;
+                height: 34rpx;
+                border-radius: 50%;
+                background: #f4f5f5;
+                position: absolute;
+                left: -17rpx;
+                bottom: -17rpx;
+            }
+            .right-ball {
+                width: 34rpx;
+                height: 34rpx;
+                border-radius: 50%;
+                background: #f4f5f5;
+                position: absolute;
+                right: -17rpx;
+                bottom: -17rpx;
+            }
+        }
+        .coupin-condition {
+            display: flex;
+            align-items: center;
+            font-family: PingFangSC-Regular;
+            font-size: 20rpx;
+            color: #888888;
+            padding: 15rpx 25rpx;
+        }
+    }
+</style>
+
+<script>
+    import wepy from 'wepy'
+    import moment from 'moment'
+    export default class Coupon extends wepy.component {
+        config={
+        }
+        props = {
+            couponData: {
+                type: Object,
+                default:{}
+            },
+        }
+        data = {
+        }
+        computed = {
+        }
+        events = {}
+        watch = {}
+        methods = {}
+        onLoad() {
+            
+        }
+    }
+</script>
+

@@ -1,0 +1,82 @@
+<style lang="less">
+    @import '../../common/default';
+    .listItem {
+        width:100%;
+        height:88rpx;
+        font-size: @secondContent;
+        background-color: white;
+        box-sizing: border-box;
+        .listItemContainer {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            width: auto;
+            height: 100%;
+            margin: 0 @commonPadding;
+            box-sizing: border-box;
+            &.line {
+                border-bottom: 1rpx solid @thinColor;
+            }
+            .available {
+                font-size: 28rpx;
+                max-width: 600rpx;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                &.red {
+                    color: @subColor;
+                }
+                &.black {
+                    color: black;
+                }
+                &.grey {
+                    color: @minorColor;
+                }
+                .rightIcon {
+                    color: @minorColor;
+                    font-size: @subContent;
+                    margin-left: 5rpx;
+                }
+            }
+
+        }
+    }
+
+</style>
+
+<template>
+    <view class="listItem">
+        <view class="listItemContainer line" :class="{ 'line': line === 'true' }" @tap="goPath({{ category }})">
+            <view>{{text}}</view>
+            <view class="available" :class="{ 'red': className === 'red', 'black': className === 'black', 'grey': className === 'grey' }">
+                {{content}}<i wx:if="{{showIcon === 'true'}}" class="iconfont rightIcon">&#xe63e;</i>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+
+    export default class listItem extends wepy.component{
+        props = {
+            text: String,
+            content: String,
+            className: String,
+            showIcon: String,
+            line: String,
+            category: String,
+        }
+
+        methods = {
+            goPath(category) {
+                switch(category) {
+                    case 'xianCard': this.$root.$navigate('./home/myXianCard'); break;
+                    case 'coupon': this.$root.$navigate('./home/myCoupon'); break;
+                    case 'remark': this.$root.$navigate('./orderRemark'); break;
+                    default: '';
+                }
+            }
+        }
+    }
+</script>

@@ -1,0 +1,36 @@
+<style lang="less">
+@import '../assets/style/weui.less';
+</style>
+<template>
+</template>
+<script>
+  import wepy from 'wepy'
+  import api from '../api/index'
+  import _ from 'underscore'
+  import Utility from '../utils/utility'
+  
+  export default class TimeCountDown extends wepy.component {
+    props = {
+      order: {
+        type: Object,
+        default: {}
+      }
+    }
+    events = {
+
+    }
+    components = {
+    }
+    mixins = []
+    data = {
+    }
+    computed = {
+    }
+    methods = {
+    }
+    onLoad() {
+      console.log(this)
+    }
+  }
+</script>
+

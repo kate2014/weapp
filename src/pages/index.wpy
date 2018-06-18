@@ -1,0 +1,978 @@
+<style lang="less">
+  @import '../common/default.less';
+  .wrapper {
+    height: 100%;
+  }
+  .index {
+    background: #FFF;
+    overflow-y: hidden;
+    .header {
+      padding: 15rpx 25rpx 0;
+      .icon-dingwei {
+        font-size: 26rpx;
+        margin-left: 20rpx;
+      }
+      .icon-up {
+        font-size: 12rpx;
+        margin-left: 10rpx;
+        margin-right: 25rpx;
+      }
+      .icon-search {
+        font-size: 28rpx;
+        margin-left: 20rpx;
+        margin-right: 10rpx;
+      }
+      .address-search {
+        float: left;
+        min-width: 205rpx;
+        max-width: 477rpx;
+        height: 58rpx;
+        background: #a6a6a6;
+        border-radius: 100rpx;
+        margin-right: 20rpx;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: #ffffff;
+        .content {
+          font-family: PingFangSC-Medium;
+          font-size: 26rpx;
+          line-height: 26rpx;
+          letter-spacing: 0.87rpx;
+          margin-left: 10rpx;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+      }
+      .product-search {
+        min-width: 203rpx;
+        background: #f2f2f2;
+        border-radius: 100rpx;
+        height: 58rpx;
+        line-height: 58rpx;
+        font-family: PingFangSC-Regular;
+        font-size: 26rpx;
+        color: @minorColor;
+        letter-spacing: 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+    .header:after {
+      display: block;
+      content: '';
+      clear: both;
+    }
+    .swiper {
+      padding: 0 25rpx;
+      position: relative;
+      margin-top: 35rpx;
+      .slide-image {
+        width: 100%;
+        height: 100%;
+      }
+    }
+    .category-show {
+      .category-flex {
+        display: flex;
+        flex-wrap: wrap;
+        .category-item {
+          flex: 1 0 150rpx;
+          margin-top: 35rpx;
+        }
+        .category-flex_icon {
+          display: block;
+          width: 88rpx;
+          height: 88rpx;
+          margin: 0 auto;
+        }
+        .category-flex__label {
+          display: block;
+          margin-top: 10rpx;
+          font-family: PingFangSC-Regular;
+          font-size: 24rpx;
+          color: @content;
+          text-align: center;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+      }
+    }
+    .activity {
+      padding: 0 25rpx;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      margin-top: 56rpx;
+      margin-bottom: 20rpx;
+      .invite {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 295rpx;
+        height: 400rpx;
+        margin-right: 10rpx;
+      }
+      .content {
+        width: 395rpx;
+        .receive {
+          display: block;
+          width: 100%;
+          height: 195rpx;
+          margin-bottom: 10rpx;
+        }
+        .new {
+          display: block;
+          width: 100%;
+          height: 195rpx;
+        }
+      }
+    }
+    .black-split {
+      background: #f4f4f4;
+      width: 100%;
+      height: 20rpx;
+    }
+    .hot-products {
+      .loadmore-line {
+        height: 88rpx;
+        widows: 100%;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .space-line {
+          background: #989898;
+          width: 60rpx;
+          height: 1rpx;
+        }
+        .title {
+          font-family: PingFangSC-Medium;
+          font-size: 36rpx;
+          color: #202020;
+          margin: 0 30rpx;
+        }
+      }
+      // .product {
+      //   padding: 30rpx 0 25rpx;
+      //   display: flex;
+      //   flex-direction: row;
+      //   justify-content: flex-start;
+      //   border-top: 1rpx solid #eee;
+      //   margin: 0 25rpx;
+      //   .product-image {
+      //     width: 250rpx;
+      //     height: 250rpx;
+      //     margin-right: 20rpx;
+      //     image {
+      //       width: 250rpx;
+      //       height: 250rpx;
+      //     }
+      //   }
+      //   .product-info {
+      //     display: flex;
+      //     flex-direction: column;
+      //     justify-content: flex-start;
+      //     width: 430rpx;
+      //     height: 250rpx;
+      //     .product-name {
+      //       font-family: PingFangSC-Regular;
+      //       font-size: 32rpx;
+      //       color: @mianColor;
+      //       text-align: left;
+      //       line-height: 34rpx;
+      //     }
+      //     .product-subName {
+      //       font-family: PingFangSC-Regular;
+      //       font-size: 30rpx;
+      //       color: @minorColor;
+      //       text-align: left;
+      //       margin-top: 13rpx;
+      //       line-height: 32rpx;
+      //     }
+      //     .product-tags {
+      //       display: flex;
+      //       flex-direction: row;
+      //       justify-content: flex-start;
+      //       margin-top: 20rpx;
+      //       .coupon {
+      //         background: #ffffff;
+      //         border: 1rpx solid #d4d4d4;
+      //         border-radius: 2rpx;
+      //         width: 148rpx;
+      //         height: 33rpx;
+      //         font-family: PingFangSC-Regular;
+      //         font-size: 22rpx;
+      //         color: #b8b8b8;
+      //         text-align: center;
+      //         margin-right: 10rpx;
+      //       }
+      //       .today {
+      //         background: #ffffff;
+      //         border: 1rpx solid #d4d4d4;
+      //         border-radius: 2rpx;
+      //         width: 78rpx;
+      //         height: 33rpx;
+      //         font-family: PingFangSC-Regular;
+      //         font-size: 22rpx;
+      //         color: #b8b8b8;
+      //         text-align: center;
+      //       }
+      //       .tommorrow {
+      //         background: #ffffff;
+      //         border: 1rpx solid @primaryColor;
+      //         border-radius: 2rpx;
+      //         width: 78rpx;
+      //         height: 33rpx;
+      //         font-family: PingFangSC-Regular;
+      //         font-size: 22rpx;
+      //         color: #02cb73;
+      //         text-align: center;
+      //         margin-right: 10rpx;
+      //       }
+      //     }
+      //     .price-info {
+      //       display: flex;
+      //       flex-direction: row;
+      //       justify-content: space-between;
+      //       align-items: center;
+      //       margin-top: 41rpx;
+      //       .product-price {
+      //         font-family: PingFangSC-Medium;
+      //         font-size: 22rpx;
+      //         color: #fe4616;
+      //         letter-spacing: 0;
+      //         text-align: left;
+      //         margin-right: 20rpx;
+      //         .price-int {
+      //           font-size: 40rpx;
+      //         }
+      //       }
+      //       .product-price-out {
+      //         font-family: PingFangSC-Regular;
+      //         font-size: 22rpx;
+      //         color: @minorColor;
+      //         text-align: left;
+      //         text-decoration: line-through;
+      //       }
+      //       .chat {
+      //         background: @primaryColor;
+      //         width: 65rpx;
+      //         height: 65rpx;
+      //         border-radius: 100%;
+      //         display: flex;
+      //         flex-direction: row;
+      //         justify-content: center;
+      //         align-items: center;
+      //         .icon-chat {
+      //           color: #f4fffd;
+      //           font-size: 30rpx;
+      //         }
+      //       }
+      //       .product-chat {
+      //         display: flex;
+      //         flex-direction: row;
+      //         justify-content: space-between;
+      //         align-items: center;
+      //         width: 160rpx;
+      //         height: 65rpx;
+      //         ;
+      //         .tap-area {
+      //           padding: 12rpx;
+      //         }
+      //         .product-chat-add {
+      //           background: @primaryColor;
+      //           width: 40rpx;
+      //           height: 40rpx;
+      //           border-radius: 100%;
+      //           display: flex;
+      //           flex-direction: row;
+      //           justify-content: center;
+      //           align-items: center;
+      //           .icon-chat {
+      //             color: #fff;
+      //             font-size: 18rpx;
+      //           }
+      //         }
+      //         .product-chat-text {
+      //           font-family: PingFangSC-Regular;
+      //           font-size: 30rpx;
+      //           color: @content;
+      //           letter-spacing: 0;
+      //         }
+      //         .product-chat-sub {
+      //           background: FFF;
+      //           border: 1rpx solid #cacaca;
+      //           width: 39rpx;
+      //           height: 39rpx;
+      //           border-radius: 100%;
+      //           display: flex;
+      //           flex-direction: row;
+      //           justify-content: center;
+      //           align-items: center;
+      //           .icon-chat {
+      //             color: @minorColor;
+      //             font-size: 18rpx;
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
+    }
+    .footer {
+      background: @thickLine;
+      width: 750rpx;
+      height: 228rpx;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      .content {
+        background: #ffffff;
+        border: 1rpx solid #cacaca;
+        border-radius: 4rpx;
+        width: 518rpx;
+        height: 78rpx;
+        font-family: MicrosoftYaHei;
+        font-size: 26rpx;
+        color: @minorColor;
+        letter-spacing: 0.25rpx;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        .icon-edit {
+          margin-left: 9rpx;
+        }
+      }
+    }
+  }
+  .default {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    image {
+      width: 615rpx;
+      height: 479rpx;
+    }
+    text {
+      margin-top: 9rpx;
+      font-size: 30rpx;
+      color: #888888;
+    }
+    .btn {
+      margin-top: 40rpx;
+      background: #02cb73;
+      border-radius: 4rpx;
+      font-size: 28rpx;
+      width: 120rpx;
+      height: 58rpx;
+      line-height: 58rpx;
+      color: #fff;
+      text-align: center
+    }
+  }
+  .hidden {
+    display: none;
+  }
+  .load{
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+  }
+</style>
+
+<template>
+  <scroll-view scroll-y={{true}} lower-threshold='300' bindscrolltolower='loadMore' class="wrapper {{ showView ? '' : 'hidden' }}">
+    <view class="index">
+      <view class='header'>
+        <view class="address-search" @tap="targetAddress">
+          <i class="iconfont icon-dingwei">&#xe604;</i>
+          <location class="content" />
+          <i class="iconfont icon-up">&#xe605;</i>
+        </view>
+        <view class="product-search" @tap="targetSearch">
+          <i class="iconfont icon-search">&#xe606;</i>
+          <view>输入商品名</view>
+        </view>
+      </view>
+      <view class="swiper" wx:if="{{ Carousel.length>0 }}">
+        <swiper indicator-dots="{{CarouselConfig.indicatorDots}}" indicator-color="{{CarouselConfig.indicatorColor}}" indicator-active-color="{{CarouselConfig.indicatorActiveColor}}" autoplay="{{CarouselConfig.autoplay}}" interval="{{CarouselConfig.interval}}"
+          duration="{{CarouselConfig.duration}}" style="height: 280rpx">
+          <block wx:for="{{ Carousel }}" wx:key="index">
+            <swiper-item>
+              <image src="{{IMAGEHOST+item.coverImage}}" @tap='goDetail({{item.product[0]}})' class="slide-image" mode="widthFix"/>
+            </swiper-item>
+          </block>
+        </swiper>
+      </view>
+      <view class="category-show" wx:if="{{categorys.length>0}}">
+        <!-- <block wx:for="{{}}" wx:key="index" wx:for-item="category"> -->
+        <view class=" category-flex" >
+          <block wx:for="{{categorys}}" wx:key="index">
+            <view class="category-item" @tap="targetChannel({{item}})">
+              <image class="category-flex_icon" src="{{item.url}}" />
+              <view class="category-flex__label">{{item.name}}</view>
+            </view>
+          </block>
+        </view>
+        <!-- </block> -->
+      </view>
+      <view class="activity" wx:if="{{activitys.length>0}}">
+        <image class="invite" @tap='goActivity({{activitys[0].activityId}}, invite)' src={{activitys[0].url}} />
+        <view class="content">
+          <image class="receive" @tap='goActivity({{activitys[1].activityId}},coupon)' src={{activitys[1].url}} />
+          <image class="new" @tap='goActivity({{activitys[2].activityId}},newer)' src={{activitys[2].url}} />
+        </view>
+      </view>
+      <view class="black-split"></view>
+      <view class="hot-products">
+        <view class="loadmore-line">
+          <view class="space-line"></view>
+          <view class="title">热销专区</view>
+          <view class="space-line"></view>
+        </view>
+        <!-- <block wx:for="{{products}}" wx:key="index">
+            <view class="product" @tap='goDetail({{item._id}})'>
+              <view class="product-image">
+                <image src="{{ IMAGEHOST+item.mainPicture}}" />
+              </view>
+              <view class="product-info">
+                <text class="product-name">{{item.name}}</text>
+                <text class="product-subName">{{item.subName}}</text>
+                <view class="product-tags">
+                  <text class="coupon" wx:if="{{item.useCoupon}}">现金券不可用</text>
+                  <text class="today" wx:if="{{item.sendWay === 1}}">今日达</text>
+                  <text class="tommorrow" wx:else>明日达</text>
+                </view>
+                <view class="price-info">
+                  <view>
+                    <text class="product-price">
+                                          <text>¥</text>
+                    <text class="price-int">{{item.price}}</text>
+                    <text>{{item.priceDemic}}</text>
+                    </text>
+                    <text class="product-price-out">¥{{item.priceOut}}</text>
+                  </view>
+                  <view wx:if="{{item.selectNumber > 0}}" class="product-chat">
+                    <view class="tap-area" @tap.stop="subProduct({{item._id}})">
+                      <view class="product-chat-sub">
+                        <i class="iconfont icon-chat">&#xe614;</i>
+                      </view>
+                    </view>
+                    <text class="product-chat-text">{{item.selectNumber}}</text>
+                    <view class="tap-area" @tap.stop="addProduct({{item._id}})">
+                      <view class="product-chat-add"><i class="iconfont icon-chat">&#xe615;</i></view>
+                    </view>
+                  </view>
+                  <view wx:else class="chat" @tap.stop="addProduct({{item._id}})"><i class="iconfont icon-chat">&#xe607;</i></view>
+                </view>
+              </view>
+            </view>
+          </block> -->
+        <repeat for="{{products}}" key="index" index="index" item="item">
+          <product :item="item" :isExpress.sync="isExpress" :unLogin.sync="unLogin"></product>
+        </repeat>
+      </view>
+      <view wx:if="{{isShowLoadMore}}" class="weui-loadmore">
+        <view class="weui-loading"></view>
+        <view class="weui-loadmore__tips">正在加载</view>
+      </view>
+      <view class="footer" wx:if="{{products.length >= 30}}">
+        <view class="content" @tap="addFeedback">
+          <i class="iconfont">&#xe608;</i>
+          <text class="icon-edit">已经没有啦~告诉我你想吃什么吧？</text>
+        </view>
+      </view>
+    </view>
+    <footerDialog />
+  </scroll-view>
+  <view class="default {{ showView ? 'hidden' : '' }}">
+    <image src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662491035.jpg" />
+    <text>无法获取您的地址，请打开定位权限</text>
+    <view class="btn" @tap="getLocated">定位</view>
+  </view>
+  <!-- <view class="weui-loadmore load" wx:if="{{loading}}">
+    <view class="weui-loading"></view>
+  </view> -->
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import shopCarMixin from '../mixins/shopcar'
+  import syncShopCar from '../mixins/syncShopCar'
+  import productMixin from '../mixins/product'
+  import LoginMixin from '../mixins/login'
+  import FooterDialog from '../components/footerDialog'
+  import api from '../api/index'
+  import config from '../common/config'
+  import Location from '../components/location'
+  import _ from 'underscore'
+  import Product from '../components/product'
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '鲜盒子',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 海鲜水产.png页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+    components = {
+      footerDialog: FooterDialog,
+      location: Location,
+      product: Product
+    }
+    // 引入混合
+    mixins = [shopCarMixin, syncShopCar,productMixin, LoginMixin]
+    data = {
+      Carousel: [],
+      CarouselConfig: {
+        indicatorDots: true,
+        indicatorColor: '#d8d8d8',
+        indicatorActiveColor: '#0acd0c',
+        autoplay: true,
+        interval: 5000,
+        duration: 1000,
+      },
+      categorys: [],
+      activitys: [],
+      products: [],
+      markArr:[0,0],
+      showView: true,
+      IMAGEHOST: config.IMAGEHOST,
+      current: 0,
+      pageSize: 5,
+      isShowLoadMore: false,
+      userExpectedContene: '',
+      userId: '',
+      unLogin: true,
+      isExpress: false,
+      code: ''
+      // loading: true
+    }
+    computed = {}
+    events = {
+      showPage() {
+        this.showView = true
+      },
+      hiddenPage() {
+        this.showView = false
+      }
+    }
+    getLocated() {
+      const self = this
+      wx.showModal({
+        title: '授权提示',
+        content: '检测到您没打开鲜盒子的定位权限，是否去设置打开？',
+        success(res) {
+          if (res.confirm) {
+            wx.openSetting({
+              success(res) {
+                const { authSetting } = res
+                self.showView = !self.showView
+                if (authSetting['scope.userInfo']) {
+                  self.login()
+                }
+                self.$apply()
+              }
+            })
+          } else if (res.cancel) {
+            console.log('用户取消授权')
+          }
+        }
+      })
+    }
+    watch = {}
+    methods = {
+      goDetail(id) {
+        if (this.unLogin) {
+          this.getLogin()
+        } else {
+          this.$navigate({
+            url: `./goodDetails?productId=${id}`
+          })
+        }
+        
+        // this.$navigate(`./goodDetails?productId=${id}`, {})
+      },
+      goActivity(param,activityType){
+        if (this.unLogin) {
+          this.getLogin()
+        } else {
+          switch (activityType) {
+            case 'coupon':
+                this.$navigate({
+                  url: './default/noActivity'
+                })
+              break;
+            case 'invite':
+                this.$navigate({
+                  url: `./activity/inviteNew?id=${param}`
+                })
+              break;
+            case 'newer':
+                this.$navigate({
+                  url: `./activity/newerCoupn?id=${param}`
+                })
+              break;
+            default:
+              break;
+          }
+          
+        }
+        
+      },
+      addFeedback() {
+        if (this.unLogin) {
+          this.getLogin()
+        } else {
+          this.$invoke('footerDialog', 'open')
+
+        }
+      },
+      targetSearch() {
+        if (this.unLogin) {
+          this.getLogin()
+        } else {
+          this.$navigate({
+            url: 'searchProduct'
+          })
+        }
+        
+      },
+      targetAddress() {
+        if (this.unLogin) {
+          this.getLogin()
+        } else {
+          this.$navigate({
+            url: 'chooseAddress?from=index'
+          })
+        }
+      },
+      targetChannel(category) {
+        if (this.unLogin) {
+          this.getLogin()
+        } else {
+          if (category.name === '全部分类') {
+            this.$navigate({
+              url: 'allCategory'
+            })
+          } else {
+            this.$navigate({
+              url: `channel?name=${category.name}&categoryId=${category.categoryId}`
+            })
+          }
+        }
+        
+      },
+      async loadMore() {
+        if (this.products.length >= 30 || this.isShowLoadMore) return;
+        this.isShowLoadMore = true;
+        this.$apply();
+        this.loadProduct()
+      }
+    }
+    async loadProduct() {
+      const {
+        boxId,
+        shopingCarData,
+        isExpress
+      } = this.$parent.globalData
+      if (!boxId) return;
+      const product = await api.home.getHomeProduct({
+        query: {
+          current: this.current,
+          pageSize: this.pageSize,
+          boxId,
+          isExpress
+        }
+      })
+      if (product.statusCode === 200) {
+        this.mergeShopDataIntoProduct(shopingCarData, product.data)
+        this.products = this.products.concat(product.data);
+        this.current = this.current + 1;
+        this.isShowLoadMore = false;
+        this.$apply();
+      }
+    }
+    async loadCarousel() {
+      const Carousel = await api.home.getAdvertise({
+        query: {
+          position: 'wxMiniProgram'
+        }
+      })
+      if (Carousel.statusCode === 200) {
+        this.Carousel = Carousel.data;
+        this.markArr[0] = 1;
+      }
+      this.checkMark()
+      
+    }
+    async loadConfig() {
+      const config = await api.home.getHomeConfig({})
+      if (config.statusCode === 200) {
+        this.categorys = config.data.categoryConfigs;
+        this.activitys = config.data.activityConfigs
+         this.markArr[1] = 1;
+      }
+      this.checkMark()
+    }
+    checkMark(){
+      for(let i=0;i<this.markArr.length;i++){
+        if(!this.markArr[i]){
+          return;
+        }
+      }
+      wx.hideNavigationBarLoading();
+      
+    }
+    async loadShopCarData() {
+      const userId = wepy.getStorageSync('userId')
+      const result = await api.shopCar.getInfoByUserId({
+        query: {
+          userId
+        }
+      })
+      if (result.statusCode === 200) {
+        this.$parent.globalData.shopingCarData = result.data;
+        this.loadProduct()
+      }
+    }
+    async getCode() {
+      const loginCode = await wepy.login()
+      const { code } = loginCode
+      return code
+    }
+    getUserInfo() {
+      wepy.getUserInfo({
+        success: function(res) {
+          console.log('success')
+          return res
+        },
+        fail: function(err) {
+          console.log(err)
+          return err
+        }
+      })
+    }
+    login() {
+      // 登录
+      const that = this
+      const { globalData } = that.$parent
+      wx.checkSession({
+        success(res) {
+          const sessionId = wepy.getStorageSync('sessionId')
+          if (sessionId) {
+            wx.getUserInfo({
+              success: function(res) {
+                wepy.setStorageSync('isAgree', true)
+                api.order.register({
+                  query: {
+                    sessionId: sessionId,
+                    rawData: res.rawData,
+                    signature: res.signature,
+                    encryptedData: res.encryptedData,
+                    iv: res.iv,
+                  },
+                  method: 'POST',
+                }).then(res => {
+                  const { data } = res
+                  const { userId, username, phone, photo, wesmallOpenId } = data
+                  const userInfo = {
+                    userId: userId,
+                    username: username,
+                    phone: phone,
+                    photo: photo,
+                    openid: wesmallOpenId,
+                  }
+                  globalData.userInfo = userInfo
+                  globalData.userId = userId
+                  wepy.setStorageSync('userInfo', userInfo)
+                  wepy.setStorageSync('userId', userId)
+                  that.unLogin = false
+                  that.$apply()
+                }).catch(err => {
+                  console.log(err)
+                })
+              },
+              fail: function(err) {
+                console.log(err)
+                wepy.setStorageSync('isAgree', false)
+              }
+            })
+          } else {
+            that.getCode().then((res) => {
+              api.order.loginIn({
+                query: {
+                  code: res
+                },
+                method: 'POST',
+              }).then(res => {
+                const { data } = res
+                const sessionId = data.data
+                wepy.setStorageSync('sessionId', sessionId)
+                that.getUserInfo().then(res => {
+                  api.order.register({
+                    query: {
+                      sessionId: sessionId,
+                      rawData: res.rawData,
+                      signature: res.signature,
+                      encryptedData: res.encryptedData,
+                      iv: res.iv,
+                    },
+                    method: 'POST',
+                  }).then(res => {
+                    const { data } = res
+                    const { userId, username, phone, photo, wesmallOpenId } = data
+                    const userInfo = {
+                      userId: userId,
+                      username: username,
+                      phone: phone,
+                      photo: photo,
+                      openid: wesmallOpenId,
+                    }
+                    globalData.userInfo = userInfo
+                    globalData.userId = userId
+                    wepy.setStorageSync('userInfo', userInfo)
+                    wepy.setStorageSync('userId', userId)
+                    that.unLogin = false
+                    that.$apply()
+                  })
+                }).catch(err => {
+                  that.getLogin()
+                })
+              })
+            }).catch(err => {
+              console.log(err)
+            })
+          }
+        },
+        fail(res) {
+          that.getCode().then((res) => {
+            api.order.loginIn({
+              query: {
+                code: res
+              },
+              method: 'POST',
+            }).then(res => {
+              const { data } = res
+              const sessionId = data.data
+              wepy.setStorageSync('sessionId', sessionId)
+              wx.getUserInfo({
+                success: function(res) {
+                  console.log('success')
+                  wepy.setStorageSync('isAgree', true)
+                  api.order.register({
+                    query: {
+                      sessionId: sessionId,
+                      rawData: res.rawData,
+                      signature: res.signature,
+                      encryptedData: res.encryptedData,
+                      iv: res.iv,
+                    },
+                    method: 'POST',
+                  }).then(res => {
+                    const { data } = res
+                    const { userId, username, phone, photo, wesmallOpenId } = data
+                    const userInfo = {
+                      userId: userId,
+                      username: username,
+                      phone: phone,
+                      photo: photo,
+                      openid: wesmallOpenId,
+                    }
+                    globalData.userInfo = userInfo
+                    globalData.userId = userId
+                    wepy.setStorageSync('userInfo', userInfo)
+                    wepy.setStorageSync('userId', userId)
+                    that.unLogin = false
+                    that.$apply()
+                  }).catch(err => {
+                    console.log(err)
+                  })
+                },
+                fail: function(err) {
+                  console.log(err)
+                  wepy.setStorageSync('loginCount', 2)
+                  wepy.setStorageSync('isAgree', false)
+                }
+              })
+            })
+          }).catch(err => {
+            console.log(err)
+          })
+        }
+      })
+      this.loadShopCarData();
+    }
+    onShow() {
+      const self = this
+      if (wepy.getStorageSync('userId')) {
+        this.unLogin = false
+      } else {
+        this.unLogin = true
+        setTimeout(function() {
+          if (!wepy.getStorageSync('isAgree') && wepy.getStorageSync('loginCount') !== 1) {
+            self.getLogin()
+          }
+        }, 500)
+        this.login()
+      }
+      this.isExpress = this.$parent.globalData.isExpress
+      //更新购物车数量
+
+      //更新定位数据
+      this.$invoke('location', 'initLocation')
+      //this.$invoke('location', 'getLocation')
+    }
+    onUnload() {
+      console.log('12')
+      console.log('onUnload');
+    }
+    async onLoad() {
+      const that = this
+      wx.showNavigationBarLoading()
+      const value = wepy.getStorageSync('userId')
+      this.userId = value
+      const value2 = this.$parent.globalData.userId
+      if (!value || !value2) {
+        this.login()
+      } else {
+        this.loadShopCarData();
+      }
+      this.loadCarousel();
+      this.loadConfig();
+    }
+    // 转发分享
+    onShareAppMessage(res) {
+      return {
+        title: this.shareTitle,
+        path: 'pages/index',
+        imageUrl: this.shareImage,
+        success: function(res) {
+          // 转发成功
+          console.log('转发成功', res)
+        },
+        fail: function(res) {
+          // 转发失败
+        },
+        complete: function(res) {}
+      }
+    }
+  }
+</script>

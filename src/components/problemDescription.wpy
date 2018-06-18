@@ -1,0 +1,197 @@
+<style lang="less">
+.problemDescription{
+    .title{
+      height: 88rpx;
+      line-height: 88rpx;
+      font-size: 30rpx;
+      color: #202020;
+    }
+    .txtInput{
+      position: relative;
+      padding-top: 10rpx;
+      .feedbackInput{
+        width: 680rpx;
+        height: 250rpx;
+        background-color: #f2f2f2;
+        font-size:28rpx;
+        color:#353535;
+        padding: 10rpx 0 0 10rpx;
+      }
+      .txtCount{
+        height:28rpx;
+        width:128rpx;
+        text-align:center;
+        position: absolute;
+        bottom: 29rpx;
+        right: 20rpx;;
+        font-size:26rpx;
+        color:#979797;
+      }
+    }
+    .uploading{
+      display:flex;
+      flex-direction:column;
+      .weui-uploader__bd {
+        margin: 20rpx 0;
+      }
+      .weui-uploader__file{
+        position: relative;
+        height:155rpx;
+        width:155rpx;
+        margin:20rpx 20rpx 20rpx 0;
+      }
+      .operation{
+        font-size:26rpx;
+        color:#888;
+        float: left;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height:153rpx;
+        width:153rpx;
+        border:1rpx dashed #ddd;
+        margin:20rpx 20rpx 20rpx 0;
+        .iconfont{
+          font-size: 70rpx;
+        }
+        .txt{
+          font-size: 22rpx;
+        }
+      }
+    }
+  }
+.hidden{
+  display: none;
+}
+.outer{
+  padding: 0 25rpx;
+  background: #fff;
+}
+</style>
+<template>
+  <view class="problemDescription outer">
+    <view class="title">问题描述</view>
+        <view class="txtInput">
+          <textarea 
+            placeholder="{{pleasHold}}" 
+            id="" 
+            cols="30" 
+            rows="10" 
+            class="feedbackInput"
+            name = 'content'
+            @input.default="focus"
+            maxlength="{{limitLength}}"
+          ></textarea>
+          <view class="txtCount">({{contentLength}}/{{limitLength}})</view>
+        </view>
+        <view class="uploading" >
+          <view class="weui-uploader__bd">
+            <view class="weui-uploader__files" id="uploaderFiles">
+              <repeat for="{{ files }}" index="index" item="item" key="key">
+                <view class="weui-uploader__file" id="{{item}}" @tap.stop="previewImage">
+                  <image class="weui-uploader__img" src="{{item}}" mode="aspectFill"></image>
+                  <view class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;" @tap.stop="deleteImage({{item}})">-</view>
+                </view>
+              </repeat>
+            </view>
+          <!-- <view class="weui-uploader__input-box">
+            <view class="weui-uploader__input" @tap="chooseImage"></view>
+          </view> -->
+
+          <view class="operation" @tap="chooseImage">
+              <i class="iconfont" style="color: #e5e5e5;">&#xe615;</i>
+              <view class="txt">最多5张</view>
+              <view class="icon">
+              </view>
+          </view>
+        </view>
+        </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import _ from 'underscore'
+
+  export default class problemDescription extends wepy.component {
+
+    components = {
+    }
+
+    props = {
+      coupon: {
+        type: String
+      },
+      btn: {
+        type: String
+      },
+      pleasHold: {
+        type: String
+      }
+    }
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      contentLength: 0,
+      limitLength: 500,
+      files: []
+    }
+
+    computed = {
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+      focus(e) {
+        const { value = '' } = e.detail
+        this.contentLength = value.length
+        this.$emit('addContent', value)
+        this.$apply()
+      },
+      chooseImage(e) {
+        const that = this
+        wx.chooseImage({
+          count: 5,
+          success: function(res) {
+            const files =  that.files
+            const tempFiles  = res.tempFiles
+            if (files.length >= 5) {
+              wepy.showToast({
+                title: '最多只能上传5张图片',
+                icon: 'none'
+              })
+            } else {
+              that.files = that.files.concat(res.tempFilePaths)
+            }
+            that.$emit('upLoadPictrue',  that.files)
+            // console.log(that.files)
+            that.$apply()
+          }
+        })
+      },
+      previewImage(e) {
+        wx.previewImage({
+          current: e.currentTarget.id, // 当前显示图片的http链接
+          urls: this.files // 需要预览的图片http链接列表
+        })
+      },
+      deleteImage(item) {
+        const files = this.files
+        this.files = _.without(files, item)
+        this.$emit('upLoadPictrue',  this.files)
+        this.$apply()
+      }
+    }
+
+    async onLoad() {
+    }
+  }
+</script>
+

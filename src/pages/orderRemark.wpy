@@ -1,0 +1,91 @@
+<style lang="less">
+    @import '../common/default';
+    .orderRemark {
+        .textareaContainer {
+            width: 100%;
+            height: 310rpx;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            position: relative;
+            textarea {
+                width: 93%;
+                height: 80%;
+                background-color: #f2f2f2;
+                font-size: 28rpx;
+                padding: 20rpx;
+            }
+            .number {
+                color: @minorColor;
+                font-size: 26rpx;
+                position: absolute;
+                bottom: 30rpx;
+                right: 25rpx;
+            }
+        }
+        button {
+            width: 670rpx;
+            height: 94rpx;
+            margin-top: 50rpx;
+        }
+    }
+    
+</style>
+<template>
+    <view class="orderRemark">
+        <view class="textareaContainer">
+            <textarea placeholder="如水果切洗等要求" maxlength="{{50}}"></textarea>
+            <view class="number">0/50</view>
+        </view>
+        <button type="primary">确定</button>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+
+  export default class orderRemark extends wepy.page {
+    config = {
+      navigationBarTitleText: '备注',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+    
+    }
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      status: ''
+    }
+
+    computed = {
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+    }
+
+    onLoad(params) {
+    //   const { status } = params
+    //   this.status = status
+    //   this.$apply()
+    //   console.log(this.status)
+    }
+  }
+</script>
+

@@ -1,0 +1,178 @@
+<!--suppress ALL -->
+<template>
+    <view id="my-coupon" :class="{'white-bg':couponDataArr.length===0}">
+        <navigator url='./myCouponQuestion'>
+            <view class="coupon-question-header">
+                现金券问题
+                <i class='wenhao icon-font'>&#xe616;</i>
+            </view>
+        </navigator>
+        <view class="coupon-container">
+            <repeat for="{{couponDataArr}}" key="index" index="index" item="item">
+                <coupon :couponData="item"></coupon>
+            </repeat>
+        </view>
+        <view class="default-bg" wx:if="{{couponDataArr.length===0&&loading===false}}">
+            <image src='https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662470085.jpg' />
+            <text>暂无相关优惠券</text>
+        </view>
+        <view wx:if="{{loading}}" class=" loading">
+            <image class="image-content" src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522663615412.gif"></image>
+            <text class="desc">努力加载中</text>
+        </view>
+        <view class="weui-loadmore weui-loadmore_line" wx:if="{{!loading&&couponDataArr.length!==0}}">
+            <text class='bottom-operate weui-loadmore__tips weui-loadmore__tips_in-line' >没有更多了</text>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import Coupon from '../../components/coupon/coupon'
+    import api from '../../api/index'
+    import moment from 'moment'
+    export default class MyCouponInvalid extends wepy.page {
+        config = {
+            navigationBarTitleText: '无效券',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {
+            coupon: Coupon
+        }
+        data = {
+            couponDataArr: [],
+            loading: true
+        }
+        // 引入混合
+        computed = {}
+        watch = {}
+        events = {}
+        methods = {
+            getMsg(e) {
+                console.log(e, e.detail)
+            }
+        }
+        // 设置转发参数
+        onShareAppMessage(options) {
+            let url = options.webViewUrl
+            return {
+                title: this.shareTitle,
+                path: 'pages/link?url=' + encodeURIComponent(url),
+                imageUrl: this.shareImage,
+                success: function(res) {
+                    // 转发成功
+                    console.log('转发成功', res)
+                },
+                fail: function(res) {
+                    // 转发失败
+                },
+                complete: function(res) {}
+            }
+        }
+        onLoad() {
+            this.loadCouponList();
+        }
+        async loadCouponList() {
+            const userId = wx.getStorageSync('userId')
+            const couponResult = await api.coupon.getMyCoupon({
+                query: {
+                    userId,
+                    type: 0
+                }
+            })
+            if (couponResult.statusCode === 200) {
+                this.loading = false
+                
+                this.couponDataArr = couponResult.data.map(element => {
+                    return {
+                        ...element,
+                        createdAt : (moment(element.createdAt).add(element.useTerm - 1, 'days').format('YYYY-MM-DD') )
+                    }
+                    
+                });
+                this.$apply();
+            }
+        }
+    }
+</script>
+
+<style lang="less">
+    view {
+        box-sizing: border-box;
+    }
+    .icon-font {
+        font-family: "iconfont";
+    }
+    #my-coupon {
+        &.white-bg {
+            background: white;
+            view {
+                background: white!important;
+            }
+        }
+        width: 100%;
+        height: 100vh;
+          .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            flex: 1;
+            .image-content {
+                width: 615rpx;
+                margin-top: 150rpx;
+            }
+            .desc {
+                font-family: PingFangSC-Regular;
+                font-size: 30rpx;
+                color: #888888;
+                margin-top: 20rpx;
+            }
+        }
+        .coupon-question-header {
+            background: #f4f5f5;
+            width: 100%;
+            height: 58rpx;
+            line-height: 58rpx;
+            padding-right: 25rpx;
+            text-align: right;
+            font-family: PingFangSC-Regular;
+            font-size: 26rpx;
+            color: #888888;
+            .wenhao {
+                display: inline-block;
+                margin-left: 10rpx;
+                font-size: 25rpx;
+            }
+        }
+        .coupon-container {
+            width: 100%;
+            background: #f4f5f5;
+            padding: 0 25rpx;
+        }
+        .default-bg {
+            width: 100%;
+            height: 480rpx;
+            margin-top: 100rpx;
+            padding: 0 68rpx;
+            text-align: center;
+            image {
+                width: 100%;
+                height: 100%;
+            }
+            text {
+                font-family: PingFangSC-Regular;
+                font-size: 30rpx;
+                color: #888888;
+            }
+        }
+        .bottom-operate {
+            background-color: #f4f5f5;
+        }
+    }
+</style>

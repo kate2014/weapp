@@ -1,0 +1,286 @@
+<style lang="less">
+  @import '../common/default.less';
+  .content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    .header {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      background: #fff;
+      padding: 15rpx 0;
+      border-bottom: 1rpx solid #eee;
+      z-index: 1000;
+      .search {
+        margin: 0 25rpx;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        background: #f2f2f2;
+        border-radius: 4rpx;
+        height: 58rpx;
+        .search-icon {
+          font-size: 30rpx;
+          color: @minorColor;
+          margin-left: 20rpx;
+        }
+        .search-desc {
+          font-family: PingFangSC-Regular;
+          font-size: 26rpx;
+          color: @mianColor;
+          margin-left: 10rpx;
+        }
+      }
+    }
+    .history {
+      flex: 1;
+      background: #fff;
+      padding: 15rpx 25rpx 30rpx;
+      margin-top: 88rpx;
+      .desc {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        height: 58rpx;
+        .title {
+          font-family: PingFangSC-Regular;
+          font-size: 28rpx;
+          color: @minorColor;
+          line-height: 58rpx;
+        }
+        .remove {
+          font-size: 36rpx;
+          color: @minorColor;
+        }
+      }
+      .tag {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        .text {
+          background: #f4f5f5;
+          border-radius: 2px;
+          padding: 10rpx 30rpx;
+          font-family: PingFangSC-Regular;
+          font-size: 28rpx;
+          color: #202020;
+          margin: 20rpx 20rpx 0 0;
+        }
+      }
+    }
+    .result {
+      background: #FFF;
+      padding: 88rpx 0 0;
+      .product:first-child {
+        border-top: none;
+      }
+    }
+    .not-product {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      margin-top: 88rpx;
+      flex: 1;
+      .image-content {
+        width: 615rpx;
+        margin-top: 150rpx;
+      }
+      .desc {
+        font-family: PingFangSC-Regular;
+        font-size: 30rpx;
+        color: @minorColor;
+        margin-top: 20rpx;
+      }
+    }
+  }
+</style>
+
+<template>
+  <view class="content">
+    <view class="header">
+      <view class="search">
+        <i class="iconfont search-icon">&#xe606;</i>
+        <input focus="true" class="search-desc" type="text" placeholder="输入商品名" confirm-type="search" @confirm="search" />
+      </view>
+    </view>
+    <view wx:if="{{isSearch && products.length > 0}}" class="result">
+      <scroll-view scroll-y style="height: 100%;">
+        <repeat for="{{products}}" key="index" index="index" item="item">
+          <product :item="item" :isExpress.sync="isExpress"></product>
+        </repeat>
+      </scroll-view>
+    </view>
+    <view wx:elif="{{isSearch && products.length === 0}}" class="not-product">
+      <image class="image-content" src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662505573.jpg"></image>
+      <text class="desc">暂无商品</text>
+    </view>
+    <view wx:else class="history">
+      <view class="desc">
+        <text class="title">历史搜索</text>
+        <i class="iconfont remove" @tap='deleteRecord'>&#xe613;</i>
+      </view>
+      <view class="tag">
+        <block wx:for="{{searchLogs}}" wx:key="index" wx:for-item="searchLog">
+          <view class="text" @tap='recordSearch({{searchLog.keyWord}})'>{{searchLog.keyWord}}</view>
+        </block>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import shopCarMixin from '../mixins/shopcar'
+  import syncShopCar from '../mixins/syncShopCar'
+  import productMixin from '../mixins/product'
+  import Product from '../components/product'
+  import api from '../api/index'
+  import config from '../common/config'
+  import _ from 'underscore'
+  export default class SearchProduct extends wepy.page {
+    config = {
+      navigationBarTitleText: '搜索',
+      navigationBarTextStyle: 'black',
+      enablePullDownRefresh: false,
+      disableScroll: false,
+      onReachBottomDistance: 50
+    }
+    components = {
+      product:Product
+    }
+    // 引入混合
+    mixins = [shopCarMixin, syncShopCar,productMixin]
+    data = {
+      // '菠萝', '番薯', '扣哦', '水果', '乐事薯片', '大波浪'
+      IMAGEHOST: config.IMAGEHOST,
+      searchLogs: [],
+      products: [],
+      isSearch: false,
+      isExpress: false
+    }
+    computed = {
+      now() {
+        return +new Date()
+      }
+    }
+    watch = {}
+    events = {}
+    methods = {
+      search(e) {
+        if (e.detail.value === '') return
+        this.actualSearch(e.detail.value)
+      },
+      recordSearch(record) {
+        console.log(record)
+        this.actualSearch(record)
+      },
+      deleteRecord() {
+        this.deleteRecord()
+      },
+      // goDetail(id) {
+      //   this.$navigate({
+      //     url: `./goodDetails?productId=${id}`
+      //   })
+      // },
+      // addProduct(_id) {
+      //   const product = _.findWhere(this.products, {
+      //     _id
+      //   })
+      //   const {
+      //     selectNumber,
+      //     sendWay,
+      //     xkAmount,
+      //     zkAmount
+      //   } = product;
+      //   const {
+      //     shopingCarData
+      //   } = this.$parent.globalData;
+      //   if (this.isOverStoreLimit(shopingCarData, product)) return;
+      //   this.updateOrInsertNumIntoShopCar(shopingCarData, product)
+      //   this.$apply()
+      // },
+      // subProduct(_id) {
+      //   const product = _.findWhere(this.products, {
+      //     _id
+      //   })
+      //   const {
+      //     shopingCarData
+      //   } = this.$parent.globalData;
+      //   this.subOrDeleteNumFromShopCar(shopingCarData,product);
+      //   this.$apply()
+      // },
+    }
+    async actualSearch(keyword) {
+      const {
+        boxId,
+        shopingCarData,
+        isExpress
+      } = this.$parent.globalData
+      const userId = wx.getStorageSync('userId')
+      wx.showLoading({
+        title: '搜索中',
+        mask: true
+      })
+      const result = await api.searchProduct.getProductByKeyword({
+        query: {
+          boxId,
+          userId,
+          keyWord: keyword,
+          isExpress
+        }
+      })
+      wx.hideLoading()
+      if (result.statusCode === 200) {
+        this.mergeShopDataIntoProduct(shopingCarData, result.data)
+        this.products = result.data
+        this.isSearch = true
+        this.$apply()
+      }
+    }
+    async loadSearchRecord() {
+      //  this.isSearch = true;
+      //  wx.showLoading({
+      //    title: '搜索中',
+      //   })
+      const userId = wx.getStorageSync('userId')
+      const result = await api.searchProduct.getMySearchReocrd({
+        query: {
+          userId
+        }
+      })
+      if (result.statusCode === 200) {
+        this.searchLogs = result.data
+        this.$apply()
+      }
+    }
+    async deleteRecord() {
+      const userId = wx.getStorageSync('userId')
+      const result = await api.searchProduct.deleteMySearchRecord({
+        query: {
+          userId,
+        },
+        method: 'DELETE'
+      })
+      if (result.statusCode === 200) {
+        this.searchLogs = [];
+        wx.showToast({
+          title: '删除成功',
+          icon: 'success',
+          duration: 1000
+        })
+        this.$apply();
+      }
+    }
+    onShow() {
+      this.isExpress = this.$parent.globalData.isExpress
+    }
+    onLoad() {
+      this.loadSearchRecord();
+    }
+  }
+</script>

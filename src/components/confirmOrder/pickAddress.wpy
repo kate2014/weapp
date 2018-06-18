@@ -1,0 +1,115 @@
+<style lang="less">
+    @import '../../common/default';
+    .pickAddress {
+        width: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        padding: 30rpx @commonPadding;
+        .locationIcon {
+            width: 70rpx;
+            color: @primaryColor;
+            i {
+                font-size: 40rpx;
+            }
+        }
+        .addressInfo {
+            display: flex;
+            flex-direction: column;
+            color: @mianColor;
+            flex: 1;
+            .userInfo {
+                display: flex;
+                font-size: 28rpx;
+                .name {
+                    max-width: 150rpx;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    margin-right: 30rpx;
+                }
+
+            }
+            .address {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                .boxName {
+                    height: 35rpx;
+                    font-size: 30rpx;
+                    font-weight: bold;
+                    display: flex;
+                    align-items: center;
+                    .way {
+                        width: 60rpx;
+                        height: 35rpx;
+                        font-size: 22rpx;
+                        border: 1px solid @primaryColor;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        box-sizing: border-box;
+                        color: @primaryColor;
+                        border-radius: 3rpx;
+                        margin-left: 10rpx;
+                    }
+                }
+                .addressDetail {
+                    color: @minorColor;
+                    font-size: 26rpx;
+                    padding-top: 10rpx;
+                }
+            }
+
+        }
+        .rightContainer {
+            .rightIcon {
+                color: @minorColor;
+                font-size: @subContent;
+                margin-left: 5rpx;
+            }
+        }
+    }
+</style>
+
+<template>
+    <view class="pickAddress" @tap="goAddAddress">
+        <view class="locationIcon">
+            <i class="iconfont">&#xe62a;</i>
+        </view>
+        <view class="addressInfo">
+            <view class="userInfo">
+                <view class="name">{{picker.name}}</view>
+                <view class="phoneNumber">{{picker.phone}}</view>
+            </view>
+            <view class="address">
+                <view class="boxName">鲜库·{{picker.boxName}}<view class="way">自提</view></view>
+                <view class="addressDetail">{{picker.locationDetail}}</view>
+            </view>
+        </view>
+        <view class="rightContainer">
+            <i class="iconfont rightIcon">&#xe63e;</i>
+        </view>
+    </view>
+
+</template>
+
+<script>
+    import wepy from 'wepy'
+
+    export default class pickAddress extends wepy.component {
+        props = {
+            picker: {
+                type: Object,
+                default: {},
+            }
+        }
+        methods = {
+            goAddAddress() {
+                this.$root.$navigate('./home/myAddress', { from: 'confirmOrder', type: 'new' });
+            },
+        }
+        
+    }
+</script>

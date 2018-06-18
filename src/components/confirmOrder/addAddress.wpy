@@ -1,0 +1,52 @@
+<style lang="less">
+    @import '../../common/default';
+    .orderAddress {
+        color: @primaryColor;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: white;
+        padding: 30rpx 0;
+        .addAddress {
+            width: 340rpx;
+            height: 70rpx;
+            border: 1px solid @primaryColor;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50px;
+            .addSymbol {
+                font-weight:bolder;
+                font-size:35rpx;
+                height:100%;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+            }
+        }
+    }
+
+</style>
+<template>
+    <view class="orderAddress" @tap="goAddAddress">
+        <view class="addAddress">
+            <i class="addSymbol iconfont">&#xe615;</i><text>&#160;</text>
+            选择收货地址
+        </view>
+    </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class Counter extends wepy.component {
+      methods = {
+          goAddAddress() {
+              this.$root.$navigate('./home/myAddress', { from: 'confirmOrder', type: 'new' });
+            //    this.$root.$redirect('./home/myAddress', { from: 'confirmOrder', type: 'new' });
+                // this.$root.$switch('./home/myAddress', { from: 'confirmOrder', type: 'new' });
+          },
+      }
+  }
+</script>
+

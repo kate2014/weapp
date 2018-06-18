@@ -1,0 +1,98 @@
+<style lang="less">
+  .stepper{
+    padding: 2rem 2rem;
+    color: #666;
+    view{
+      display: inline-block;
+      line-height: 30px;
+      height: 32px;
+      text-align: center;
+      min-width: 40px;
+      box-sizing: border-box;
+      vertical-align: middle;
+      font-size: 12px;
+      border: 1rpx solid #999;
+    }
+    .stepper-minus{
+      border-right: none;
+      border-radius: 2px 0 0 2px;
+    }
+    .stepper-text{
+      border: 1rpx solid #999;
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+      height: 30px;
+      width: 40px;
+      font-size: 12px;
+      line-height: 30px;
+    }
+    .stepper-plus{
+      border-left: none;
+      border-radius: 0 2px 2px 0 ;
+    }
+    .stepper-disabled{
+      background: #f8f8f8;
+      color: #bbb;
+      border-color: #e8e8e8;
+    }
+  }
+</style>
+<template>
+  <view class="stepper">
+    <view class="stepper-minus {{ stepper <= min ? 'stepper-disabled':'' }}" data-disabled="{{ stepper <= min }}" @tap="handleStepperMinus({{stepper}})">-</view>
+    <input class="stepper-text {{ min >= max ? 'stepper-disabled':'' }}" value="{{ stepper }}" disabled="{{ min >= max }}" bindblur="handleStepperBlur({{max}},{{min}},{{stepper}})"></input>
+    <view class="stepper-plus {{ stepper >= max ? 'stepper-disabled':'' }}" data-disabled="{{ stepper >= max }}" @tap="handleStepperPlus({{stepper}})">+</view>
+  </view>
+</template>
+  
+<script>
+  import wepy from 'wepy'
+
+  export default class Stepper extends wepy.page {
+    data = {
+      stepper: 10,
+      min: 1,
+      max: 20
+    }
+    methods = {
+      handleStepperMinus(stepper,e) {
+        this.handle(e, -1, stepper)
+      },
+      handleStepperPlus(stepper,e) {
+        this.handle(e, +1, stepper)
+      },
+      handleStepperBlur(max, min, stepper, e){
+        const { value } = e.detail
+        const _value = parseInt(value)
+        const self = this
+        if (!_value) {
+          setTimeout(()=>{
+            self.stepper = min
+            self.$apply()
+          }, 15)
+        }
+        if (_value > max) {
+          self.stepper = max
+          self.$apply()
+        } else if (_value < min){
+          stepper = min
+          self.$apply()
+        } else {
+          self.stepper = _value
+          self.$apply()
+        }
+      }
+    }
+    handle(e,num,stepper) {
+      let { disabled } = e.currentTarget.dataset
+      if (disabled) return null
+      this.stepper = stepper+num
+      this.$apply()
+
+    }
+    onShow() {
+    }
+  }
+</script>
+

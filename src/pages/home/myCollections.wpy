@@ -1,0 +1,355 @@
+<!--suppress ALL -->
+<template>
+    <scroll-view scroll-y="{{true}}" bindscrolltolower="loadMore" lower-threshold='100' id="my-collections">
+        <block wx:for="{{products}}" wx:key="index">
+            <view class="product" @tap="goDetail({{item}})">
+                <view class="product-image">
+                    <image src="{{IMAGEHOST+item.mainPicture}}" />
+                </view>
+                <view class="product-info">
+                    <text class="product-name">{{item.name}}</text>
+                    <text class="product-subName">{{item.subName}}</text>
+                    <view class="product-tags">
+                        <text class="coupon" wx:if="{{item.useCoupon}}">现金券不可用</text>
+                        <text class="today" wx:if="{{item.sendWay === 1}}">今日达</text>
+                        <text class="tommorrow" wx:else>明日达</text>
+                    </view>
+                    <view class="price-info">
+                        <view>
+                            <text class="product-price">
+                                    <text>¥</text>
+                            <text class="price-int">{{item.price}}</text>
+                            <text>{{item.priceDemic}}</text>
+                            </text>
+                            <text class="product-price-out">¥{{item.priceOut}}</text>
+                        </view>
+                        <view class="chat" @tap.stop="cancle({{item._id}})">
+                            <i class="iconfont icon-chat">&#xe60e;</i> 已收藏
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </block>
+        <view wx:if="{{products.length <=0&&loading===false}}" class="not-product">
+            <image class="image-content" src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662505573.jpg"></image>
+            <text class="desc">暂无收藏</text>
+        </view>
+        <view wx:if="{{loading}}" class="not-product loading">
+            <image class="image-content" src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522663615412.gif"></image>
+            <text class="desc">努力加载中</text>
+        </view>
+        <view wx:if="{{isShowLoadMore}}" class="weui-loadmore">
+            <view class="weui-loading"></view>
+            <view class="weui-loadmore__tips">正在加载</view>
+        </view>
+    </scroll-view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import api from '../../api/index'
+    import config from '../../common/config'
+    export default class MyCollections extends wepy.page {
+        config = {
+            navigationBarTitleText: '我的收藏',
+            navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+            backgroundColor: '', // 窗口的背景色
+            backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+            enablePullDownRefresh: false, // 是否开启下拉刷新
+            disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+            onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+        }
+        components = {}
+        data = {
+            IMAGEHOST: config.IMAGEHOST,
+            products: [],
+            current: 0,
+            pageSize: 5,
+            isShowLoadMore: false,
+            loading: true
+        }
+        computed = {}
+        watch = {}
+        events = {}
+        methods = {
+            goDetail(item) {
+                if(item.status==='已下架')return;
+                const id = item._id
+                this.$navigate(`../goodDetails?productId=${id}`, {})
+            },
+            cancle(id) {
+                let that = this;
+                wx.showModal({
+                    title: '提示',
+                    content: '确认取消收藏该商品？',
+                    showCancel: true,
+                    cancelText: '取消',
+                    cancelColor: '#353535',
+                    confirmText: '确认',
+                    confirmColor: '#02CB73',
+                    success: function(res) {
+                        if (res.confirm) {
+                            that.doCancelCollection(id)
+                        }
+                    }
+                })
+            },
+            loadMore() {
+                if (this.isShowLoadMore) return;
+                this.isShowLoadMore = true;
+                this.$apply();
+                this.loadProduct()
+            }
+        }
+        async doCancelCollection(id) {
+            const userId = wx.getStorageSync('userId')
+            const result = await api.myCollection.cancelCollection({
+                query: {
+                    userId,
+                    productId: id
+                },
+                method: 'POST'
+            })
+            if (result.statusCode === 200) {
+                // debugger;
+                
+                this.products.forEach((element,index) => {
+                      if (element._id === id) {
+                        this.products.splice(index, 1)
+                    }
+                });
+                this.$apply()
+            }
+        }
+        onLoad(options) {
+            console.log('onloasdasfasf');
+            this.loadProduct();
+        }
+        async loadProduct() {
+            const userId = wx.getStorageSync('userId')
+            const product = await api.myCollection.getMyCollection({
+                query: {
+                    userId,
+                    current: this.current,
+                    pageSize: this.pageSize
+                }
+            })
+            if (product.statusCode === 200) {
+                this.products = this.products.concat(product.data);
+                this.loading = false;
+                this.current = this.current + 1;
+                this.isShowLoadMore = false;
+                this.$apply();
+            }
+        }
+        // 设置转发参数
+        onShareAppMessage(options) {
+            let url = options.webViewUrl
+            return {
+                title: this.shareTitle,
+                path: 'pages/link?url=' + encodeURIComponent(url),
+                imageUrl: this.shareImage,
+                success: function(res) {
+                    // 转发成功
+                    console.log('转发成功', res)
+                },
+                fail: function(res) {
+                    // 转发失败
+                },
+                complete: function(res) {}
+            }
+        }
+    }
+</script>
+
+<style lang="less">
+    @import '../../common/default.less';
+    view {
+        box-sizing: border-box;
+    }
+    #my-collections {
+        background: white;
+        height: 100%;
+        .not-product {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            flex: 1;
+            .image-content {
+                width: 615rpx;
+                margin-top: 150rpx;
+            }
+            .desc {
+                font-family: PingFangSC-Regular;
+                font-size: 30rpx;
+                color: @minorColor;
+                margin-top: 20rpx;
+            }
+        }
+        .product {
+            padding: 30rpx 0 25rpx;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            border-top: 1rpx solid #eee;
+            margin: 0 25rpx;
+            .product-image {
+                width: 250rpx;
+                height: 250rpx;
+                margin-right: 20rpx;
+                image {
+                    width: 250rpx;
+                    height: 250rpx;
+                }
+            }
+            .product-info {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                width: 430rpx;
+                height: 250rpx;
+                .product-name {
+                    font-family: PingFangSC-Regular;
+                    font-size: 32rpx;
+                    color: @mianColor;
+                    text-align: left;
+                    line-height: 34rpx;
+                }
+                .product-subName {
+                    font-family: PingFangSC-Regular;
+                    font-size: 30rpx;
+                    color: @minorColor;
+                    text-align: left;
+                    margin-top: 13rpx;
+                    line-height: 32rpx;
+                }
+                .product-tags {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: flex-start;
+                    margin-top: 20rpx;
+                    .coupon {
+                        background: #ffffff;
+                        border: 1rpx solid #d4d4d4;
+                        border-radius: 2rpx;
+                        width: 148rpx;
+                        height: 33rpx;
+                        font-family: PingFangSC-Regular;
+                        font-size: 22rpx;
+                        color: #b8b8b8;
+                        text-align: center;
+                        padding: 1rpx 6rpx;
+                        margin-right: 10rpx;
+                    }
+                    .today {
+                        background: #ffffff;
+                        border: 1rpx solid #d4d4d4;
+                        border-radius: 2rpx;
+                        width: 78rpx;
+                        height: 33rpx;
+                        font-family: PingFangSC-Regular;
+                        font-size: 22rpx;
+                        color: #b8b8b8;
+                        text-align: center;
+                        padding: 1rpx 6rpx;
+                    }
+                    .tommorrow {
+                        background: #ffffff;
+                        border: 1rpx solid @primaryColor;
+                        border-radius: 2rpx;
+                        width: 78rpx;
+                        height: 33rpx;
+                        font-family: PingFangSC-Regular;
+                        font-size: 22rpx;
+                        color: #02cb73;
+                        text-align: center;
+                        padding: 1rpx 6rpx;
+                        margin-right: 10rpx;
+                    }
+                }
+                .price-info {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-top: 41rpx;
+                    .product-price {
+                        font-family: PingFangSC-Medium;
+                        font-size: 22rpx;
+                        color: #fe4616;
+                        letter-spacing: 0;
+                        text-align: left;
+                        margin-right: 20rpx;
+                        .price-int {
+                            font-size: 40rpx;
+                        }
+                    }
+                    .product-price-out {
+                        font-family: PingFangSC-Regular;
+                        font-size: 22rpx;
+                        color: @minorColor;
+                        text-align: left;
+                        text-decoration: line-through;
+                    }
+                    .chat {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-end;
+                        align-items: center;
+                        color: #02cb73;
+                        font-size: 22rpx;
+                        .icon-chat {
+                            font-size: 35rpx;
+                        }
+                    }
+                    .product-chat {
+                        display: flex;
+                        flex-direction: row;
+                        justify-content: space-between;
+                        align-items: center;
+                        width: 160rpx;
+                        .tap-area {
+                            padding: 12rpx;
+                        }
+                        .product-chat-add {
+                            background: @primaryColor;
+                            width: 40rpx;
+                            height: 40rpx;
+                            border-radius: 100%;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: center;
+                            align-items: center;
+                            .icon-chat {
+                                color: #fff;
+                                font-size: 18rpx;
+                            }
+                        }
+                        .product-chat-text {
+                            font-family: PingFangSC-Regular;
+                            font-size: 30rpx;
+                            color: @content;
+                            letter-spacing: 0;
+                        }
+                        .product-chat-sub {
+                            background: FFF;
+                            border: 1rpx solid #cacaca;
+                            width: 39rpx;
+                            height: 39rpx;
+                            border-radius: 100%;
+                            display: flex;
+                            flex-direction: row;
+                            justify-content: center;
+                            align-items: center;
+                            .icon-chat {
+                                color: @minorColor;
+                                font-size: 18rpx;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+</style>

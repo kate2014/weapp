@@ -1,0 +1,147 @@
+<style lang="less">
+  .steps{
+    position: relative;
+    padding-top: 20rpx;
+  }
+  .steps-vsteps{
+    color: #999;
+    font-size: 14px;
+    .steps-step{
+      position: relative;
+      display: flex;
+      justify-content: flex-start;
+      .left{
+        margin-right: 28rpx;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+      }
+      .right{
+        padding-top:13rpx;
+      }
+      .steps-time{
+        margin-top:5rpx;
+      }
+      .steps-icons{
+        padding: 20rpx 0;
+      }
+    }
+    .steps-step-first-child{
+      .steps-title::before{
+        content: '';
+        background-color: #fff;
+        z-index: 1;
+      }
+      .steps-icons{
+        padding: 11rpx 0;
+      }
+      .right{
+        padding-top: 0; 
+      }
+    }
+    .steps-step-last-child{
+      padding-bottom: 27rpx;
+      .steps-title::after{
+        content: '';
+        width: 1px;
+        background-color: #fff;
+        z-index: 1;
+      }
+      .steps-line{
+        display: none;
+      }
+
+    }
+    .steps-step-done{
+    }
+    .steps-title{
+      display: inline-block;
+      line-height: 20px;
+      span{
+        color: #02cb73;
+      }
+    }
+    
+    .steps-circle{
+      background:#02cb73;
+      width:20rpx;
+      height:20rpx;
+      border-radius:100%;
+    }
+    .steps-step-done{
+      .steps-title{
+        font-size:28rpx;
+        color:#000;
+      }
+      .steps-time{
+        font-size:24rpx;
+        color:#888;
+      }
+      .steps-circle{
+        width: 5px;
+        height: 5px;
+      }
+      .steps-line{
+      }
+    }
+    .steps-step-cur{
+      .steps-circle{
+        border-radius: 0;
+        width:20rpx;
+        height:20rpx;
+        border-radius:50%;
+        background-color:#02cb73;
+        border:4rpx solid #98eac6;
+      }
+      .steps-line{
+        flex-direction:column
+      }
+    }
+    .steps-line{
+      background-color: #98eac6; 
+      width: 5rpx;
+      height:83rpx;
+    }
+  }
+</style>
+<template>
+  <view class="steps steps-vsteps">
+    <repeat for="{{detail}}" index="index" item="item" key="key">
+      <view class="steps-step {{ index === 0 ? 'steps-step-first-child' : '' }} {{ index == detail.length - 1 ? 'steps-step-last-child' : '' }} {{ item.done ? 'steps-step-done' : '' }} {{ item.current ? 'steps-step-cur' : '' }}">
+        <view class="left">
+          <view class="steps-icons">
+            <view class="steps-circle"></view>
+          </view>
+          <view class="steps-line"></view>
+        </view>
+        <view class="right">
+          <view class="steps-title" wx:if="{{item.expressInfo === '备货完成，等待配送'}}">鲜盒子工作人员<span @tap="phoneCall({{item.phone}})">{{item.phone}}</span>正在为您派件请保持电话畅通</view>
+          <view class="steps-title" wx:else>{{item.expressInfo}}</view>
+          <view class="steps-time">{{item.time}}</view>
+        </view>
+      </view>
+    </repeat>  
+  </view>
+</template>
+  
+<script>
+  import wepy from 'wepy'
+
+  export default class Steps extends wepy.page {
+    props = {
+      detail: {
+        type: Array
+      }
+    }
+    methods = {
+      phoneCall(phone) {
+        wepy.makePhoneCall({
+          phoneNumber: phone
+        })
+      }
+    }
+    onShow() {
+    }
+  }
+</script>
+

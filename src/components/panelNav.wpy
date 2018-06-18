@@ -1,0 +1,91 @@
+<style lang="less">
+  .container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 750rpx;
+    height: 88rpx;
+    background-color: #FFFFFF;
+    color: #888888;
+    .icon {
+      font-size: 32rpx;
+      margin-left: 30rpx;
+    }
+    .content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 645rpx;
+      height: 100%;
+      margin-right: 25rpx;
+      .title {
+        color: #000000;
+        font-size: 30rpx;
+        // margin-left: 20rpx;
+      }
+      .link {
+        font-size: 26rpx;
+      }
+    }
+    .border {
+      border-top: 1rpx solid #EEE;
+    }
+  }
+</style>
+<template>
+  <navigator style="{{style}}" url="{{url}}" class="container" @tap='call'>
+    <i class="iconfont icon">{{icon}}</i>
+    <view wx:if="{{ topBorder }}" class="content border">
+      <text class="title">{{title}}</text>
+      <i class="iconfont link">&#xe617;</i>
+    </view>
+    <view wx:else class="content">
+      <text class="title">{{title}}</text>
+      <i class="iconfont link">&#xe617;</i>
+    </view>
+  </navigator>
+  
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class PanelNav extends wepy.component {
+    props = {
+      title: {
+        type: String,
+        default: ''
+        // twoWay: true
+      },
+      icon: {
+        type: String,
+        default: ''
+      },
+      url: {
+        type: String,
+        default: ''
+      },
+      style: {
+        type: String,
+        default: ''
+      },
+      topBorder: {
+        type: String
+      },
+      noJump:{
+        type: String
+      }
+    }
+    methods={
+      call(){
+        if(this.noJump==='no'){
+          this.$emit('hideTagPanel')
+        }
+      }
+    }
+
+    onLoad () {
+      // console.log(this)
+    }
+  }
+</script>

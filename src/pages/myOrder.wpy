@@ -1,0 +1,456 @@
+<style lang="less">
+// @import '../assets/style/weui.less';
+.order{
+  height: 100%;
+  .page__bd{
+    padding-bottom: 0;
+    height: 100%;
+    .weui-navbar__item.weui-bar__item_on {
+      color:#02cb73;
+    }
+    .weui-tab__content{
+      text-align: center;
+      height: 100%;
+    }
+    .weui-navbar {
+      position: fixed;
+      background-color: #fff; 
+      border-bottom: none;
+      height:86rpx;
+      border-bottom: 2rpx solid #eee;
+      .weui-navbar__slider {
+        width: 60rpx;
+        height: 6rpx;
+        background-color:#02cb73;
+      }
+    }
+    .weui-tab__panel{
+      padding-top: 88rpx;
+    }
+  }
+}
+.default{
+  height: 100%;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  image{
+    height: 479rpx;
+    width: 615rpx;
+  }
+  .txt{
+    font-size:30rpx;
+    color:#888888;
+  }
+}
+.waitLogin{
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  image{
+   width: 615rpx;
+   height: 479rpx;
+  }
+  text{
+    margin-top:9rpx; 
+    font-size:30rpx;
+    color:#888888;
+  }
+  .btn{
+    margin-top: 40rpx;
+    background:#02cb73;
+    border-radius:4rpx;
+    font-size: 28rpx;
+    width:120rpx;
+    height:58rpx;
+    line-height: 58rpx;
+    color: #fff;
+    text-align: center
+  }
+}
+.hidden{
+  display: none;
+}
+.loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      height: 100%;
+      .image-content {
+        width: 615rpx;
+        margin-top: 150rpx;
+      }
+      .desc {
+        font-family: PingFangSC-Regular;
+        font-size: 30rpx;
+        color: #888888;
+        margin-top: 20rpx;
+      }
+}
+</style>
+<template>
+    <view class="order">
+        <view class="page__bd">
+            <view class="weui-tab">
+                <view class="weui-navbar">
+                    <repeat for="{{tabs}}" key="key" index="index" item="item">
+                        <view id="{{index}}" class="weui-navbar__item {{activeIndex === index ? 'weui-bar__item_on' : ''}}" @tap.stop="tabClick({{index}})">
+                            <view class="weui-navbar__title">{{item}}</view>
+                        </view>
+                    </repeat>
+                    <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+                </view>
+                <view class="weui-tab__panel {{ defaults ? 'hidden' : '' }}">
+                    <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
+                      <scroll-view scroll-y={{true}} style="height:100%" lower-threshold='200' bindscrolltolower="loadMore">
+                        <OrderItem1 :orders.sync="orders" :isShowLoadMore.sync="isShowLoadMore" :total.sync="total" :timing.sync="timing" :noOrder.sync="noOrder" :loading.sync="loading"></OrderItem1>
+                      </scroll-view>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
+                      <scroll-view scroll-y={{true}} style="height:100%" lower-threshold='200' bindscrolltolower="loadMore">
+                        <OrderItem2 :orders.sync="orders" :isShowLoadMore.sync="isShowLoadMore" :total.sync="total" :timing.sync="timing" :noOrder.sync="noOrder" :loading.sync="loading"></OrderItem2>
+                      </scroll-view>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 2}}">
+                      <scroll-view scroll-y={{true}} style="height:100%" lower-threshold='200' bindscrolltolower="loadMore">
+                        <OrderItem3 :orders.sync="orders" :isShowLoadMore.sync="isShowLoadMore" :total.sync="total" :noOrder.sync="noOrder" :loading.sync="loading"></OrderItem3>
+                      </scroll-view>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 3}}">
+                      <scroll-view scroll-y={{true}} style="height:100%" lower-threshold='200' bindscrolltolower="loadMore">
+                        <OrderItem4 :orders.sync="orders" :isShowLoadMore.sync="isShowLoadMore" :total.sync="total" :noOrder.sync="noOrder" :loading.sync="loading"></OrderItem4>
+                      </scroll-view>
+                    </view>
+                    <view class="weui-tab__content" hidden="{{activeIndex != 4}}">
+                      <scroll-view scroll-y={{true}} style="height:100%" lower-threshold='200' bindscrolltolower="loadMore">
+                        <OrderItem5 :orders.sync="orders" :isShowLoadMore.sync="isShowLoadMore" :total.sync="total" :noOrder.sync="noOrder" :loading.sync="loading"></OrderItem5>
+                      </scroll-view>
+                    </view>
+                </view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import LoginMixin from '../mixins/login'
+  import OrderItem from '../components/orderItem'
+  import Utility from '../utils/utility.js'
+  import _ from 'underscore'
+  import api from '../api/index'
+  import moment from 'moment'
+
+  export default class Service extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的订单',
+      navigationBarTextStyle: 'black',
+      enablePullDownRefresh: false,
+      disableScroll: false,
+      onReachBottomDistance: 50
+    }
+
+    components = {
+      OrderItem1: OrderItem,
+      OrderItem2: OrderItem,
+      OrderItem3: OrderItem,
+      OrderItem4: OrderItem,
+      OrderItem5: OrderItem
+    }
+
+    // 引入混合
+    mixins = [baseMixin, LoginMixin]
+
+    data = {
+      defaults: false,
+      tabs: ['全部', '待付款', '待发货', '待收货', '退款'],
+      activeIndex: 0,
+      sliderOffset: 0,
+      sliderLeft: 0,
+      sliderWidth: 32,
+      orders: [],
+      // unLogin: true,
+      isShowLoadMore: false,
+      current: 0,
+      pageSize: 5,
+      total: {
+        type: Number,
+      },
+      status: '全部',
+      currentTime: {
+        type: Date
+      },
+      timing: '00:00:00',
+      type: 0,
+      noOrder: false,
+      loading: true
+    }
+
+    computed = {
+      now() {
+        return +new Date()
+      }
+    }
+
+    watch = {
+    }
+
+    events = {
+      'deleteOrder': (id) => {
+        this.deleteOrder(id)
+      },
+      'confirmOrder': (id) => {
+        this.confirmOrder(id)
+      }
+    }
+
+    methods = {
+      tabClick(index, e) {
+        this.sliderOffset = e.currentTarget.offsetLeft
+        this.activeIndex = e.currentTarget.id
+        this.orders = [] 
+        switch (index) {
+          case 0:
+            this.type = 0
+            this.current = 0
+            this.loading = true
+            this.$apply()
+            this.loadOrder()
+            break
+          case 1:
+            this.type = 1
+            this.current = 0
+            this.loading = true
+            this.$apply()
+            this.loadOrder()
+            break
+          case 2:
+            this.type = 2
+            this.current = 0
+            this.loading = true
+            this.$apply()
+            this.loadOrder()
+            break
+          case 3:
+            this.type = 3
+            this.current = 0
+            this.loading = true
+            this.$apply()
+            this.loadOrder()
+            break
+          default: 
+            this.type = 4
+            this.current = 0
+            this.loading = true
+            this.$apply()
+            this.loadOrder()
+            break
+        }
+        this.$apply()
+      },
+      async loadMore() {
+        if(this.orders.length>=this.total||this.isShowLoadMore) return;
+        this.isShowLoadMore = true;
+        this.loadOrder()
+        this.$apply()
+      }
+    }
+    async loadOrder() {
+      const that = this
+      const timerArr = []
+      const userId = wx.getStorageSync('userId')
+      if (this.isShowLoadMore) {
+        this.current = this.current + 1
+      }
+      const results = await api.order.getOrderListByPage({
+        query: {
+          current: this.current,
+          pageSize: this.pageSize,
+          type: this.type,
+          userId: userId,
+        }
+      })
+      if (results.statusCode === 200) {
+        const { data } = results
+        const { res, total } = data
+        _.each(res, item => {
+          const { detail } = item
+          let totalAmount = 0
+          let btn = []
+          _.each(detail, value => {
+            const { mainPicture, amount } = value
+            if (mainPicture.slice(0,4) === 'http') {
+              value.mainPicture = mainPicture
+            } else {
+              value.mainPicture = Utility.splicePictureUrl(mainPicture, 'todayList')
+            }
+            totalAmount += amount
+          })
+          switch (item.status) {
+            case '待付款':
+              let currentTime = new Date()
+              let timestamp = 10 * 60 * 1000 - (currentTime.getTime() - item.timestamp)
+              item.timing = this.formate(timestamp)
+              this.timer(timestamp, item)
+              item.title = '待付款'
+              break;
+            case '已取消':
+              item.title = '已取消'
+              btn.push({ txt: '删除订单' })
+              break;
+            case '待发货':
+              item.title = '待发货'
+              btn.push({ txt: '订单追踪' })
+              break;
+            case '已付款':
+              item.title = '待发货'
+              btn.push({ txt: '订单追踪' })
+              break;
+            case '支付后取消':
+              item.title = '支付后取消'
+              btn.push({ txt: '订单追踪' })
+              break;
+            case '待收货':
+              item.title = '待收货'
+              btn.push({ txt: '订单追踪' }, { txt: '确认收货' })
+              break;
+            case '已签收':
+              item.title = '已签收'
+              btn.push({ txt: '删除订单' }, { txt: '订单追踪' })
+              break;
+            case '待退款':
+              item.title = '待退款'
+              btn.push({ txt: '订单追踪' })
+              break;
+            case '已退款':
+              item.title = '已退款'
+              btn.push({ txt: '订单追踪' })
+              break;
+            default:
+              item.title = '拒绝退款'
+              btn.push({ txt: '订单追踪' })
+              break;
+          }
+          item.totalAmount = totalAmount
+          item.btn = btn
+          if (detail) {
+            item.detail = detail.slice(0,4)
+          }
+          item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
+        })
+        if (this.current === 0) {
+          const waitSort = _.sortBy(res, function(item) { return -item.createdAt })
+          this.orders = waitSort
+        } else {
+          this.orders = this.orders.concat(res)
+        }
+        this.isShowLoadMore = false
+        this.total = total
+        if (this.orders.length === 0) {
+          this.noOrder = true
+        } else {
+          this.noOrder = false
+        }
+        this.loading = false
+        wx.hideNavigationBarLoading()
+        this.$apply()
+      }
+    }
+    // deleteOrder
+    async deleteOrder(id) {
+      const result = await api.order.delOrderById({
+        query: {
+          id: id,
+        },
+        method: 'POST',
+      })
+      if (result.statusCode === 200) {
+        wepy.showToast({
+          title: '成功删除订单'
+        })
+        const currentOrders = _.reject(this.orders, { _id: id })
+        this.orders = currentOrders
+        this.$apply()
+      }
+    }
+    // confirmOrder
+    async confirmOrder(id) {
+      const userId = wx.getStorageSync('userId')
+      const result = await api.order.confirmGuestOrder({
+        query: {
+          orderId: id,
+          userId: userId,
+        },
+        method: 'POST',
+      })
+      if (result.statusCode === 200) {
+        wepy.showToast({
+          title: '确定收货成功哦'
+        })
+        const currentOrders = _.reject(this.orders, { _id: id })
+        this.orders = currentOrders
+        this.$apply()
+      }
+    }
+    timer(timestamp, order) {
+      if (timestamp > 0) {
+        timestamp = timestamp - 1000
+        order.timing = this.formate(timestamp)
+        setTimeout(() => {
+          this.timer(timestamp, order)
+        }, 1000)
+      } else {
+        order.title = '已取消'
+        order.status = '已取消'
+        order.btn = [{ txt: '删除订单' }]
+        wepy.showToast({
+          title: '订单已超时，系统自动取消',
+          icon: 'none'
+        })
+      }
+      this.$apply()
+    }
+    onLoad(options) {
+      this.init()
+      const that = this
+      this.loading = true
+      wx.getSystemInfo({
+        success: function(res) {
+          that.sliderLeft = (res.windowWidth / that.data.tabs.length - that.sliderWidth) / 2
+          that.sliderOffset = res.windowWidth / that.data.tabs.length * that.data.activeIndex
+          that.$apply()
+        }
+      })
+      this.loadOrder()
+    }
+    formate(timestamp) {
+      return moment( timestamp < 0 ? 0 : timestamp ).utc().format('HH:mm:ss')
+    }
+    onShow() {
+      wx.showNavigationBarLoading()
+      this.current = 0
+      const { globalData } = this.$parent
+      const { location } = globalData
+      const userId = wx.getStorageSync('userId')
+      this.loading = true
+      if (userId && location) {
+        // this.unLogin = true
+      } else {
+        this.$switch({ url: './index' })
+        // this.unLogin = false
+      }
+      this.loadOrder()
+      this.$apply()
+    }
+
+    async init (store) {
+    }
+  }
+</script>

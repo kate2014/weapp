@@ -1,0 +1,729 @@
+<style lang="less">
+.orderDetail{
+  height: 100%;
+  .title{
+    height: 86rpx;
+    display: flex;
+    justify-content: flex-start;
+    font-size: 30rpx;
+    align-items: center;
+    border-bottom: 1rpx solid #eee;
+  }
+  .component-OrderHeaderContainer{
+    height: 285rpx;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #fff;
+    .image{
+      width: 70rpx;
+      height: 75rpx;
+      display:flex;
+      align-items:center;
+      margin-bottom: 20rpx;
+      i{
+        font-size: 75rpx;
+      }
+    }
+    .status{
+      font-size: 36rpx;
+      margin-bottom: 20rpx;
+    }
+    .havePadding{
+      padding-left: 42rpx;
+    }
+    .content{
+      font-size: 26rpx;
+      color: #888888;
+      span{
+        color: #fe4616;
+      }
+    }
+  }
+  .product-area{
+    height: 668rpx;
+      .component-ProductImageList{
+        height: 150rpx;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1rpx solid #eee;
+        .image-container{
+          display: flex;
+          justify-content: flex-start;
+          height: 120rpx;
+          .img-wrapper{
+            margin-right: 36rpx;
+            image{
+              height: 120rpx;
+              width: 120rpx;
+            }
+          }
+        }
+        .total{
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .amount-wrapper{
+            font-size: 26rpx;
+            margin-right: 5rpx;
+            color: #888888;
+            span{
+              color: #02cb73;
+            }
+          }
+          .iconfont{
+            font-size: 26rpx;
+          }
+        }
+      }
+      .price{
+        display: flex;
+        flex-direction: column;
+        border-bottom: 1rpx solid #eee;
+        .num{
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 28rpx;
+          color: #888888;
+          height: 58rpx;
+        }
+      }
+      .actualPrice{
+        display: flex;
+        justify-content: flex-end;
+        font-size: 30rpx;
+        height: 88rpx;
+        align-items: center;
+        span{
+          margin-left: 10rpx;
+          color: #fe4616;
+        }
+      }
+      .contact{
+        height: 110rpx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .btn{
+          border-radius:4rpx;
+          height: 60rpx;
+          width: 250rpx;
+          line-height: 60rpx;
+          text-align: center;
+          background-color: #fff;
+          font-size: 28rpx;
+          color: #888888;
+          i{
+            margin-right: 10rpx;
+          }
+        }
+      }
+  }
+  .component-ReveiverInfo{
+    // height: 341rpx;
+    font-size: 28rpx;
+    .deliverTime{
+      height: 86rpx;
+      line-height: 86rpx;
+      border-bottom: 2rpx solid #f4f5f5;
+      display: flex;
+      justify-content: flex-start;
+    }
+    .addressInfo{
+      // height: 143rpx;
+      display: flex;
+      justify-content: flex-start;
+      padding-top: 20rpx;
+      border-bottom: 1rpx solid #eee;
+      .right{
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        .info{
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          .nickName{
+            margin-right: 25rpx;
+          }
+        }
+        .address{
+          font-size: 26rpx;
+          color: #353535;
+          i{
+            color: #888;
+            font-size: 26rpx;
+          }
+        }
+        .arayacak{
+          color: #02cb73;  
+        }
+        .detail {
+          color: #888;
+        }
+      }
+    }
+    .sendWay{
+      height: 88rpx;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+  }
+  .orderInfo{
+    font-size: 26rpx;
+    border-bottom: 25rpx solid #f4f5f5;
+    .common{
+      height: 58rpx;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      .right{
+        color: #353535;
+        font-size: 28rpx; 
+      }
+    }
+  }
+  .component-FootButtons{
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    height: 98rpx;
+    align-items: center;
+    width:100%;
+    box-shadow: 0 0 10px 0 rgba(57, 133, 118, 0.17);
+    .pay{
+      margin-right: 25rpx;
+      padding-right: 25rpx;
+      display: flex;
+    }
+    .btnContainer{
+      display: flex;
+      margin-right: 25rpx;
+      padding-right: 25rpx;
+    }
+    .common{
+      font-size: 26rpx;
+      line-height: 60rpx;
+      text-align: center;
+      border-radius: 4rpx;
+      margin-left: 20rpx;
+    }
+    .minBtn{
+      height: 56rpx;
+      background-color: #fff;
+      color: #888;
+      width: 156rpx;
+      border: 2rpx solid #cacaca;
+    }
+    .maxBtn{
+      height: 60rpx;
+      width: 246rpx;
+      color: #fff;
+      background-color: #02cb73;
+    }
+    .maxBtnColor{
+      height: 60rpx;
+      width: 160rpx;
+      color: #fff;
+      background-color: #02cb73;
+
+    }
+    .minBtnColor{
+      color: #02cb73;
+      height: 56rpx;
+      width: 156rpx;
+      background: #fff;
+      border: 2rpx solid #02cb73;
+    }
+  }
+  .outer{
+    margin-top: 20rpx;
+    padding: 0 25rpx;
+    background-color: #fff;
+  }
+  .left{
+      color: #888;
+      width: 150rpx;
+      font-size:28rpx;
+  }
+  .hidden{
+    display: none;
+  }
+}
+ .load{
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+</style>
+<template>
+  <view class="orderDetail {{loading? 'hidden' : ''}}" wx:if="{{order._id !== undefined }}">
+    <scroll-view scroll-y="true" style="height: 92%" >
+        <view class="component-OrderHeaderContainer ">
+          <view class="image">
+            <i class="iconfont" style="color: #02cb73">
+              {{ order.title === '待付款' ? '&#xe61e;' : order.title === '已取消' ? '&#xe622;' : order.title === '订单待发货' ? '&#xe61f;' : order.title === '支付后取消' ? '&#xe624;' : order.title === '订单待收货' ? '&#xe61d;' : order.title === '订单待退款' ? '&#xe61c;' : order.title === '订单已签收' ? '&#xe621;' : order.title === '订单已退款' ? '&#xe623;' : '&#xe620;' }}
+            </i>
+          </view>
+          <view class="status {{ order.title === '待付款' ? '' : order.title === '已取消' ? '' : 'havePadding' }}" @tap="goTrace({{order._id}}, {{order.status}})">
+            {{order.title}}
+            <i class="iconfont {{ order.title === '待付款' ? 'hidden' : order.title === '已取消' ? 'hidden' : '' }}" style="color:#888;marginLeft:10rpx;">&#xe617;</i>
+          </view>
+          <view wx:if="{{ order.title === '待付款' }}" class="content">请在<span>{{order.timing}}</span>内完成支付，超时自动取消</view>
+          <view wx:else class="content">{{order.txt}}</view>
+        </view>
+        <view class="product-area outer">
+            <view class="title">商品信息</view>
+            <view class="component-ProductImageList" @tap="getProductInfo({{order._id}}, true)" >
+              <view class="image-container">
+                <repeat for="{{ order.detail }}" index="index" key="key" item="item">
+                  <view class="img-wrapper">
+                    <image src="{{ item.mainPicture }}"/>
+                  </view>
+                </repeat>
+              </view>
+              <view class="total">
+                <view class="amount-wrapper">共<span>{{order.totalAmount}}</span>件</view>
+                <i class="iconfont" style="color: #888888">&#xe617;</i>
+              </view>
+            </view>
+            <view class="price">
+              <view class="num">
+                <view class="content">商品总价</view>
+                <view class="priceNum">¥{{order.total}}</view>
+              </view>
+              <view class="num">
+                <view class="content">现金券</view>
+                <view class="priceNum">¥{{order.couponDiscountMoney}}</view>
+              </view>
+              <view class="num">
+                <view class="content">鲜卡</view>
+                <view class="priceNum">¥{{order.deductMoney}}</view>
+              </view>
+              <view class="num">
+                <view class="content">运费</view>
+                <view class="priceNum">¥{{order.freight}}</view>
+              </view>
+            </view>
+            <view class="actualPrice">实付款<span>¥{{order.actualPay}}</span></view>
+            <view class="contact">
+              <button class="btn" @tap="phoneCall"><i class="iconfont" style="color: #02cb73">&#xe61b;</i>联系鲜盒子</button>
+            </view>
+        </view>
+        <view class="component-ReveiverInfo outer">
+          <view class="title">收货信息</view>
+          <view class="{{ order.title === '待付款' ? 'hidden' : order.title === '已取消' ? 'hidden' : order.sendWay === '快递' ? 'hidden' : 'deliverTime' }}">
+            <view class="left">{{ order.sendWay === '上门自提' ? '自提时间：' : order.sendWay === '鲜盒子配送' ? '送达时间' : '' }}</view> 
+            <view class="right">{{ order.sendWay === '上门自提' ?  order.pickTime : order.sendWay === '鲜盒子配送' ? order.sendTime : '' }}</view>
+          </view>
+          <view class="addressInfo">
+            <view class="left">{{ order.sendWay === '上门自提' ? '自提地址：' : order.sendWay === '鲜盒子配送' ? '收货地址' : '收货地址' }}</view>
+            <view class="right">
+              <view class="info">
+                <view class="nickName">{{order.receiver}}</view>
+                <view class="phone">{{order.phoneNumber}}</view>
+              </view>
+              <view class="address {{ order.sendWay === '上门自提' ? 'arayacak' : '' }}" @tap="goMap({{order.boxInfo}})">{{ order.sendWay === '上门自提' ? '鲜库·': '' }}{{ order.sendWay === '上门自提' ?  order.boxName  : order.sendWay === '鲜盒子配送' ? order.addressDetail : order.addressDetail }}<i class="iconfont {{ order.sendWay === '上门自提' ? '': 'hidden' }}">&#xe617;</i></view>
+              <view class="detail">{{order.sendWay === '上门自提' ? order.locationDetail : '' }}</view>
+            </view>
+          </view>
+          <view class="sendWay">
+            <view class="left">配送方式：</view>
+            <view class="right">{{ order.sendWay === '快递' ? '顺丰' : '' }}{{order.sendWay}}</view>
+          </view>
+        </view>
+        <view class="orderInfo outer">
+          <view class="title">订单信息</view>
+          <view class="infoDetail">
+            <view class="common">
+              <view class="left" >订单编号：</view>
+              <view class="right">{{order.orderNumber}}</view>
+            </view>
+            <view class="{{ order.status === '待付款' ? 'hidden' : order.status === '已取消' ? 'hidden' : 'common' }}">
+              <view class="left">支付方式：</view>
+              <view class="right">{{order.payType}}</view>
+            </view>
+            <view class="common">
+              <view class="left">下单时间：</view>
+              <view class="right">{{order.createdAt}}</view>
+            </view>
+            <view class="{{ order.status === '待付款' ? 'hidden' : order.status === '已取消' ? 'hidden' : 'common' }}">
+              <view class="left">支付时间：</view>
+              <view class="right">{{order.payTime}}</view>
+            </view>
+          </view>
+        </view>
+    </scroll-view>
+        <view class="component-FootButtons outer">
+          <view wx:if="{{order.title === '待付款'}}" class="pay">
+            <view class="minBtn common" @tap.stop="cancelOrder({{order._id}}, {{order.status}})">取消订单</view>
+            <view class="maxBtn common" @tap="toPay({{order._id}})">{{'去支付' + order.timing}}</view>
+          </view>
+          <view wx:else class="btnContainer">
+            <repeat for="{{order.btn}}" index="index" key="key" item="itm">
+                <view class="common {{ order.title === '已取消' ? 'minBtn': order.title === '订单待发货' ? 'minBtn': order.title === '支付后取消' ? 'minBtn': order.title === '订单待收货' ? (itm.txt !== '确认收货' ? 'minBtn' : 'minBtnColor') : order.title === '订单已签收' ? 'minBtn' : order.title === '订单待退款' ? 'minBtn' : order.title === '订单已退款' ? 'minBtn' : order.title === '拒绝退款' ? 'minBtn':'maxBtn' }}"
+                @tap.stop="goDetail({{order._id}}, {{ itm.txt}}, {{order.status}})"
+                >
+                  {{ itm.txt}}
+                </view>
+            </repeat>
+          </view>
+        </view>
+    <CancelOrder wx:if="{{ showModal }}" ></CancelOrder>
+  </view>
+  <view class="weui-loadmore load" wx:if="{{loading}}">
+    <view class="weui-loading"></view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import CancelOrder from '../components/cancelOrder'
+  import OrderItem from '../components/orderItem'
+  // import TimeCountDown from '../components/TimeCountDown'
+  import api from '../api/index'
+  import moment from 'moment'
+  import _ from 'underscore'
+  import Utility from '../utils/utility.js'
+
+  export default class OrderDetail extends wepy.page {
+    props = {
+    }
+    config = {
+      navigationBarTitleText: '订单详情',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+      CancelOrder,
+      OrderItem
+      // TimeCountDown
+    }
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      order: {},
+      showModal: false,
+      currentTime: {
+        type: Date
+      },
+      timing: {
+        type:Date
+      },
+      time: {
+        type: Function 
+      },
+      loading: true
+    }
+
+    computed = {
+    }
+
+    events = {
+      hideTagPanel() {
+        this.showModal = false
+      }
+    }
+
+    watch = {
+    }
+
+    methods = {
+      getProductInfo(_id, cDetail) {
+        this.$navigate({
+          url: `productInfo?id=${_id}&cDetail=${cDetail}`
+        })
+      },
+      goDetail(id, txt, status) {
+        const that = this 
+        if (txt === '申请售后') {
+          if (status === '待退款' || status === '已退款' || status === '拒绝退款') {
+            this.$navigate({
+              url: `productInfo?id=${id}&status=${status}`
+            })
+          }
+          this.$navigate({
+            url: `productInfo?id=${id}&status=${status}`
+          })
+        } else if (txt === '订单追踪') {
+          this.$navigate({
+            url: `orderTrace?id=${id}`
+          })
+        } else if (txt === '删除订单') {
+          wepy.showModal({
+            content: '确定删除订单吗'
+          }).then((res) => {
+            if (res.confirm) {
+              that.deleteOrder(id)
+            }
+          })
+        } else if (txt === '确认收货') {
+          wepy.showModal({
+            content: '要确认收货嘛'
+          }).then((res) => {
+            if (res.confirm) {
+              that.confirmOrder(id)
+            }
+          })
+        } else if (txt === '取消订单') {
+          this.showModal = !this.showModal
+          this.$broadcast('openTagPanel', id, status)
+          this.$apply()
+        }
+      },
+      cancelOrder(id, status) {
+        this.showModal = !this.showModal
+        this.$broadcast('openTagPanel', id, status)
+        this.$apply()
+      },
+      phoneCall() {
+        wepy.makePhoneCall({
+          phoneNumber: '18888888888'
+        })
+      },
+      goMap(boxInfo) {
+        const { lng, lat } = boxInfo
+        wepy.openLocation({
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lng),
+        })
+      },
+      goTrace(id, status) {
+        if (status === '待退款' || status === '已退款' || status === '拒绝退款' ) {
+          this.$navigate({
+            url: `productInfo?id=${id}&status=${status}`
+          })  
+        } else if (status === '支付后取消'){
+          console.log(status)
+          this.$navigate({
+            url: `orderTrace?id=${id}&status=${status}`
+          })
+        } else {
+          this.$navigate({
+            url: `orderTrace?id=${id}`
+          })
+        }
+      },
+      async toPay(orderId) {
+        const { userId, userInfo } = this.$root.$parent.globalData;
+        const wechatPay = await api.wechat.wechatPay({
+          query: {
+            userId,
+            _id: orderId,
+            openid: userInfo.openid,
+          },
+          method: 'POST'
+        });
+        const prepay_id = wechatPay.data.prepay_id;
+        Utility.wechatPay({ prepay_id }, () => {
+          this.$redirect('./paySuccess', { orderId });
+        },()=> {
+          // this.$switch('./myOrder')
+        });
+      }
+    }
+    async getOrderDetail(id) {
+      const res = await api.order.getOrderDetailById({
+        query: {
+          id: id
+        }
+      })
+      if (res.statusCode === 200) {
+        const { data } = res
+        const { detail, createdAt, status, payTime, sendWay } = data 
+        if (sendWay === '鲜盒子配送' || sendWay === '快递') {
+          const { addressInfo } = data
+          const { receiver, phoneNumber, unitNumber } = addressInfo
+          const addressDetail = addressInfo.detail + unitNumber
+          data.receiver = receiver
+          data.phoneNumber = phoneNumber
+          data.addressDetail = addressDetail
+          const { sendTime } = data
+          if (sendTime) {
+            data.sendTime = sendTime.replace('T', ' ')
+          } else {
+            data.sendTime = '即刻配送'
+          }
+        } else if (sendWay === '上门自提') {
+          const { pickerInfo, boxInfo } = data
+          const { name, phone, createdAt } = pickerInfo
+          const { workTimeStart, workTimeEnd } = boxInfo
+          const boxStartTime = moment(workTimeStart, 'hh-mm').format('HH:mm');
+          const boxEndTime = moment(workTimeEnd, 'hh-mm').subtract(30, 'minute').format('HH:mm');
+          const currentTime = new Date
+          const pickTime = `${moment(currentTime).format('YYYY-MM-DD')} ${boxStartTime} - ${boxEndTime}`;
+          data.pickTime = pickTime
+          data.receiver = name
+          data.phoneNumber = phone
+          data.boxName = boxInfo.name
+          data.locationDetail = boxInfo.locationDetail
+        }
+        let totalAmount = 0
+        _.each(detail, item => {
+          const { mainPicture, amount } = item
+          item.mainPicture = Utility.splicePictureUrl(mainPicture, 'todayList')
+          totalAmount += amount
+        })
+        let title = ''
+        let txt = ''
+        let btn = []
+        switch (status) {
+          case '待付款':
+            let currentTime = new Date()
+            let timestamp = 10 * 60 * 1000 - (currentTime.getTime() - data.timestamp)
+            data.timing = this.formate(timestamp)
+            this.timer(timestamp, data)
+            title = '待付款'
+            break;
+          case '已取消':
+            title = '已取消'
+            txt = (status === '已取消' ? '超10分钟未支付，订单已取消' : '您取消了订单')
+            btn.push({ txt: '删除订单' })
+            break;
+          case '待发货':
+            title = '订单待发货'
+            btn.push({ txt: '取消订单' }, { txt: '订单追踪' })
+            break;
+          case '已付款':
+            title = '订单待发货'
+            btn.push({ txt: '取消订单' }, { txt: '订单追踪' })
+            break;
+          case '支付后取消':
+            title = '支付后取消'
+            btn.push({ txt: '订单追踪' })
+            break;
+          case '待收货':
+            title = '订单待收货'
+            btn.push({ txt: '申请售后' }, { txt: '订单追踪' }, { txt: '确认收货' })
+            break;
+          case '已签收':
+            title = '订单已签收'
+            txt = '感谢您对鲜盒子的信任，期待再次光临'
+            btn.push({ txt: '删除订单' }, { txt: '申请售后' }, { txt: '订单追踪' })
+            break;
+          case '待退款':
+            title = '订单待退款'
+            btn.push({ txt: '申请售后' }, { txt: '订单追踪' })
+            break;
+          case '已退款':
+            title = '订单已退款'
+            btn.push({ txt: '申请售后' }, { txt: '订单追踪' })
+            break;
+          default:
+            title = '拒绝退款'
+            btn.push({ txt: '申请售后' }, { txt: '订单追踪' })
+            break;
+        }
+        if (detail) {
+          data.detail = detail.slice(0,4)
+        }
+        data.title = title
+        data.txt = txt
+        data.btn = btn
+        data.totalAmount = totalAmount
+        data.payTime = moment(payTime).format('YYYY-MM-DD HH:mm:ss')
+        data.createdAt = moment(createdAt).format('YYYY-MM-DD HH:mm:ss')
+        this.order = data
+        this.loading = false
+        this.$apply()
+      }
+    }
+    timer(timestamp, order) {
+      if (timestamp > 0) {
+        timestamp = timestamp - 1000
+        order.timing = this.formate(timestamp)
+        setTimeout(() => {
+          this.timer(timestamp, order)
+        }, 1000)
+      } else {
+        order.title = '已取消'
+        order.status = '已取消'
+        order.txt = '超10分钟未支付，订单已取消'
+        order.btn = [{ txt: '删除订单' }]
+        if (order._id === this.order._id) {
+          wepy.showToast({
+            title: '订单已超时，系统自动取消',
+            icon: 'none'
+          })
+        }
+      }
+      this.$apply()
+    }
+    formate(timestamp) {
+      return moment( timestamp < 0 ? 0 : timestamp ).utc().format('HH:mm:ss')
+    }
+    // deleteOrder
+    async deleteOrder(id) {
+      const result = await api.order.delOrderById({
+        query: {
+          id: id,
+        },
+        method: 'POST',
+      })
+      if (result.statusCode === 200) {
+        wepy.showToast({
+          title: '成功删除订单'
+        })
+        wx.switchTab({
+          url: './myOrder',
+          success(res) {
+            const page = getCurrentPages().pop(); 
+            if (page == undefined || page == null) return; 
+            page.onLoad(); 
+          }
+        })
+      }
+    }
+    // confirmOrder
+    async confirmOrder(id) {
+      const userId = wx.getStorageSync('userId')
+      const result = await api.order.confirmGuestOrder({
+        query: {
+          orderId: id,
+          userId: userId,
+        },
+        method: 'POST',
+      })
+      if (result.statusCode === 200) {
+        wepy.showToast({
+          title: '确定收货成功哦'
+        })
+        wx.switchTab({
+          url: './myOrder',
+          success(res) {
+            const page = getCurrentPages().pop(); 
+            if (page == undefined || page == null) return; 
+            page.onLoad(); 
+          }
+        })
+      }
+    }
+    onLoad(params) {
+      const { status, id } = params
+      this.getOrderDetail(id)
+      this.$apply()
+    }
+    
+  }
+</script>
+

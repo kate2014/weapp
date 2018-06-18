@@ -1,0 +1,180 @@
+<style lang="less">
+.productDetail{
+  height: 200rpx;
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-bottom: 1rpx solid #eee;
+  .image{
+    width: 160rpx;
+    height: 160rpx;
+    margin-right: 20rpx;
+    image{
+      width: 160rpx;
+      height: 160rpx;
+    }
+  }
+  .info{
+    display: flex;
+    .name-weight{
+      display: flex;
+      flex-direction:column;
+      justify-content: space-between;
+      .name{
+        font-size:28rpx;
+        color:#000;
+      }
+      .weight{
+        font-size:26rpx;
+        color:#888888;
+      }
+    }
+    .notUseCashCoupon{
+      margin-top: 10rpx;
+      width: 130rpx;
+      height: 30rpx;
+      line-height: 30rpx;
+      border: 1rpx solid #d4d4d4;
+      border-radius: 2rpx;
+      font-size: 20rpx;
+      color: #b8b8b8;
+      text-align: center;
+    }
+  }
+  .price-btn{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    flex: 1;
+    .price{
+      position: absolute;
+      right:25rpx;
+      top:20rpx;
+      color: #FE4616;
+      font-size: 28rpx;
+      span{
+        font-size: 26rpx;
+        color: #888888;
+      }
+    }
+    .common{
+      position: absolute;
+      bottom: 20rpx;
+      right: 25rpx;
+      width: 196rpx;
+      height: 54rpx;
+      line-height: 56rpx;
+      border-radius: 4rpx;
+      font-size: 28rpx;
+      text-align:center;
+    }
+    .btnColor{
+      color: #02cb73;
+      border: 2rpx solid #02cb73;
+    }
+    .btn{
+      border: 2rpx solid #cacaca;
+      border-radius:4rpx;
+      color: #888;
+    }
+  }
+}
+// .outers{
+//   padding:0 25rpx;
+//   background-color:#fff;
+// }
+.hidden{
+  display: none;
+}
+</style>
+<template>
+  <repeat for ="{{pDetail}}" index="index" key="key" item="item">
+    <view class="productDetail">
+      <!-- <view class="pContainer">
+      </view> -->
+        <view class="info">
+          <view class="image">
+            <image src="{{item.image}}"/>
+          </view>
+          <view class="name-weight">
+            <view class="top">
+              <view class="name">{{item.name}}</view>
+              <view class="{{ item.useCashCoupon === '现金券不可用' ? 'notUseCashCoupon' : 'hidden' }} ">{{item.useCashCoupon}}</view>
+            </view>
+            <view class="weight ">总重量：{{item.weight}}kg</view>
+          </view>
+        </view>
+        <view class="price-btn">
+          <view class="price ">¥{{item.price}} <span>x{{item.num}}</span></view>
+          <view wx:if="{{item.refundStatus.length >= 1}}"  class="common btnColor" @tap="goRefund({{item.productId}}, {{orderId}}, {{cDetail}})">查看详情</view>
+          <view wx:else class="common {{cDetail ? 'hidden' : 'btn'}} " @tap="goAfterSall({{orderId}})">申请售后</view>
+        </view>
+    </view>
+  </repeat>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+
+  export default class productDetail extends wepy.component {
+    config = {
+      navigationBarTitleText: '商品信息',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+    }
+
+    props = {
+      pDetail: {
+        type: Array
+      },
+      btn: {
+        type: String
+      },
+      orderId: {
+        type: String
+      },
+      cDetail: {
+        type: Boolean
+      }
+    }
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+    }
+
+    computed = {
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+      goRefund(productId, orderId, cDetail) {
+        this.$root.$navigate({
+          url: `refundDetail?productId=${productId}&orderId=${orderId}&cDetail=${cDetail}`
+        })
+      },
+      goAfterSall(orderId) {
+        console.log()
+        this.$root.$navigate({
+          url: `afterSale?orderId=${orderId}`
+        })
+      }
+    }
+
+    async onLoad() {
+    }
+  }
+</script>
+

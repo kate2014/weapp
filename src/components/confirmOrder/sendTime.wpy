@@ -1,0 +1,55 @@
+<style lang="less">
+    @import '../../common/default';
+    .sendTime {
+        font-size: @secondContent;
+        height: @commonHeight;
+        background-color: white;
+        .sendTimeContainer {
+            width: auto;
+            height: 100%;
+            margin: 0 @commonPadding;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid @thinColor;
+            box-sizing: border-box;
+            .sendWayText {
+                height: 30rpx;
+                width: 100rpx;
+                border-left: 6rpx solid @primaryColor;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                padding-left: 10rpx;
+            }
+            .sendTimeText {
+                color: @primaryColor;
+                .rightIcon {
+                    color: @minorColor;
+                    font-size: @subContent;
+                    margin-left: 5rpx;
+                }
+            }
+        }
+    }
+</style>
+
+<template>
+    <view class="sendTime">
+        <view class="sendTimeContainer">
+            <view class="sendWayText">{{sendWay}}</view>
+            <view class="sendTimeText">{{sendTime}}<i class="iconfont rightIcon">&#xe617;</i></view>
+        </view>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy';
+    
+    export default class senTime extends wepy.component{
+        props = {
+            sendWay: String,
+            sendTime: String,
+        }
+    }
+</script>

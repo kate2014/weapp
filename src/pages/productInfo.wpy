@@ -1,0 +1,156 @@
+<style lang="less">
+.outer{
+  margin-top: 20rpx;
+  padding: 0 25rpx;
+  background-color: #fff; 
+}
+.loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #fff;
+      height: 100%;
+      .image-content {
+        width: 615rpx;
+        margin-top: 150rpx;
+      }
+      .desc {
+        font-family: PingFangSC-Regular;
+        font-size: 30rpx;
+        color: #888888;
+        margin-top: 20rpx;
+      }
+    }
+</style>
+<template>
+  <view class="productInfo outer" wx:if="{{pDetail.length > 0 }}">
+    <ProductDetail :pDetail.sync="pDetail" :btn.sync="btn" :coupon.sync="coupon" :orderId.sync="orderId" :cDetail.sync="cDetail"></ProductDetail>
+  </view>
+  <view wx:if="{{pDetail.length <= 0 }}" class=" loading">
+      <image class="image-content" src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522663615412.gif"></image>
+      <text class="desc">努力加载中</text>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import ProductDetail from '../components/productDetail'
+  import api from '../api/index'
+  import moment from 'moment'
+  import _ from 'underscore'
+  import Utility from '../utils/utility.js'
+
+  export default class productInfo extends wepy.page {
+    config = {
+      navigationBarTitleText: '商品信息',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+      ProductDetail
+    }
+    
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      btn: '',
+      coupon: '',
+      pDetail: [],
+      orderId: '',
+      cDetail: false
+    }
+
+    computed = {
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+    }
+    async getRefundByOrderId(id, status) {
+      const res = await api.order.getRefundByOrderId({
+        query: {
+          id: id
+        }
+      })
+      if (res.statusCode === 200) {
+        const { data } = res
+        const { detail, orderId } = data 
+        this.orderId = orderId
+        _.each(detail, item => {
+          const { mainPicture, productName, amount } = item
+          item.image = Utility.splicePictureUrl(mainPicture, 'productDetail')
+          item.name = productName
+          item.num = amount
+          item.status = status
+        })
+        this.pDetail = detail
+        this.$apply()
+      }
+    }
+    async getProductDetail(id,status) {
+      const res = await api.order.getProductDetailById({
+        query: {
+          id: id
+        }
+      })
+      if (res.statusCode === 200) {
+        const { data } = res
+        this.orderId = id
+        this.$apply()
+        _.each(data, item => {
+          const { image } = item
+          item.image = Utility.splicePictureUrl(image, 'productDetail')
+          item.status = status
+        })
+        this.pDetail = data
+        this.$apply()
+      }
+    }
+    async onLoad(params, data) {
+      
+      const { id, status } = params
+      console.log(params)
+      if (params.cDetail) {     
+        this.cDetail = params.cDetail
+        this.$apply()
+        this.getProductDetail(id, status)
+      } else if (data && data.preload && data.preload.cDetail){
+        _.each(data.preload.productList, item => {
+          const { amount, mainPicture } = item
+          item.num = amount
+          item.image = Utility.splicePictureUrl(mainPicture, 'productDetail')
+        })
+        this.pDetail = data.preload.productList
+        this.cDetail = data.preload.cDetail
+      } else {
+        this.$apply()
+        if (status === '待退款' || status === '已退款' || status === '拒绝退款') {
+          this.cDetail = false
+          this.$apply()
+          wepy.setNavigationBarTitle({
+            title: '退款进度'
+          })
+          this.getRefundByOrderId(id, status)
+        } else {
+          this.cDetail = false
+          this.$apply()
+          this.getProductDetail(id, status)
+        }
+      }
+    }
+
+  }
+</script>
+

@@ -1,0 +1,276 @@
+<style lang="less">
+.bindingPhoneNum{
+  .containerContent{
+    display:flex;
+    flex-direction:column;
+    .common{
+      height: 88rpx;
+      line-height: 88rpx;
+      .title{
+        font-size:30rpx;
+        color:#000000;
+      }
+      .txt{
+        padding-left: 30rpx;
+        font-size: 28rpx;
+        color: #888;
+      }
+    }
+    .phone{
+      display: flex;
+      border-bottom: 2rpx solid #eee;
+      position: relative;
+      .left{
+        display: flex;
+        align-items: center;
+        float: left;
+      }
+      .right{
+        position: absolute;
+        right: 0;
+        top: 15rpx;
+        padding: 0;
+        background:#ffffff;
+        border-radius:4rpx;
+        width:196rpx;
+        height:54rpx;
+        line-height: 54rpx;
+        text-align: center;
+        font-size:24rpx;
+      }
+      .sendCode{
+        color: #02cb73;
+      }
+      .timeIntval{
+        color: #888;
+      }
+      .sendCode::after{
+        border:2rpx solid #02cb73;
+      }
+      .timeIntval::after{
+        border:2rpx solid #888;
+      }
+    }
+    .captcha{
+      display: flex;
+      align-items: center;
+    }
+  }
+  .footer{
+    display: flex;
+    justify-content: center;
+    .btn{
+      margin-top: 50rpx;
+      border-radius:4rpx;
+      width:670rpx;
+      height:94rpx;
+      line-height:94rpx;
+      text-align: center; 
+      color: #fff;
+      border: none;
+    }
+    .waitBind{
+      background:#b2b2b2;
+    }
+    .goBind{
+      background:#02cb73;
+    }
+  }
+}
+.outer{
+  margin-top: 20rpx;
+  padding: 0 25rpx;
+  background-color: #fff; 
+}
+</style>
+<template>
+  <form class="bindingPhoneNum " bindsubmit="formSubmit">
+    <view class="containerContent outer">
+      <form class="phone common" bindsubmit="getCode">
+        <view class="left">
+          <view class="title">手机号</view>
+          <input type="number" name="phone" class="txt" style="width: 70%;">
+        </view>
+        <button class="right {{ !isSend ? 'sendCode' : 'timeIntval' }}" form-type="submit" hover-class="none">{{ !isSend ? '发送验证码' : timing }}{{ !isSend ? '' : 's' }}</button>
+      </form>
+      <view class="captcha common">
+        <view class="title">验证码</view>
+        <input type="number" name="code" class="txt" style="width: 70%;" bindinput="getCodeValue">
+      </view>
+    </view>
+    <view class="footer">
+      <button class="btn {{ !toBind ? 'waitBind' : 'goBind' }}" form-type="submit" hover-class="none">确定</button>
+    </view>
+  </form>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import api from '../api/index'
+  import moment from 'moment'
+  import _ from 'underscore'
+  import Utility from '../utils/utility.js'
+
+  export default class bindingPhoneNum extends wepy.page {
+    config = {
+      navigationBarTitleText: '绑定手机号',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+    }
+    
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      code:{
+        type: Number
+      },
+      timing: 60,
+      timer: {
+        type: Function
+      },
+      isSend: false,
+      toBind: false,
+      inputValue: '',
+      phone: ''
+    }
+
+    computed = {
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+      getCodeValue(e) {
+        if (e.detail.value === this.code) {
+          this.toBind = true
+          this.$apply()
+        } else {
+          this.toBind = false
+          this.$apply()
+        }
+        return e.detail.value
+      },
+      async getCode(e) {
+        const that = this
+        const { phone } = e.detail.value
+        this.phone = phone 
+        this.$apply()
+        const phoneReg = /^[1][3,4,5,7,8][0-9]{9}$/    
+        if (phone) {
+          if (!phoneReg.test(phone)) {
+            wepy.showToast({
+              title: '请输入正确的手机号',
+              icon: 'none'
+            })
+          } else {
+            const res = await api.order.getCode({
+              query: {
+                phone: phone
+              }
+            })
+            if (res.statusCode === 200) {
+              const { data } = res
+              console.log(data)
+              this.code = data.data
+              this.$apply()
+              wepy.showToast({
+                title: '发送成功',
+                icon: 'none',
+              })
+              this.isSend = true
+              this.timer = setInterval(() => {
+                if (this.timing === 1) {
+                  this.clearTime()
+                  this.isSend = false
+                }
+                this.timing = this.timing -1
+                this.$apply()
+              }, 1000)
+              this.$apply()
+            } else if (res.statusCode === 400) {
+              wepy.showToast({
+                title: '当前手机号已被注册',
+                icon: 'none'
+              })
+            } else if (res.statusCode === 400.2) {
+              wepy.showToast({
+                title: '请输入正确的手机号',
+                icon: 'none'
+              })
+            } else {
+              wepy.showToast({
+                title: '发送失败',
+                icon: 'none'
+              })
+            }
+          }
+        } else {
+          wepy.showToast({
+            title: '请输入手机号',
+            icon: 'none'
+          })
+        }
+
+      },
+      async formSubmit(e) {
+        const { phone, code } = e.detail.value
+        const userId = wx.getStorageSync('userId')
+        const codeReg = /^[0-9]{6}$/
+        const phoneReg = /^[1][3,4,5,7,8][0-9]{9}$/    
+        // 验证码正则判断6位
+        if (codeReg.test(code)) {
+          if (code === this.code && phoneReg.test(phone)) {
+            const res = await api.order.bingPhone({
+              query: {
+                phone: phone,
+                userId: userId
+              },
+              method: 'POST',
+            })
+            if (res.statusCode === 200) {
+              const userInfo = wx.getStorageSync('userInfo')
+              
+              if (!userInfo.phone) {
+                userInfo.phone = phone
+              }
+              wx.setStorageSync('userInfo', userInfo)
+              wepy.showToast({
+                title: '绑定成功',
+              })
+              this.$switch({ url: './home' })
+            } else {
+              wepy.showToast({
+                title: '绑定失败',
+              })
+            }
+          } else {
+            wepy.showToast({
+              title: '请输入正确的验证码',
+            })
+          }
+        }
+      }
+    }
+    clearTime() {
+      clearInterval(this.timer);
+    }
+    async onLoad(params) {
+      
+    }
+
+  }
+</script>
+

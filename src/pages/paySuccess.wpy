@@ -1,0 +1,201 @@
+<style lang="less">
+    @import '../common/default';
+    .paySuccess {
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        padding-top: 175rpx;
+        box-sizing: border-box;
+        view {
+            box-sizing: border-box;
+        }
+        .payInfo {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            .paySuccessIcon {
+                font-size: 185rpx;
+                line-height: 1;
+                color: @primaryColor;
+            }
+            .paySuccessText {
+                margin-top: 50rpx;
+                font-size: 40rpx;
+            }
+            .actualPay {
+                margin-top: 45rpx;
+                color: @minorColor;
+            }
+            .operate {
+                width: 100%;
+                height: @commonHeight;
+                display: flex;
+                justify-content: space-around;
+                margin: 60rpx 0 175rpx 0;
+                .goRoute {
+                    width: 300rpx;
+                    height: 100%;
+                    border: 1px solid #cacaca;
+                    color: @minorColor;
+                    font-size: 30rpx;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 5rpx;
+                }
+            }
+        }
+        .address {
+            box-sizing: border-box;
+            .receiveText {
+                width: 100%;
+                height: 58rpx;
+                font-size: 26rpx;
+                display: flex;
+                align-items: center;
+                background-color: #f4f4f4;
+                padding: 0 @commonPadding;
+                color: @minorColor;
+            }
+            .receive {
+                width: 100%;
+                height: 140rpx;
+                padding: 25rpx @commonPadding;
+                .receiverInfo {
+                    display: flex;
+                    font-size: @subContent;
+                    color: @minorColor;
+                    .name {
+                        width: 220rpx;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        margin-right: 30rpx;
+                    }
+                }
+                .addressDetail {
+                    font-size: @secondContent;
+                }
+            }
+        }
+    }
+</style>
+<template>
+    <view class="paySuccess">
+        <view class="payInfo">
+            <!-- <view class="paySuccessIcon"> -->
+                <i class="iconfont paySuccessIcon">&#xe625;</i>
+            <!-- </view> -->
+            <view class="paySuccessText">支付成功</view>
+            <view class="actualPay">实付款{{actualPayFixed}}元</view>
+            <view class="operate">
+                <view class="goRoute" @tap="goRoute('myOrder')">查看订单</view>
+                <view class="goRoute" @tap="goRoute('index')">返回首页</view>
+            </view>
+        </view>
+        <view class="address">
+            <view class="receiveText">{{addressText}}</view>
+            <view class="receive">
+                <view class="receiverInfo">
+                    <view class="name">{{addressDetail.name}}</view>
+                    <view class="phoneNumber">{{addressDetail.phone}}</view>
+                </view>
+                <view class="addressDetail">{{addressDetail.address}}</view>
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import api from '../api/index'
+
+  export default class orderTrace extends wepy.page {
+    config = {
+      navigationBarTitleText: '支付成功',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundColor: '', // 窗口的背景色
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+    
+    }
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      orderInfo: null
+    }
+
+    computed = {
+        actualPayFixed() {
+            return this.orderInfo ? `${this.orderInfo.actualPay.toFixed(2)}` : 0;
+        },
+        addressText() {
+            // console.log(this.orderInfo)
+            if (this.orderInfo) {
+                const { sendWay } = this.orderInfo;
+                if (sendWay === '上门自提') return '自提信息';
+                return '收货信息';
+            }
+            return '收货信息';
+        },
+        addressDetail() {
+            const { orderInfo } = this;
+            if (orderInfo) {
+                const { sendWay } = orderInfo;
+                if (sendWay === '上门自提') {
+                    const { boxName, location, locationDetail, name, phone } = orderInfo.pickerInfo;
+                    return {
+                        name,
+                        phone,
+                        address: `${boxName}·${locationDetail}`
+                    };
+                } else {
+                    const { receiver, phoneNumber, detail, unitNumber } = orderInfo.addressInfo;
+                    return {
+                        name: receiver,
+                        phone: phoneNumber,
+                        address: `${detail}${unitNumber ? unitNumber : ''}`
+                    }
+                }
+            }
+            return {};
+        }
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+        goRoute(routeName) {
+            this.$switch(`./${routeName}`);
+        }
+    }
+
+    async onLoad(params) {
+        const { orderId } = params
+        const payInfo = await api.confirmOrder.paySuccess({
+            query: {
+                orderId,
+            },
+            method: 'POST'
+        })
+        // console.log(payInfo)
+        this.orderInfo = payInfo.data;
+        this.$apply()
+        // console.log(this.orderInfo)
+    }
+  }
+</script>
+

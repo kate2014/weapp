@@ -1,0 +1,136 @@
+<style lang="less">
+    @import '../../common/default.less';
+    view {
+        box-sizing: border-box;
+    }
+    .user-info-list {}
+    .userItem {
+        height: 120rpx;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        padding-right: 25rpx;
+        .user-img {
+            height: 100%;
+            width: 100rpx;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            image {
+                width: 60rpx;
+                height: 60rpx;
+                border-radius: 50%;
+            }
+        }
+        .user-info {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            .top {
+                display: flex;
+                font-size: 26rpx;
+                color: #202020;
+                justify-content: space-between;
+                overflow: hidden;
+                .name {
+                    width: 30%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+                .phone {
+                    flex: 1;
+                    margin-left: 10rpx;
+                }
+                .status {
+                    color: #979797;
+                    &.red {
+                        color: #e60405;
+                    }
+                }
+            }
+            .bottom {
+                display: flex;
+                font-size: 26rpx;
+                color: #979797;
+                justify-content: space-between;
+                .time {}
+            }
+            padding:25rpx 0;
+        }
+        .user-status {}
+        &:last-child {
+            &:after {
+                height: 0;
+            }
+        }
+        &:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            height: 1rpx;
+            width: 100%;
+            padding: 0 25rpx;
+            background: #eeeeee;
+            background-clip: content-box;
+        }
+    }
+</style>
+
+<template>
+    <view class="user-info-list">
+        <block wx:for="{{userList}}" wx:key='index'>
+            <view class='userItem'>
+                <view class='user-img'>
+                    <image src='{{IMAGEHOST+item.photo}}' alt="" />
+                </view>
+                <view class='user-info'>
+                    <view class='top'>
+                        <view class='name'>
+                            {{item.username}}
+                        </view>
+                        <view class='phone'>
+                            {{item.phone}}
+                        </view>
+                        <view class='status' :class="{'red':item.isOrder}">
+                            +8元现金
+                        </view>
+                    </view>
+                    <view class='bottom'>
+                        <view class='time'></view>
+                        <view class='status'>{{item.isOrder ? '已到账' : '未下单'}}</view>
+                    </view>
+                </view>
+            </view>
+        </block>
+    </view>
+</template>
+
+<script>
+    import wepy from 'wepy'
+    import config from '../../common/config'
+    import moment from 'moment'
+    // import LoginMixin from '../../mixins/login'
+    export default class UserInfoList extends wepy.component {
+        props = {
+            userList: {
+                type: Array
+            },
+            cutNum:String
+        }
+        watch = {
+            userList(current,past) {
+                this.userList = current.slice(0,1);
+                this.$apply();
+            },
+        }
+        data = {
+            IMAGEHOST: config.IMAGEHOST,
+        }
+        methods = {}
+    }
+</script>

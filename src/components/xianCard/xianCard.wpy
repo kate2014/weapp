@@ -1,0 +1,170 @@
+<template>
+    <view id="xiancard">
+        <view class="card-meta" :class="{invalid:xiancardData.showStatus==='invalid'}">
+            <view class="card-name">
+                鲜盒子{{xiancardData.cardFunction === 'new' ? '新人':''}}鲜卡
+            </view>
+            <view class="card-info">
+                <text>{{xiancardData.cardNumber}}</text>
+                <text>面值：{{xiancardData.cardValue}}元</text>
+            </view>
+        </view>
+        <view class="card-rest" :class="{invalid:xiancardData.showStatus==='invalid'}">
+            <view class="value-container">
+                <view class="label">
+                    余额:
+                </view>
+                <view class="value">
+                    <i class='symbol'>¥</i>
+                    <i>{{xiancardData.restValue}}</i>
+                </view>
+            </view>
+            <view wx:if="{{xiancardData.showStatus==='invalid'}}" class="status-tag icon-font">
+                {{xiancardData.restValue===0 ?'&#xe62d;':'&#xe62e;'}}
+            </view>
+        </view>
+        <view class="card-date">
+            <view class="date">
+                有效期 {{xiancardData.activeTime}}~{{xiancardData.terminalTime}}
+            </view>
+            <navigator class="button" url="./xianCardUseRecord?id={{xiancardData._id}}">
+                消费记录
+            </navigator>
+        </view>
+    </view>
+</template>
+
+<style lang="less">
+    #xiancard {
+        width: 100%;
+        height: 310rpx;
+        margin-bottom: 20rpx;
+        
+        .card-meta {
+            &.invalid {
+                background: rgba(136, 136, 136, 0.95)!important;
+            }
+            height: 100rpx;
+            width: 100%;
+            background-image: linear-gradient(0deg, #08b067 1%, #02cb73 100%);
+            padding: 0 25rpx;
+            .card-name {
+                height: 50rpx;
+                font-family: PingFangSC-Medium;
+                font-size: 30rpx;
+                color: #ffffff;
+                font-weight: 700;
+                padding-top: 10rpx;
+            }
+            .card-info {
+                font-family: PingFangSC-Regular;
+                font-size: 24rpx;
+                color: #ffffff;
+                height: 50rpx;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+        .card-rest {
+            &.invalid {
+                view,
+                text,
+                i {
+                    color: #888888!important;
+                }
+            }
+            position: relative;
+            height: 150rpx;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            .value-container {
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                .label {
+                    font-family: PingFangSC-Regular;
+                    font-size: 32rpx;
+                    color: #000000;
+                    line-height: 1;
+                    padding-bottom: 5rpx;
+                }
+                .value {
+                    position: relative;
+                    font-family: HelveticaNeue;
+                    line-height: 1;
+                    font-size: 55rpx;
+                    color: #000000;
+                    margin-left: 30rpx;
+                    .symbol {
+                        font-family: HelveticaNeue-Medium;
+                        font-size: 30rpx;
+                        color: #202020;
+                        margin-right: 5rpx;
+                    }
+                }
+            }
+            .status-tag {
+                position: absolute;
+                color: #888888;
+                width: 120rpx;
+                height: 90rpx;
+                font-size: 90rpx;
+                top: 5rpx;
+                right: 25rpx;
+            }
+        }
+        .card-date {
+            height: 60rpx;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25rpx;
+            border-top: 1rpx #eeeeee solid;
+            background: white;
+            .date {
+                font-family: PingFangSC-Regular;
+                font-size: 24rpx;
+                color: #888888;
+            }
+            .button {
+                background: #ffffff;
+                border: 2rpx solid #cacaca;
+                border-radius: 8rpx;
+                width: 116rpx;
+                height: 35rpx;
+                font-family: PingFangSC-Regular;
+                font-size: 24rpx;
+                color: #888888;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+</style>
+
+<script>
+    import wepy from 'wepy'
+    export default class XianCard extends wepy.component {
+        props = {
+            xiancardData:{
+                type:Object,
+                default:{}
+            }
+        }
+        data = {
+            
+        }
+        components = {}
+        events = {}
+        watch = {}
+        methods = {}
+        onLoad() {}
+    }
+</script>
+

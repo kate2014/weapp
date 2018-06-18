@@ -1,0 +1,491 @@
+<style lang="less">
+  @import '../../assets/style/weui.less';
+  @import '../../common/default';
+  view{
+    box-sizing: border-box;
+  }
+  .select {
+    height: 60rpx;
+    width: 60rpx;
+    // background-color: @primaryColor;
+    overflow: hidden;
+    margin: 0 0 -60rpx 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    i {
+      font-size: 60rpx;
+      color: @primaryColor;
+    }
+  }
+  .address-info {
+    background-color: #ffffff;
+    width: 750rpx;
+    .toCreateBoth {
+      background-color: #ffffff;
+      z-index: 9;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      .create {
+        width: 670rpx;
+        height: 94rpx;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 20rpx 0;
+      }
+      .createAddress {
+        background-color: @primaryColor;
+        color: #ffffff;
+        font-size: 32rpx;
+      }
+      .createPicker {
+        border: 1rpx solid #cacaca;
+        color: @minorColor;
+        font-size: 32rpx;
+      }
+    }
+    .select-title {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 88rpx;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      border-bottom: 1rpx solid #eeeeee;
+      font-size: 28rpx;
+      .selected {
+        height: 88rpx;
+        border-bottom:6rpx solid @primaryColor;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: @primaryColor;
+      }
+    }
+    .select-list {
+      width: 750rpx;
+      .empty {
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 88rpx;
+        left: 0;
+        right: 0;
+        bottom: 0rpx;
+        view {
+          color: #888888;
+          font-size: 30rpx;
+        }
+      }
+      .send {
+        height: 140rpx;
+      }
+      .self {
+        height: 160rpx;
+      }
+      .item {
+        border-bottom: 1rpx solid #eeeeee;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        .left{
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 90rpx;
+          padding-left: 25rpx;
+          .user {
+            width: 360rpx;
+            display: flex;
+            justify-content: space-between;
+            color:#888888;
+            font-size: 26rpx;
+          }
+          .xianBox {
+            font-size: 28rpx;
+            color: #202020;
+          }
+          .address {
+            width: 600rpx;
+            overflow: hidden;
+            color: #000000;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 28rpx;
+          }
+        }
+        .right {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 130rpx;
+          color:#888888;
+        }
+      }
+    }
+  }
+
+  .addNew {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 0 8rpx 0 rgba(134, 129, 129, 0.18);
+    width: 750rpx;
+    height: 94rpx;
+    .text {
+      font-size: 30rpx;
+      color: @primaryColor;
+    }
+  }
+
+</style>
+
+<template>
+  <view>
+    <view class="address-info">
+      <view class="toCreateBoth" wx:if="{{from === 'confirmOrder' && addressList.length === 0 && pickerList.length === 0}}">
+        <image src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662487133.jpg" />
+        <navigator hover-class="none" url="/pages/distriAddress?type=new&from=confirmOrder" class="create createAddress">
+          新增配送地址
+        </navigator>
+        <navigator hover-class="none" url="/pages/selfAddress?type=new&from=confirmOrder" class="create createPicker">
+          新增自提地址
+        </navigator>
+      </view>
+        <view class="select-title">
+          <view class="distribution {{distribution ? 'selected' : ''}}" id="distribution" bindtap="change">配送地址</view>
+          <view class="take {{distribution ? '' : 'selected'}}" id="take" bindtap="change">自提地址</view>
+        </view>
+        <view style="height:88rpx;"></view>
+        <view class="select-list" wx:if="{{distribution}}">
+          <view class="empty" wx:if="{{addressList.length === 0}}">
+            <image src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662487133.jpg" />
+            <view>暂无配送地址</view>
+          </view>
+          <block wx:for="{{addressList}}" wx:key="key">
+          <view class="select" wx:if="{{selectedAddress === item._id && toSelect}}">
+            <i class="iconfont">&#xe634;</i>
+          </view>
+          <view class="item send">
+            <view class="left" id="{{item._id}}" bindtap="{{from === 'confirmOrder' ? 'selectAddress' : ''}}">
+              <view class="user">
+                <view>{{item.receiver}}</view>
+                <view>{{item.phoneNumber}}</view>
+              </view>
+              <view class="address">{{item.detail}}{{item.unitNumber}}</view>
+            </view>
+            <navigator hover-class="none" url="/pages/distriAddress?type=edit&id={{item._id}}{{from ? '&from=' + from : ''}}" class="right">
+              <i style="font-size: 30rpx;" class="iconfont">&#xe626;</i>
+            </navigator>
+          </view>
+          </block>
+        </view>
+
+        <view class="select-list" wx:if="{{!distribution}}">
+          <view class="empty" wx:if="{{pickerList.length === 0}}">
+            <image src="https://xian62-1.oss-cn-hangzhou.aliyuncs.com/server/common/dev/2018/4/1522662487133.jpg" />
+            <view>暂无自提地址</view>
+          </view>
+          <block wx:for="{{pickerList}}" wx:key="key">
+          <view class="select" wx:if="{{selectedAddress === item._id && toSelect}}">
+            <i class="iconfont">&#xe619;</i>
+          </view>
+          <view class="item self">
+            <view class="left" style="height:110rpx;" id="{{item._id}}" bindtap="{{from === 'confirmOrder' ? 'selectPicker' : ''}}">
+              <view style="color: #353535;" class="user">
+                <view>{{item.name}}</view>
+                <view>{{item.phone}}</view>
+              </view>
+              <view class="xianBox">鲜库·{{item.boxInfo.name}}</view>
+              <view style="color: #888888; font-size: 26rpx;" class="address">{{item.boxInfo.locationDetail}}</view>
+            </view>
+            <navigator hover-class="none" url="/pages/selfAddress?type=edit&id={{item._id}}{{from ? '&from=' + from : ''}}" class="right">
+              <i style="font-size: 30rpx;" class="iconfont">&#xe626;</i>
+            </navigator>
+          </view>
+          </block>
+        </view>
+      </view>
+    <view style="height:100rpx;"></view>
+    <navigator hover-class="none" url="/pages/{{distribution ? 'distriAddress' : 'selfAddress'}}?type=new{{from ? '&from=' + from : ''}}" class="addNew">
+      <text class="text">新增{{distribution ? '配送' : '自提'}}地址</text>
+    </navigator>
+  </view>      
+</template>
+
+<script>
+import wepy from 'wepy'
+import baseMixin from '../../mixins/base'
+import api from '../../api/index'
+import utility from '../../utils/utility'
+import _ from 'underscore'
+
+var QQMapWX = require('../../utils/qqmap-wx-jssdk.min.js')
+var qqmapsdk
+
+export default class MyAddress extends wepy.page {
+  config = {
+    navigationBarTitleText: '我的地址',
+    navigationBarBackgroundColor: '#FFFFFF',
+    navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+    backgroundColor: '', // 窗口的背景色
+    backgroundTextStyle: 'light', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+    enablePullDownRefresh: false, // 是否开启下拉刷新
+    disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+    onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+  }
+
+  components = {
+    
+  }
+
+  // 引入混合
+  mixins = [baseMixin]
+
+  data = {
+    distribution: true,
+    addressList: null,
+    pickerList: null,
+    xianboxList: null,
+    toSelect: false,
+    selectedAddress: null,
+    selectedPicker: null,
+    from: null,
+    addressPage: 0,
+    pickerPage: 0,
+    pageSize: 20
+  }
+
+  computed = {
+  }
+
+  events = {}
+
+  watch = {
+  }
+
+  methods = {
+    change: function (e) {
+      if ((e.currentTarget.id === 'distribution' && !this.distribution) || (e.currentTarget.id === 'take' && this.distribution)) {
+        this.distribution = !this.distribution
+      }
+    },
+    selectAddress: function (e) {
+      var that = this
+      const { globalData } = this.$parent
+      this.addressList.forEach(function (i) {
+        if (i._id === e.currentTarget.id) {
+          globalData.location.landmark = i.detail// + i.unitNumber
+          globalData.location.coordinate.lat = i.coordinate.lat
+          globalData.location.coordinate.lng = i.coordinate.lng
+          globalData.location.province = i.province
+          globalData.addressId = i._id
+          globalData.pickerId = ''
+          // globalData.boxId
+          that.calculateDistance(i.coordinate.lat, i.coordinate.lng)
+        }
+      })
+    },
+    selectPicker: function (e) {
+      var that = this
+      const { globalData } = this.$parent
+      this.pickerList.forEach(function (i) {
+        if (i._id === e.currentTarget.id) {
+          globalData.location.landmark = '自提：鲜库·' + i.boxInfo.name
+          globalData.location.coordinate.lat = i.boxInfo.lat
+          globalData.location.coordinate.lng = i.boxInfo.lng
+          globalData.location.province = i.boxInfo.location[0]
+          globalData.sendWay = 'pick'
+          globalData.boxId = i.boxId
+          globalData.addressId = ''
+          globalData.pickerId = i._id
+          globalData.isExpress = false
+        }
+      })
+      wx.navigateBack({
+        delta: 1
+      })
+      // wx.redirectTo({
+      //   url: '/pages/'+that.from
+      // })
+    }
+  }
+  calculateDistance(lat, lng) {
+    var that = this
+    const { globalData } = this.$parent
+    var distanceList = []
+    this.xianboxList.forEach(function (i) {
+      var temp = {}
+      temp.id = i._id
+      temp['latitude'] = i.lat * 1
+      temp['longitude'] = i.lng * 1
+      temp.deliveryRange = i.deliveryRange * 1
+      distanceList.push(temp)
+    })
+    distanceList = distanceList.filter(function (i) {
+      return utility.caculateDistance({ startLng: lng, startLat: lat, endLng: i.longitude, endLat: i.latitude }) <= i.deliveryRange
+    })
+    if (distanceList.length === 0) {
+      globalData.boxId = 'BJ0001'
+      globalData.sendWay = 'express'
+      globalData.isExpress = true
+      wx.navigateBack({
+        delta: 1
+      })
+      // wx.redirectTo({
+      //   url: '/pages/'+that.from
+      // })
+    } else {
+      qqmapsdk.calculateDistance({
+        mode: 'walking',
+        from: {
+          latitude: lat,
+          longitude: lng
+        },
+        to: distanceList,
+        success: function(res) {
+          var result = res.result.elements
+          distanceList.forEach(function (i) {
+            result.forEach(function (j) {
+              if (Math.abs(i.latitude - j.to.lat) < 0.00001 && Math.abs(i.longitude - j.to.lng) < 0.00001) {
+                i.distance = j.distance
+              }
+            })
+          })
+          var success = distanceList.filter(function (i) {
+            return i.deliveryRange * 1000 - i.distance >= 0
+          })
+          if (success.length === 0) {
+            globalData.boxId = 'BJ0001'
+            globalData.sendWay = 'express'
+            globalData.isExpress = true
+          } else {
+            // 排序取distance最小的
+            globalData.boxId = success[0].id
+            globalData.sendWay = 'send'
+            globalData.isExpress = false
+          }
+          wx.navigateBack({
+            delta: 1
+          })
+          // wx.redirectTo({
+          //   url: '/pages/'+that.from
+          // })
+        },
+        fail: function(res) {
+        },
+        complete: function(res) {
+        }
+      })
+    }
+  }
+  async init() {
+    var that = this
+    var userId = this.$parent.globalData.userId || this.$parent.globalData.userInfo.userId || wx.getStorageSync('userId')
+    const getXianbox = await api.chooseAddress.getXianbox({
+      method: 'GET',
+      query: {
+        current: 0,
+        pageSize: 20
+      }
+    })
+    const getUserAddress = await api.chooseAddress.getUserAddress({
+      method: 'GET',
+      query: {
+        userId: userId,
+        current: 0,
+        pageSize: that.pageSize
+      }
+    })
+    const getUserPicker = await api.chooseAddress.getUserPicker({
+      method: 'GET',
+      query: {
+        userId: userId,
+        current: 0,
+        pageSize: that.pageSize
+      }
+    })
+    this.xianboxList = getXianbox.data
+    this.addressList = getUserAddress.data
+    this.pickerList = getUserPicker.data
+    this.$apply()
+  }
+  async onLoad(options) {
+    qqmapsdk = new QQMapWX({
+      key: 'SATBZ-RDSWW-YDDR3-RZAAP-ZGCVJ-WRFT3'
+    })
+    this.from = options.from
+    this.init()
+    if (options.from === 'confirmOrder') {
+      this.toSelect = true
+      if (!this.addressList && !this.pickerList) {
+        wepy.setNavigationBarTitle({
+          title: '新增收货地址'
+        })
+      } else {
+        wepy.setNavigationBarTitle({
+          title: '选择收货地址'
+        })
+      }
+      
+    }
+    this.selectedAddress = this.$parent.globalData.addressId
+    this.selectedPicker = this.$parent.globalData.pickerId
+  }
+
+  async onShow () {
+    this.init()
+  }
+
+  async onHide () {
+    wepy.removeStorageSync('picker')
+  }
+  onPullDownRefresh (){
+    wx.startPullDownRefresh()
+    this.init()
+    wx.stopPullDownRefresh()
+  }
+  onReachBottom (){
+
+  }
+  // 设置转发参数
+  onShareAppMessage (res) {
+    return {
+      title: this.shareTitle,
+      path: 'pages/home',
+      imageUrl: this.shareImage,
+      success: function(res) {
+        // 转发成功
+        console.log('转发成功 curry', res)
+      },
+      fail: function(res) {
+        // 转发失败
+      },
+      complete: function (res) {
+
+      }
+    }
+  }
+}
+</script>
+

@@ -1,0 +1,57 @@
+<style lang="less">
+.outer{
+  margin-top: 20rpx;
+}
+</style>
+<template>
+  <view class="productInfo outer">
+    <ProductDetail :btn="btn" :coupon="coupon"></ProductDetail>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import baseMixin from '../mixins/base'
+  import ProductDetail from '../components/productDetail'
+
+  export default class productInfo extends wepy.page {
+    config = {
+      navigationBarTitleText: '退款进度',
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持 black/white
+      backgroundTextStyle: 'dark', // 下拉背景字体、loading 图的样式，仅支持 dark/light
+      enablePullDownRefresh: false, // 是否开启下拉刷新
+      disableScroll: false, // 设置为 true 则页面整体不能上下滚动
+      onReachBottomDistance: 50 // 页面上拉触底事件触发时距页面底部距离，单位为px
+    }
+
+    components = {
+      ProductDetail
+    }
+
+    // 引入混合
+    mixins = [baseMixin]
+
+    data = {
+      btn: '查看详情',
+      coupon: '现金券不可用'
+    }
+
+    computed = {
+    }
+
+    events = {
+    }
+
+    watch = {
+    }
+
+    methods = {
+    }
+
+    onLoad(params) {
+     
+    }
+
+  }
+</script>
+
